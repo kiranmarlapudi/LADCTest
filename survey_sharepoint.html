@@ -108,6 +108,54 @@ body {
   margin-top: 12px;
 }
 
+/* ── INSTRUCTIONS PAGE ── */
+.instructions-card {
+  background: var(--surface);
+  border-radius: 4px;
+  box-shadow: var(--shadow-card);
+  padding: 28px 32px;
+  margin-bottom: 16px;
+  border-left: 5px solid var(--ms-purple);
+}
+.instructions-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+.instructions-card ol {
+  padding-left: 20px;
+  margin-bottom: 16px;
+  line-height: 1.8;
+  color: var(--text-subtle);
+}
+.instructions-card ol li {
+  margin-bottom: 8px;
+}
+.checkbox-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: var(--ms-blue-light);
+  border-radius: 4px;
+  border: 1px solid #C7E0F4;
+}
+.checkbox-confirm input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--ms-blue);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.checkbox-confirm label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+
 /* ── QUESTION CARD ── */
 .ms-question {
   background: var(--surface); border-radius: 4px; box-shadow: var(--shadow-card);
@@ -378,7 +426,41 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
   <button class="ms-btn" id="demoNextBtn" onclick="submitDemographics()">Next ›</button>
 </div>
 
-<!-- Pages 2–19 built by JS -->
+<!-- ═══ PAGE 2 — INSTRUCTIONS ═══ -->
+<div class="page" id="page-2">
+  <div class="ms-card">
+    <div class="ms-card-accent"></div>
+    <div class="ms-card-body">
+      <div class="ms-card-title">Before You Begin</div>
+      <div class="ms-card-desc">Please read these instructions carefully. They explain what will happen during the survey.</div>
+    </div>
+  </div>
+
+  <div class="instructions-card">
+    <h3>What to Expect</h3>
+    <ol>
+      <li><strong>You will view 9 images one at a time.</strong> Each image will be displayed for <strong>20 seconds</strong>. Observe it carefully — you cannot go back once the time is up.</li>
+      <li><strong>After each image, you'll write a narrative response.</strong> Describe what you observed, what the image made you think or feel, and any associations it brought to mind.</li>
+      <li><strong>Your narrative should be at least 350 characters</strong> for the best results. You can proceed earlier once you reach this target.</li>
+      <li><strong>If you haven't reached 350 characters,</strong> a 3-minute timer will run. You can continue after the timer ends <em>provided you've written at least 150 characters</em>.</li>
+      <li><strong>You cannot go back to previous pages.</strong> Once you advance, your response is final for that image.</li>
+      <li><strong>Pasting text is disabled.</strong> Please type your responses naturally.</li>
+      <li><strong>Your responses are anonymous</strong> and will be used for research purposes only.</li>
+    </ol>
+  </div>
+
+  <div class="ms-question">
+    <div class="checkbox-confirm">
+      <input type="checkbox" id="instructionsCheckbox" onchange="toggleBeginButton()">
+      <label for="instructionsCheckbox">I have read and understood the instructions. I am ready to begin the survey.</label>
+    </div>
+    <div class="submit-area" style="margin-top:16px;">
+      <button class="ms-btn" id="beginBtn" disabled onclick="startImageSequence()">Begin ›</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pages 3–19 built by JS (images + narratives) -->
 
 <!-- ═══ PAGE 20 — THANK YOU ═══ -->
 <div class="page" id="page-20">
@@ -435,7 +517,7 @@ const IMAGE_SECS      = 20;
 const NARRATIVE_SECS  = 180;
 const NARRATIVE_CHARS = 350;
 const MIN_CHARS_TIMER = 150;
-const TOTAL_PAGES     = 19;
+const TOTAL_PAGES     = 20;   // added instructions page
 
 /* ═══════════════════════════════════════════════════
    GLOBAL STATE
@@ -454,8 +536,8 @@ let pagesReady = false;
     const body = document.body;
 
     for (let i = 0; i < 9; i++) {
-      const imgPageN = 2 + i * 2;
-      const narPageN = 3 + i * 2;
+      const imgPageN = 3 + i * 2;   // first image page is page 3
+      const narPageN = 4 + i * 2;
 
       /* ── Image Page ── */
       const imgPage = document.createElement("div");
@@ -468,7 +550,6 @@ let pagesReady = false;
             <div style="font-size:12px;color:var(--text-subtle);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Image ${i+1} of 9</div>
             <div class="ms-card-title" style="font-size:20px;">${IMAGE_LABELS[i]}</div>
             <div class="image-callout">👁️ <strong>Please observe this image carefully.</strong> You will write a narrative response about it on the next screen.</div>
-            <!-- Visual warning added here -->
             <div class="visual-warning">
               <span style="font-size:16px;">⚠️</span>
               <span><strong>Warning:</strong> The next page will require you to write a narrative response. Reflect on what you see, feel, and associate with this image. You cannot return to this image once you proceed.</span>
@@ -531,14 +612,14 @@ let pagesReady = false;
         </div>`;
       body.insertBefore(narPage, thankyou);
 
-      // Disable paste on this textarea
+      // Disable paste on narrative field
       const textarea = document.getElementById(`narrative-${i}`);
       if (textarea) {
         textarea.addEventListener('paste', (e) => e.preventDefault());
       }
     }
     pagesReady = true;
-    console.log("Survey pages built successfully. Pasting disabled on all narrative fields.");
+    console.log("Survey pages built. Pasting disabled on all narrative fields.");
   } catch (e) {
     console.error("buildPages failed:", e);
     pagesReady = false;
@@ -547,32 +628,25 @@ let pagesReady = false;
 })();
 
 /* ═══════════════════════════════════════════════════
-   IMAGE PRELOADER
+   IMAGE PRELOADER + INJECT
 ═══════════════════════════════════════════════════ */
 function preloadImages(srcArray) {
   const promises = srcArray.map(src => {
     return new Promise(resolve => {
       if (!src || !src.trim()) {
-        console.warn("Empty image URL, skipping.");
         resolve({ src, status: 'skipped' });
         return;
       }
       const img = new Image();
-      img.crossOrigin = 'anonymous'; // for GitHub raw URLs
+      img.crossOrigin = 'anonymous';
       img.onload = () => resolve({ src, status: 'loaded' });
-      img.onerror = () => {
-        console.warn("Image failed to preload:", src);
-        resolve({ src, status: 'failed' });
-      };
+      img.onerror = () => resolve({ src, status: 'failed' });
       img.src = src;
     });
   });
   return Promise.all(promises);
 }
 
-/* ═══════════════════════════════════════════════════
-   INJECT IMAGES
-═══════════════════════════════════════════════════ */
 function injectImages() {
   IMAGE_SRCS.forEach((src, i) => {
     const frame = document.getElementById(`frame-${i}`);
@@ -594,7 +668,6 @@ function injectImages() {
     };
     img.onerror = () => {
       if (msgEl) msgEl.textContent = "Image could not be loaded. Check the URL.";
-      console.error("Image load error:", src);
     };
     img.src = src;
   });
@@ -611,7 +684,7 @@ function showPage(n) {
   const target = document.getElementById(`page-${n}`);
   if (!target) {
     console.error(`Page ${n} is missing.`);
-    alert(`Error: Page ${n} not found. The survey may be misconfigured.`);
+    alert(`Error: Page ${n} not found.`);
     return;
   }
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -619,7 +692,12 @@ function showPage(n) {
   currentPage = n;
   const pct = ((n - 1) / TOTAL_PAGES * 100).toFixed(1);
   document.getElementById("progressFill").style.width = pct + "%";
-  document.getElementById("progressText").textContent = `Question ${n - 1} of ${TOTAL_PAGES}`;
+  // Progress text: page 2 is instructions, image pages (3‑19) count from 1
+  let displayText;
+  if (n === 2) displayText = "Instructions";
+  else if (n >= 3 && n <= 19) displayText = `Question ${n - 2} of 19`;
+  else displayText = `Question ${n - 1} of ${TOTAL_PAGES}`;
+  document.getElementById("progressText").textContent = displayText;
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -673,22 +751,30 @@ async function submitDemographics() {
   responses.timestamps.start = new Date().toISOString();
 
   try {
-    console.log("Preloading images…");
-    const results = await preloadImages(IMAGE_SRCS);
-    const failed = results.filter(r => r.status === 'failed');
-    if (failed.length) {
-      console.warn(`${failed.length} image(s) failed to preload.`);
-    }
+    await preloadImages(IMAGE_SRCS);
     injectImages();
   } catch (err) {
     console.error("Image preload error:", err);
     injectImages();
   }
 
-  showPage(2);
-  startImageTimer(0);
+  showPage(2);   // Go to instructions page
   btn.disabled = false;
   btn.textContent = "Next ›";
+}
+
+/* ═══════════════════════════════════════════════════
+   INSTRUCTIONS CHECKBOX & START
+═══════════════════════════════════════════════════ */
+function toggleBeginButton() {
+  const checkbox = document.getElementById("instructionsCheckbox");
+  const btn = document.getElementById("beginBtn");
+  btn.disabled = !checkbox.checked;
+}
+
+function startImageSequence() {
+  showPage(3);
+  startImageTimer(0);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -699,10 +785,7 @@ function startImageTimer(idx) {
   const arc = document.getElementById(`ringArc-${idx}`);
   const numEl = document.getElementById(`ringNum-${idx}`);
   const txtEl = document.getElementById(`ringNumText-${idx}`);
-  if (!arc || !numEl) {
-    console.error("Timer elements missing for image", idx);
-    return;
-  }
+  if (!arc || !numEl) return;
   const circ = 2 * Math.PI * 30;
   let rem = IMAGE_SECS;
   arc.style.strokeDashoffset = "0";
@@ -716,14 +799,14 @@ function startImageTimer(idx) {
     arc.style.strokeDashoffset = ((1 - rem / IMAGE_SECS) * circ).toFixed(2);
     if (rem <= 0) {
       clearInterval(imgTimers[idx]);
-      showPage(3 + idx * 2);
+      showPage(4 + idx * 2);
       startNarrativeTimer(idx);
     }
   }, 1000);
 }
 
 /* ═══════════════════════════════════════════════════
-   NARRATIVE TIMER + CHARACTER TRACKING
+   NARRATIVE TIMER + UNLOCK
 ═══════════════════════════════════════════════════ */
 const narState = {};
 function startNarrativeTimer(idx) {
@@ -754,14 +837,12 @@ function onInput(idx) {
   if (!textarea) return;
   const n = textarea.value.length;
   const metFull = n >= NARRATIVE_CHARS;
-
   document.getElementById(`charInfoTxt-${idx}`).textContent = `${n} characters`;
   document.getElementById(`charInfo-${idx}`).className = `char-info${metFull ? " met" : ""}`;
   document.getElementById(`charPillTxt-${idx}`).textContent = `${n} / ${NARRATIVE_CHARS} characters`;
   const charPill = document.getElementById(`charPill-${idx}`);
   if (metFull) charPill.classList.add("done");
   else charPill.classList.remove("done");
-
   if (narState[idx]) {
     narState[idx].charsDone = metFull;
     checkUnlock(idx);
@@ -775,16 +856,11 @@ function checkUnlock(idx) {
   const charCount = textarea ? textarea.value.length : 0;
   const btn = document.getElementById(`narBtn-${idx}`);
   const hint = document.getElementById(`hint-${idx}`);
-
   const canProceed = charsDone || (timeDone && charCount >= MIN_CHARS_TIMER);
   btn.disabled = !canProceed;
-
   if (hint) {
-    if (timeDone && charCount < MIN_CHARS_TIMER) {
-      hint.classList.add("visible");
-    } else {
-      hint.classList.remove("visible");
-    }
+    if (timeDone && charCount < MIN_CHARS_TIMER) hint.classList.add("visible");
+    else hint.classList.remove("visible");
   }
 }
 
@@ -792,7 +868,6 @@ function submitNarrative(idx) {
   const text = document.getElementById(`narrative-${idx}`).value;
   const elapsed = narState[idx] ? Math.round((Date.now() - narState[idx].t0) / 1000) : 0;
   if (narState[idx]?.iv) clearInterval(narState[idx].iv);
-
   responses.narratives[idx] = {
     imageNumber: idx + 1,
     imageLabel:  IMAGE_LABELS[idx],
@@ -801,9 +876,8 @@ function submitNarrative(idx) {
     timeSpentSeconds: elapsed,
     submittedAt: new Date().toISOString(),
   };
-
   if (idx < 8) {
-    showPage(4 + idx * 2);
+    showPage(5 + idx * 2);  // next image page (image idx+1)
     startImageTimer(idx + 1);
   } else {
     finishSurvey();
@@ -811,24 +885,25 @@ function submitNarrative(idx) {
 }
 
 /* ═══════════════════════════════════════════════════
-   MICROSOFT FORMS SUBMISSION
+   GOOGLE APPS SCRIPT SUBMISSION
 ═══════════════════════════════════════════════════ */
-const FORMS_POST_URL = "https://forms.guest.usercontent.microsoft/formapi/api/29bebd42-f1ff-4c3d-9688-067e3460dc1f/users/f7345359-82f2-4923-ab53-9b788e1bb7e9/forms('Qr2-Kf_xPUyWiAZ-NGDcH1lTNPfygiNJq1ObeI4bt-lUREtNMDZCUERCUFZVRzVTTEFNNlJOMDFQNS4u')/responses";
-const FORMS_QUESTION_ID = "rfce8eeffc7104b03a328256205242974";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/a/macros/bm.iitr.ac.in/s/AKfycbzYtkwCHP40jQF2Px3ZJ-98BzLOCvAfKc2PO6Ix6QuQbF-YWAFGAZu4c5KBSFGUpejXdw/exec";
 
-async function saveToForms() {
-  const body = {
-    [FORMS_QUESTION_ID]: JSON.stringify(responses, null, 2)
-  };
-  const r = await fetch(FORMS_POST_URL, {
+async function saveToGoogle() {
+  const r = await fetch(GOOGLE_SCRIPT_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
+    body: JSON.stringify(responses)
   });
   if (!r.ok) {
     const errText = await r.text();
-    throw new Error(`Forms submission failed (${r.status}): ${errText}`);
+    throw new Error(`Submission failed (${r.status}): ${errText}`);
   }
+  const result = await r.json();
+  if (result.status === "error") {
+    throw new Error(result.message);
+  }
+  return result;
 }
 
 async function finishSurvey() {
@@ -841,12 +916,12 @@ async function finishSurvey() {
   document.getElementById("overlay").classList.add("active");
 
   try {
-    await saveToForms();
+    await saveToGoogle();
     document.getElementById("overlay").classList.remove("active");
     document.getElementById("submitStatus").innerHTML =
       `<span class="status-badge ok">✓ Response saved successfully</span>`;
   } catch (err) {
-    console.error("Forms submission error:", err);
+    console.error("Google submission error:", err);
     document.getElementById("overlay").classList.remove("active");
     document.getElementById("submitStatus").innerHTML =
       `<span class="status-badge fail">⚠ Could not save automatically. Please download your response below and share it manually.</span>
