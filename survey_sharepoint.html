@@ -751,14 +751,7 @@ async function submitDemographics() {
   responses.timestamps.start = new Date().toISOString();
 
   try {
-    await preloadImages(IMAGE_SRCS);
-    injectImages();
-  } catch (err) {
-    console.error("Image preload error:", err);
-    injectImages();
-  }
-
-  showPage(2);   // Go to instructions page
+  showPage(2);
   btn.disabled = false;
   btn.textContent = "Next ›";
 }
