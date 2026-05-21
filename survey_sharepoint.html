@@ -214,7 +214,7 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
 }
 .ty-icon svg { width:30px; height:30px; stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
 .response-id { font-size:12px; color:var(--text-subtle); margin-top:12px; font-family:monospace; }
-.btn-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+.btn-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; justify-content:center; }
 .status-badge {
   display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:99px;
   font-size:12px; font-weight:600;
@@ -269,7 +269,7 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
     </div>
   </div>
 
-  <!-- DEMOGRAPHICS FIELDS (updated as requested) -->
+  <!-- DEMOGRAPHICS FIELDS (reordered: Email before Facilitator Code) -->
   <div class="ms-question">
     <div class="ms-question-label">Full Name <span class="ms-required">*</span></div>
     <input type="text" id="d_name" placeholder="Enter your full name">
@@ -322,20 +322,21 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
       </select>
       <div class="field-error" id="err_section">Please select your section.</div>
     </div>
+    <!-- Email now appears before Facilitator Code -->
     <div class="ms-question">
-      <div class="ms-question-label">LADC Facilitator Code <span class="ms-required">*</span></div>
-      <input type="text" id="d_fac_code" placeholder="Numeric code only" pattern="[0-9]+">
-      <div class="field-error" id="err_fac_code">Please enter a valid numeric code.</div>
+      <div class="ms-question-label">Your Manipal Email Address <span class="ms-required">*</span></div>
+      <input type="email" id="d_email" placeholder="you@manipal.edu">
+      <div class="field-error" id="err_email">Please enter a valid Manipal email address.</div>
     </div>
   </div>
 
   <div class="ms-question">
-    <div class="ms-question-label">Your Manipal Email Address <span class="ms-required">*</span></div>
-    <input type="email" id="d_email" placeholder="you@manipal.edu">
-    <div class="field-error" id="err_email">Please enter a valid Manipal email address.</div>
+    <div class="ms-question-label">LADC Facilitator Code <span class="ms-required">*</span></div>
+    <input type="text" id="d_fac_code" placeholder="Numeric code only" pattern="[0-9]+">
+    <div class="field-error" id="err_fac_code">Please enter a valid numeric code.</div>
   </div>
 
-  <!-- IMPORTANT INSTRUCTIONS (updated) -->
+  <!-- IMPORTANT INSTRUCTIONS -->
   <div class="instructions-card">
     <h3>Important</h3>
     <ol>
@@ -371,10 +372,8 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
       </div>
       <div id="submitStatus" style="margin-top:16px;"></div>
       <div class="response-id" id="responseIdDisplay"></div>
-      <div class="btn-row" style="justify-content:center;">
+      <div class="btn-row">
         <button class="ms-btn" id="emailCopyBtn" onclick="sendEmailCopy()">📧 Send a copy to my email</button>
-        <button class="ms-btn ms-btn-outline" onclick="downloadJSON()">⬇ Download JSON</button>
-        <button class="ms-btn ms-btn-outline" onclick="downloadCSV()">⬇ Download CSV</button>
       </div>
     </div>
   </div>
@@ -411,6 +410,32 @@ const NARRATIVE_CHARS = 350;
 const MIN_CHARS_TIMER = 150;
 const TOTAL_PAGES     = 20;
 
+/* ═══════════════════════════════════════════════════
+   GOOGLE FORM MAPPING (only required fields)
+   ═══════════════════════════════════════════════════ */
+const FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSexdAHtEGKGfIFEYz99eMHP5ciDEwO2WH8uW_HC-BhEgs9wTA/formResponse";
+
+const FORM_FIELDS = {
+  name:           "entry.1205258635",
+  age:            "entry.1080019585",
+  gender:         "entry.1080022877",
+  rollNumber:     "entry.6088538",
+  batch:          "entry.1877425387",
+  section:        "entry.115958953",
+  facilitatorCode:"entry.2021172452",
+  email:          "entry.644166367",
+  // Narratives (only the text, no chars/secs/submitted)
+  n1_text:        "entry.907510778",
+  n2_text:        "entry.1627219098",
+  n3_text:        "entry.1397793827",
+  n4_text:        "entry.252200043",
+  n5_text:        "entry.378787329",
+  n6_text:        "entry.204104886",
+  n7_text:        "entry.716914662",
+  n8_text:        "entry.1773230758",
+  n9_text:        "entry.1829606907",
+};
+
 let currentPage = 1;
 const sessionId = crypto.randomUUID ? crypto.randomUUID() : `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const responses = { sessionId, demographics: {}, narratives: [], timestamps: { start: null, end: null } };
@@ -428,7 +453,7 @@ let pagesReady = false;
       const imgPageN = 2 + i * 2;
       const narPageN = 3 + i * 2;
 
-      /* ── Image Page (without visual warning) ── */
+      /* ── Image Page ── */
       const imgPage = document.createElement("div");
       imgPage.className = "page";
       imgPage.id = `page-${imgPageN}`;
@@ -463,7 +488,7 @@ let pagesReady = false;
         </div>`;
       body.insertBefore(imgPage, thankyou);
 
-      /* ── Narrative Page (updated description) ── */
+      /* ── Narrative Page ── */
       const narPage = document.createElement("div");
       narPage.className = "page";
       narPage.id = `page-${narPageN}`;
@@ -587,8 +612,8 @@ async function submitDemographics() {
   const roll = document.getElementById("d_roll").value.trim();
   const batch = document.getElementById("d_batch").value;
   const section = document.getElementById("d_section").value;
-  const facCode = document.getElementById("d_fac_code").value.trim();
   const email = document.getElementById("d_email").value.trim();
+  const facCode = document.getElementById("d_fac_code").value.trim();
   const confirmed = document.getElementById("instructionsCheckbox").checked;
 
   let ok = true;
@@ -600,8 +625,8 @@ async function submitDemographics() {
   showErr("err_roll", !roll);       if (!roll) ok = false;
   showErr("err_batch", !batch);     if (!batch) ok = false;
   showErr("err_section", !section); if (!section) ok = false;
-  showErr("err_fac_code", !facOk);  if (!facOk) ok = false;
   showErr("err_email", !email || !email.includes("@manipal.edu"));  if (!email || !email.includes("@manipal.edu")) ok = false;
+  showErr("err_fac_code", !facOk);  if (!facOk) ok = false;
   if (!confirmed) ok = false;
 
   const pageErr = document.getElementById("demo-error");
@@ -614,7 +639,7 @@ async function submitDemographics() {
 
   responses.demographics = {
     name, age: +age, gender, rollNumber: roll, batch, section,
-    facilitatorCode: facCode, email
+    email, facilitatorCode: facCode
   };
   responses.timestamps.start = new Date().toISOString();
 
@@ -734,23 +759,26 @@ function submitNarrative(idx) {
 }
 
 /* ═══════════════════════════════════════════════════
-   GOOGLE FORM SUBMISSION
+   GOOGLE FORM SUBMISSION (only required fields)
 ═══════════════════════════════════════════════════ */
-const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSexdAHtEGKGfIFEYz99eMHP5ciDEwO2WH8uW_HC-BhEgs9wTA/formResponse";
-const GOOGLE_ENTRY_ID = "entry.1205258635";
-
-function saveToGoogle() {
+function submitToGoogle(flatData) {
   return new Promise((resolve) => {
     const form = document.createElement("form");
     form.method = "POST";
-    form.action = GOOGLE_FORM_URL;
+    form.action = FORM_URL;
     form.target = "hidden_iframe";
     form.style.display = "none";
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = GOOGLE_ENTRY_ID;
-    input.value = JSON.stringify(responses, null, 2);
-    form.appendChild(input);
+
+    for (const [key, entryId] of Object.entries(FORM_FIELDS)) {
+      if (flatData.hasOwnProperty(key) && entryId) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = entryId;
+        input.value = flatData[key] == null ? "" : flatData[key];
+        form.appendChild(input);
+      }
+    }
+
     document.body.appendChild(form);
     const iframe = document.getElementById("hidden_iframe");
     const onLoad = () => {
@@ -770,14 +798,32 @@ function saveToGoogle() {
 
 async function finishSurvey() {
   responses.timestamps.end = new Date().toISOString();
-  showPage(20);
 
+  const d = responses.demographics;
+  const flat = {
+    name:           d.name,
+    age:            d.age,
+    gender:         d.gender,
+    rollNumber:     d.rollNumber,
+    batch:          d.batch,
+    section:        d.section,
+    email:          d.email,
+    facilitatorCode:d.facilitatorCode,
+  };
+
+  // Add only narrative texts (n1_text ... n9_text)
+  for (let i = 0; i < 9; i++) {
+    const n = responses.narratives[i] || {};
+    flat[`n${i+1}_text`] = n.narrative || "";
+  }
+
+  showPage(20);
   document.getElementById("responseIdDisplay").textContent = `Response ID: ${responses.sessionId}`;
   document.getElementById("overlayMsg").textContent = "Saving your response…";
   document.getElementById("overlay").classList.add("active");
 
   try {
-    await saveToGoogle();
+    await submitToGoogle(flat);
     document.getElementById("overlay").classList.remove("active");
     document.getElementById("submitStatus").innerHTML =
       `<span class="status-badge ok">✓ Response saved successfully</span>`;
@@ -785,40 +831,18 @@ async function finishSurvey() {
     console.error(err);
     document.getElementById("overlay").classList.remove("active");
     document.getElementById("submitStatus").innerHTML =
-      `<span class="status-badge fail">⚠ Could not save automatically. Please download your response below or send a copy via email.</span>`;
+      `<span class="status-badge fail">⚠ Could not save automatically. Please use the email button to send a copy.</span>`;
   }
 }
 
 /* ═══════════════════════════════════════════════════
-   EMAIL COPY & EXPORT
+   EMAIL COPY
 ═══════════════════════════════════════════════════ */
 function sendEmailCopy() {
   const email = responses.demographics.email || "";
   const subject = encodeURIComponent("TAT - Assessment 6 – Your Responses");
   const body = encodeURIComponent(JSON.stringify(responses, null, 2));
   window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-}
-
-function downloadJSON() {
-  const blob = new Blob([JSON.stringify(responses, null, 2)], { type: "application/json" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-  a.download = `tat_assessment_${responses.sessionId.slice(0,8)}.json`; a.click();
-}
-
-function downloadCSV() {
-  const d = responses.demographics;
-  const rows = [
-    ["session_id","name","age","gender","roll_number","batch","section","facilitator_code","email","start","end"],
-    [responses.sessionId, d.name, d.age, d.gender, d.rollNumber, d.batch, d.section, d.facilitatorCode, d.email, responses.timestamps.start, responses.timestamps.end],
-    [],
-    ["image_number","image_label","character_count","time_spent_seconds","submitted_at","narrative"],
-  ];
-  responses.narratives.forEach(n => {
-    rows.push([n.imageNumber, n.imageLabel, n.characterCount, n.timeSpentSeconds, n.submittedAt, `"${(n.narrative||"").replace(/"/g,'""')}"`]);
-  });
-  const blob = new Blob([rows.map(r=>r.join(",")).join("\n")], { type: "text/csv" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-  a.download = `tat_assessment_${responses.sessionId.slice(0,8)}.csv`; a.click();
 }
 </script>
 </body>
