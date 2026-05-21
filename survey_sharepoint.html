@@ -765,9 +765,24 @@ function toggleBeginButton() {
   btn.disabled = !checkbox.checked;
 }
 
-function startImageSequence() {
+async function startImageSequence() {
+  const beginBtn = document.getElementById("beginBtn");
+  beginBtn.disabled = true;
+  beginBtn.textContent = "Loading images…";
+
+  try {
+    await preloadImages(IMAGE_SRCS);
+    injectImages();
+  } catch (err) {
+    console.error("Image preload error:", err);
+    injectImages();
+  }
+
   showPage(3);
   startImageTimer(0);
+
+  beginBtn.disabled = false;
+  beginBtn.textContent = "Begin ›";
 }
 
 /* ═══════════════════════════════════════════════════
