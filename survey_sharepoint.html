@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Visual Narrative Survey</title>
+<title>TAT - Assessment 6</title>
 <style>
 /* ═══════════════════════════════════════════
    FLUENT UI / MICROSOFT FORMS DESIGN SYSTEM
@@ -40,7 +40,7 @@ body {
   min-height: 100vh;
 }
 
-/* ── MS FORMS HEADER ── */
+/* ── HEADER ── */
 .ms-header { background: var(--ms-purple); height: 6px; width: 100%; }
 .ms-banner {
   background: #fff; border-bottom: 1px solid var(--border);
@@ -77,84 +77,24 @@ body {
 }
 .ms-card-accent { height: 5px; background: var(--ms-purple); }
 .ms-card-body { padding: 28px 32px 32px; }
-
 .ms-card-title { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 6px; line-height: 1.25; }
 .ms-card-desc { font-size: 14px; color: var(--text-subtle); margin-bottom: 0; line-height: 1.6; }
 
-/* ── ATTENTION CALLOUT ── */
-.image-callout {
-  background: #FFF4CE;
-  border-left: 5px solid #FFD335;
-  padding: 12px 16px;
-  margin-top: 12px;
-  font-size: 15px;
-  line-height: 1.6;
-  color: #323130;
-  border-radius: 2px;
-}
-
-/* ── VISUAL WARNING ── */
-.visual-warning {
-  background: #FDE7E9;
-  border: 1px solid #F1707B;
-  color: #A4252A;
-  padding: 10px 14px;
-  border-radius: 2px;
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-/* ── INSTRUCTIONS AT BOTTOM OF DEMOGRAPHICS ── */
+/* ── INSTRUCTIONS CARD ── */
 .instructions-card {
-  background: var(--surface);
-  border-radius: 4px;
-  box-shadow: var(--shadow-card);
-  padding: 28px 32px;
-  margin-bottom: 16px;
-  border-left: 5px solid var(--ms-purple);
+  background: var(--surface); border-radius: 4px; box-shadow: var(--shadow-card);
+  padding: 28px 32px; margin-bottom: 16px; border-left: 5px solid var(--ms-purple);
 }
-.instructions-card h3 {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: var(--text);
-}
-.instructions-card ol {
-  padding-left: 20px;
-  margin-bottom: 16px;
-  line-height: 1.8;
-  color: var(--text-subtle);
-}
-.instructions-card ol li {
-  margin-bottom: 8px;
-}
+.instructions-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: var(--text); }
+.instructions-card ol { padding-left: 20px; margin-bottom: 16px; line-height: 1.8; color: var(--text-subtle); }
+.instructions-card ol li { margin-bottom: 8px; }
+
 .checkbox-confirm {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-top: 16px;
-  padding: 14px 16px;
-  background: var(--ms-blue-light);
-  border-radius: 4px;
-  border: 1px solid #C7E0F4;
+  display: flex; align-items: flex-start; gap: 12px; margin-top: 16px;
+  padding: 14px 16px; background: var(--ms-blue-light); border-radius: 4px; border: 1px solid #C7E0F4;
 }
-.checkbox-confirm input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--ms-blue);
-  margin-top: 2px;
-  flex-shrink: 0;
-}
-.checkbox-confirm label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  cursor: pointer;
-}
+.checkbox-confirm input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--ms-blue); margin-top: 2px; flex-shrink: 0; }
+.checkbox-confirm label { font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; }
 
 /* ── QUESTION CARD ── */
 .ms-question {
@@ -182,7 +122,7 @@ select {
 textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
 .input-error { border-color: var(--warn) !important; }
 
-/* ── RADIO / CHECKBOX ── */
+/* ── RADIO ── */
 .ms-choices { display: flex; flex-direction: column; gap: 6px; }
 .ms-choice {
   display: flex; align-items: center; gap: 10px; padding: 8px 10px;
@@ -190,10 +130,7 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
   transition: background .12s; font-size: 14px;
 }
 .ms-choice:hover { background: var(--ms-blue-light); border-color: #C7E0F4; }
-.ms-choice input[type="radio"], .ms-choice input[type="checkbox"] {
-  width: 16px; height: 16px; accent-color: var(--ms-blue); flex-shrink: 0;
-  border: none; box-shadow: none; padding: 0;
-}
+.ms-choice input[type="radio"] { width: 16px; height: 16px; accent-color: var(--ms-blue); flex-shrink: 0; }
 
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 @media (max-width: 500px) { .two-col { grid-template-columns: 1fr; } }
@@ -247,23 +184,17 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
 .char-info { display:flex; justify-content:space-between; margin-top:5px; font-size:12px; color:var(--text-subtle); }
 .char-info.met { color: var(--success); }
 .submit-area { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:16px; }
+.unlock-hint { font-size:12px; color:var(--text-subtle); margin-top:6px; display:none; }
+.unlock-hint.visible { display:block; }
 
-.unlock-hint {
-  font-size: 12px;
-  color: var(--text-subtle);
-  margin-top: 6px;
-  display: none;
-}
-.unlock-hint.visible { display: block; }
-
-/* ── ERROR MSG ── */
+/* ── ERROR / SUCCESS ── */
 .field-error { font-size:12px; color:var(--warn); margin-top:4px; display:none; }
 .page-error {
   background:#FDE7E9; border:1px solid #F1707B; border-radius:var(--radius);
   padding:10px 14px; font-size:13px; color:#A4252A; margin-bottom:12px; display:none;
 }
 
-/* ── SUBMISSION OVERLAY ── */
+/* ── OVERLAY ── */
 .overlay {
   position:fixed; inset:0; background:rgba(255,255,255,.85);
   display:none; flex-direction:column; align-items:center; justify-content:center;
@@ -283,11 +214,6 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
 }
 .ty-icon svg { width:30px; height:30px; stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
 .response-id { font-size:12px; color:var(--text-subtle); margin-top:12px; font-family:monospace; }
-.data-preview {
-  background:var(--bg); border:1px solid var(--border); border-radius:var(--radius);
-  padding:14px; font-size:12px; font-family:monospace; max-height:220px; overflow-y:auto;
-  white-space:pre-wrap; word-break:break-word; margin-top:16px; color:var(--text-subtle);
-}
 .btn-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
 .status-badge {
   display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:99px;
@@ -305,7 +231,7 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
   <span id="overlayMsg">Submitting your response…</span>
 </div>
 
-<!-- ══ MS HEADER ══ -->
+<!-- ══ HEADER ══ -->
 <div class="ms-header"></div>
 <div class="ms-banner">
   <div class="ms-banner-logo">
@@ -315,129 +241,113 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
       <rect x="5" y="9.25" width="10" height="1.5" rx=".75" fill="white"/>
       <rect x="5" y="12.5" width="6" height="1.5" rx=".75" fill="white"/>
     </svg>
-    Microsoft Forms
+    LADC-TAPMI BLR
   </div>
   <div class="ms-banner-sep"></div>
-  <span class="ms-banner-title">Visual Narrative Survey</span>
+  <span class="ms-banner-title">TAT - Assessment 6</span>
 </div>
 <div class="ms-progress">
   <div class="ms-progress-bar"><div class="ms-progress-fill" id="progressFill" style="width:0%"></div></div>
-  <span class="ms-progress-text" id="progressText">Question 0 of 19</span>
+  <span class="ms-progress-text" id="progressText"></span>
 </div>
 
-<!-- ═══ PAGE 1 — DEMOGRAPHICS ═══ -->
+<!-- ═══ PAGE 1 — DEMOGRAPHICS + INSTRUCTIONS ═══ -->
 <div class="page active" id="page-1">
   <div class="ms-card">
     <div class="ms-card-accent"></div>
     <div class="ms-card-body">
-      <div class="ms-card-title">Visual Narrative Survey</div>
+      <div class="ms-card-title">TAT - Assessment 6</div>
       <div class="ms-card-desc">
-        Thank you for participating. This survey asks you to view a series of images and write short narratives in response to each one. Please complete all demographic fields below, read the instructions, and tick the confirmation box before beginning.<br><br>
-        <strong>Note:</strong> Once you advance past each page you cannot return. Please read instructions carefully.
+        You will be shown a series of images and you have to write short narratives in response to each of the image. Please complete all demographic fields below, read the instructions, and tick the confirmation box before beginning.
       </div>
     </div>
   </div>
 
   <div class="ms-question">
     <div style="font-size:13px;color:var(--text-subtle);background:#FFF4CE;border:1px solid #FFD335;border-radius:2px;padding:8px 12px;margin-bottom:16px;">
-      ⚠️ <strong>Informed Consent:</strong> By completing this survey, you agree that your anonymous responses may be used for research purposes. You may close this page at any time to withdraw.
+      ⚠️ <strong>Informed Consent:</strong> By completing this survey, you agree that your anonymous responses may be used for academic and research purposes. You may close this page at any time to withdraw or contact the LADC point of contact.
     </div>
   </div>
 
-  <!-- DEMOGRAPHIC FIELDS -->
+  <!-- DEMOGRAPHICS FIELDS (updated as requested) -->
+  <div class="ms-question">
+    <div class="ms-question-label">Full Name <span class="ms-required">*</span></div>
+    <input type="text" id="d_name" placeholder="Enter your full name">
+    <div class="field-error" id="err_name">Please enter your full name.</div>
+  </div>
+
   <div class="two-col">
     <div class="ms-question">
       <div class="ms-question-label">Age <span class="ms-required">*</span></div>
-      <input type="number" id="d_age" min="18" max="99" placeholder="e.g. 28">
+      <input type="number" id="d_age" min="18" max="99" placeholder="e.g. 22">
       <div class="field-error" id="err_age">Please enter a valid age (18–99).</div>
     </div>
     <div class="ms-question">
-      <div class="ms-question-label">Gender Identity <span class="ms-required">*</span></div>
+      <div class="ms-question-label">Gender <span class="ms-required">*</span></div>
       <select id="d_gender">
         <option value="">Select an option</option>
-        <option>Man</option><option>Woman</option><option>Non-binary / Gender non-conforming</option>
-        <option>Genderqueer / Genderfluid</option><option>Transgender man</option><option>Transgender woman</option>
-        <option>Prefer to self-describe</option><option>Prefer not to say</option>
+        <option>Man</option>
+        <option>Woman</option>
+        <option>Other</option>
       </select>
       <div class="field-error" id="err_gender">Please select an option.</div>
     </div>
   </div>
 
-  <div class="ms-question">
-    <div class="ms-question-label">Ethnicity / Cultural Background <span class="ms-required">*</span></div>
-    <select id="d_ethnicity">
-      <option value="">Select an option</option>
-      <option>Asian / Asian Indian</option><option>Black / African / Caribbean</option><option>East Asian</option>
-      <option>Hispanic / Latino</option><option>Middle Eastern / North African</option>
-      <option>Mixed / Multiple ethnic groups</option><option>South Asian</option><option>Southeast Asian</option>
-      <option>White / European</option><option>Prefer to self-describe</option><option>Prefer not to say</option>
-    </select>
-    <div class="field-error" id="err_ethnicity">Please select an option.</div>
-  </div>
-
-  <div class="ms-question">
-    <div class="ms-question-label">Highest Level of Education Completed <span class="ms-required">*</span></div>
-    <select id="d_education">
-      <option value="">Select an option</option>
-      <option>Less than high school</option><option>High school diploma / GED</option>
-      <option>Some college, no degree</option><option>Associate degree</option><option>Bachelor's degree</option>
-      <option>Master's degree</option><option>Doctoral degree (PhD, EdD, etc.)</option>
-      <option>Professional degree (MD, JD, etc.)</option><option>Prefer not to say</option>
-    </select>
-    <div class="field-error" id="err_education">Please select an option.</div>
+  <div class="two-col">
+    <div class="ms-question">
+      <div class="ms-question-label">MAHE/TAPMI Enrollment/Roll No. <span class="ms-required">*</span></div>
+      <input type="text" id="d_roll" placeholder="e.g. 210911234">
+      <div class="field-error" id="err_roll">Please enter your enrollment/roll number.</div>
+    </div>
+    <div class="ms-question">
+      <div class="ms-question-label">Batch <span class="ms-required">*</span></div>
+      <select id="d_batch">
+        <option value="">Select your batch</option>
+        <option>BBA 2nd year</option>
+        <option>BBA 3rd year</option>
+        <option>MBA 1st year</option>
+      </select>
+      <div class="field-error" id="err_batch">Please select your batch.</div>
+    </div>
   </div>
 
   <div class="two-col">
     <div class="ms-question">
-      <div class="ms-question-label">Country of Residence <span class="ms-required">*</span></div>
-      <input type="text" id="d_country" placeholder="e.g. India">
-      <div class="field-error" id="err_country">Please enter your country.</div>
+      <div class="ms-question-label">Section <span class="ms-required">*</span></div>
+      <select id="d_section">
+        <option value="">Select your section</option>
+        <option>Sec A</option><option>Sec B</option><option>Sec C</option>
+        <option>Sec D</option><option>Sec E</option><option>Not applicable</option>
+      </select>
+      <div class="field-error" id="err_section">Please select your section.</div>
     </div>
     <div class="ms-question">
-      <div class="ms-question-label">Primary Language <span class="ms-required">*</span></div>
-      <input type="text" id="d_language" placeholder="e.g. English">
-      <div class="field-error" id="err_language">Please enter your primary language.</div>
+      <div class="ms-question-label">LADC Facilitator Code <span class="ms-required">*</span></div>
+      <input type="text" id="d_fac_code" placeholder="Numeric code only" pattern="[0-9]+">
+      <div class="field-error" id="err_fac_code">Please enter a valid numeric code.</div>
     </div>
   </div>
 
   <div class="ms-question">
-    <div class="ms-question-label">Employment Status <span class="ms-required">*</span></div>
-    <div class="ms-choices" id="d_employment">
-      <label class="ms-choice"><input type="radio" name="employment" value="Employed full-time"> Employed full-time</label>
-      <label class="ms-choice"><input type="radio" name="employment" value="Employed part-time"> Employed part-time</label>
-      <label class="ms-choice"><input type="radio" name="employment" value="Self-employed / Freelance"> Self-employed / Freelance</label>
-      <label class="ms-choice"><input type="radio" name="employment" value="Student"> Student</label>
-      <label class="ms-choice"><input type="radio" name="employment" value="Unemployed / Looking for work"> Unemployed / Looking for work</label>
-      <label class="ms-choice"><input type="radio" name="employment" value="Retired"> Retired</label>
-      <label class="ms-choice"><input type="radio" name="employment" value="Prefer not to say"> Prefer not to say</label>
-    </div>
-    <div class="field-error" id="err_employment">Please select an option.</div>
+    <div class="ms-question-label">Your Manipal Email Address <span class="ms-required">*</span></div>
+    <input type="email" id="d_email" placeholder="you@manipal.edu">
+    <div class="field-error" id="err_email">Please enter a valid Manipal email address.</div>
   </div>
 
-  <div class="ms-question">
-    <div class="ms-question-label">How often do you engage with visual art?</div>
-    <select id="d_arts">
-      <option value="">Select an option</option>
-      <option>Never</option><option>Rarely (a few times a year)</option><option>Sometimes (monthly)</option>
-      <option>Often (weekly)</option><option>Very often (daily)</option>
-    </select>
-  </div>
-
-  <!-- INSTRUCTIONS (now at bottom of demographics) -->
+  <!-- IMPORTANT INSTRUCTIONS (updated) -->
   <div class="instructions-card">
-    <h3>What to Expect</h3>
+    <h3>Important</h3>
     <ol>
-      <li><strong>You will view 9 images one at a time.</strong> Each image will be displayed for <strong>20 seconds</strong>. Observe it carefully — you cannot go back once the time is up.</li>
-      <li><strong>After each image, you'll write a narrative response.</strong> Describe what you observed, what the image made you think or feel, and any associations it brought to mind.</li>
-      <li><strong>Your narrative should be at least 350 characters</strong> for the best results. You can proceed earlier once you reach this target.</li>
-      <li><strong>If you haven't reached 350 characters,</strong> a 3-minute timer will run. You can continue after the timer ends <em>provided you've written at least 150 characters</em>.</li>
-      <li><strong>You cannot go back to previous pages.</strong> Once you advance, your response is final for that image.</li>
-      <li><strong>Pasting text is disabled.</strong> Please type your responses naturally.</li>
-      <li><strong>Your responses are anonymous</strong> and will be used for research purposes only.</li>
+      <li>You will be shown a series of images, one at a time. Pay attention to them and observe carefully. After each image, you will be asked to write a <strong>narrative story</strong> about the image shown. <strong>Do not describe the image</strong>; instead write a story around the associations this image brought to your mind, how it made you think or feel. <strong>Again, do not describe the image.</strong></li>
+      <li>You will be given <strong>3 minutes</strong> to write the story. Be as elaborate and creative as possible.</li>
+      <li>At times images may take a few seconds to load, hence be patient.</li>
+      <li>Once you start this assessment, there is no option to go back or forward. Focus on this activity and write the 9 stories.</li>
+      <li>Reach out to your LADC facilitator if you need any help.</li>
     </ol>
     <div class="checkbox-confirm">
       <input type="checkbox" id="instructionsCheckbox" onchange="toggleNextButton()">
-      <label for="instructionsCheckbox">I have read and understood the instructions. I am ready to begin the survey.</label>
+      <label for="instructionsCheckbox">I have read and understood the instructions. I am ready to begin the assessment.</label>
     </div>
   </div>
 
@@ -445,7 +355,7 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
   <button class="ms-btn" id="demoNextBtn" disabled onclick="submitDemographics()">Next ›</button>
 </div>
 
-<!-- Pages 2–19 built by JS (images + narratives) -->
+<!-- Pages 2–19 built by JS -->
 
 <!-- ═══ PAGE 20 — THANK YOU ═══ -->
 <div class="page" id="page-20">
@@ -461,16 +371,11 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
       </div>
       <div id="submitStatus" style="margin-top:16px;"></div>
       <div class="response-id" id="responseIdDisplay"></div>
-    </div>
-  </div>
-
-  <div class="ms-question">
-    <div class="ms-question-label">Your Response (Reference Copy)</div>
-    <div class="data-preview" id="finalDataBox"></div>
-    <div class="btn-row">
-      <button class="ms-btn" onclick="downloadJSON()">⬇ Download JSON</button>
-      <button class="ms-btn ms-btn-outline" onclick="downloadCSV()">⬇ Download CSV</button>
-      <button class="ms-btn ms-btn-outline" onclick="copyData()">Copy to Clipboard</button>
+      <div class="btn-row" style="justify-content:center;">
+        <button class="ms-btn" id="emailCopyBtn" onclick="sendEmailCopy()">📧 Send a copy to my email</button>
+        <button class="ms-btn ms-btn-outline" onclick="downloadJSON()">⬇ Download JSON</button>
+        <button class="ms-btn ms-btn-outline" onclick="downloadCSV()">⬇ Download CSV</button>
+      </div>
     </div>
   </div>
 </div>
@@ -480,7 +385,7 @@ textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
 
 <script>
 /* ═══════════════════════════════════════════════════
-   ██████  CONFIGURATION  ██████
+   CONFIGURATION
    ═══════════════════════════════════════════════════ */
 const IMAGE_SRCS = [
   "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image1.png",
@@ -500,16 +405,12 @@ const IMAGE_LABELS = [
   "Stimulus Image 7","Stimulus Image 8","Stimulus Image 9",
 ];
 
-/* ═══ TIMING & CONSTRAINTS ═══ */
 const IMAGE_SECS      = 20;
 const NARRATIVE_SECS  = 180;
 const NARRATIVE_CHARS = 350;
 const MIN_CHARS_TIMER = 150;
 const TOTAL_PAGES     = 20;
 
-/* ═══════════════════════════════════════════════════
-   GLOBAL STATE
-═══════════════════════════════════════════════════ */
 let currentPage = 1;
 const sessionId = crypto.randomUUID ? crypto.randomUUID() : `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 const responses = { sessionId, demographics: {}, narratives: [], timestamps: { start: null, end: null } };
@@ -524,10 +425,10 @@ let pagesReady = false;
     const body = document.body;
 
     for (let i = 0; i < 9; i++) {
-      const imgPageN = 2 + i * 2;   // first image is page 2
-      const narPageN = 3 + i * 2;   // first narrative is page 3
+      const imgPageN = 2 + i * 2;
+      const narPageN = 3 + i * 2;
 
-      /* ── Image Page ── */
+      /* ── Image Page (without visual warning) ── */
       const imgPage = document.createElement("div");
       imgPage.className = "page";
       imgPage.id = `page-${imgPageN}`;
@@ -537,11 +438,7 @@ let pagesReady = false;
           <div class="ms-card-body">
             <div style="font-size:12px;color:var(--text-subtle);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Image ${i+1} of 9</div>
             <div class="ms-card-title" style="font-size:20px;">${IMAGE_LABELS[i]}</div>
-            <div class="image-callout">👁️ <strong>Please observe this image carefully.</strong> You will write a narrative response about it on the next screen.</div>
-            <div class="visual-warning">
-              <span style="font-size:16px;">⚠️</span>
-              <span><strong>Warning:</strong> The next page will require you to write a narrative response. Reflect on what you see, feel, and associate with this image. You cannot return to this image once you proceed.</span>
-            </div>
+            <div class="image-callout">👁️ <strong>Please observe this image carefully.</strong> You will write a narrative story about it on the next screen.</div>
           </div>
         </div>
         <div class="ms-question">
@@ -561,12 +458,12 @@ let pagesReady = false;
               <div class="ring-label" id="ringNum-${i}">${IMAGE_SECS}</div>
             </div>
             <div class="countdown-note">Advancing automatically in <strong id="ringNumText-${i}">${IMAGE_SECS}</strong> seconds. Please stay on this page.</div>
-            <div class="image-callout" style="margin-top:12px;">👁️ <strong>Please observe this image carefully.</strong> You will write a narrative response about it on the next screen.</div>
+            <div class="image-callout" style="margin-top:12px;">👁️ <strong>Please observe this image carefully.</strong> You will write a narrative story about it on the next screen.</div>
           </div>
         </div>`;
       body.insertBefore(imgPage, thankyou);
 
-      /* ── Narrative Page ── */
+      /* ── Narrative Page (updated description) ── */
       const narPage = document.createElement("div");
       narPage.className = "page";
       narPage.id = `page-${narPageN}`;
@@ -576,7 +473,7 @@ let pagesReady = false;
           <div class="ms-card-body">
             <div style="font-size:12px;color:var(--text-subtle);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Response ${i+1} of 9</div>
             <div class="ms-card-title" style="font-size:20px;">Write Your Narrative</div>
-            <div class="ms-card-desc">Describe what you observed, what the image made you think or feel, and any associations it brought to mind.</div>
+            <div class="ms-card-desc">Write a story around the associations this image brought to your mind. Be as creative and elaborate as possible. <strong>Do not describe the image.</strong></div>
           </div>
         </div>
         <div class="ms-question">
@@ -591,7 +488,7 @@ let pagesReady = false;
             </div>
           </div>
           <div class="ms-question-label">Your narrative <span class="ms-required">*</span></div>
-          <textarea id="narrative-${i}" rows="9" placeholder="Begin writing your response here…" oninput="onInput(${i})"></textarea>
+          <textarea id="narrative-${i}" rows="9" placeholder="Begin writing your story here…" oninput="onInput(${i})"></textarea>
           <div class="char-info" id="charInfo-${i}"><span id="charInfoTxt-${i}">0 characters</span><span>${NARRATIVE_CHARS} target</span></div>
           <div class="submit-area">
             <button class="ms-btn" id="narBtn-${i}" disabled onclick="submitNarrative(${i})">Next ›</button>
@@ -600,39 +497,31 @@ let pagesReady = false;
         </div>`;
       body.insertBefore(narPage, thankyou);
 
-      // Disable paste on narrative field
       const textarea = document.getElementById(`narrative-${i}`);
-      if (textarea) {
-        textarea.addEventListener('paste', (e) => e.preventDefault());
-      }
+      if (textarea) textarea.addEventListener('paste', (e) => e.preventDefault());
     }
     pagesReady = true;
-    console.log("Survey pages built. Pasting disabled on all narrative fields.");
   } catch (e) {
-    console.error("buildPages failed:", e);
+    console.error(e);
     pagesReady = false;
-    alert("Survey page structure could not be created. Please check the configuration and reload the page.");
+    alert("Survey page structure could not be created. Please reload the page.");
   }
 })();
 
 /* ═══════════════════════════════════════════════════
-   IMAGE PRELOADER + INJECT
+   IMAGE PRELOAD + INJECT
 ═══════════════════════════════════════════════════ */
 function preloadImages(srcArray) {
-  const promises = srcArray.map(src => {
+  return Promise.all(srcArray.map(src => {
     return new Promise(resolve => {
-      if (!src || !src.trim()) {
-        resolve({ src, status: 'skipped' });
-        return;
-      }
+      if (!src || !src.trim()) return resolve({ src, status:'skipped' });
       const img = new Image();
       img.crossOrigin = 'anonymous';
-      img.onload = () => resolve({ src, status: 'loaded' });
-      img.onerror = () => resolve({ src, status: 'failed' });
+      img.onload = () => resolve({ src, status:'loaded' });
+      img.onerror = () => resolve({ src, status:'failed' });
       img.src = src;
     });
-  });
-  return Promise.all(promises);
+  }));
 }
 
 function injectImages() {
@@ -640,10 +529,7 @@ function injectImages() {
     const frame = document.getElementById(`frame-${i}`);
     if (!frame) return;
     const msgEl = document.getElementById(`imgLoadMsg-${i}`);
-    if (!src || !src.trim()) {
-      if (msgEl) msgEl.textContent = "No image URL set.";
-      return;
-    }
+    if (!src || !src.trim()) { if(msgEl) msgEl.textContent = "No image URL set."; return; }
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.alt = IMAGE_LABELS[i];
@@ -654,9 +540,7 @@ function injectImages() {
       frame.appendChild(img);
       if (msgEl) msgEl.textContent = "";
     };
-    img.onerror = () => {
-      if (msgEl) msgEl.textContent = "Image could not be loaded. Check the URL.";
-    };
+    img.onerror = () => { if(msgEl) msgEl.textContent = "Image could not be loaded. Check the URL."; };
     img.src = src;
   });
 }
@@ -665,68 +549,59 @@ function injectImages() {
    NAVIGATION
 ═══════════════════════════════════════════════════ */
 function showPage(n) {
-  if (!pagesReady) {
-    alert("The survey pages are not ready. Please check the configuration and reload.");
-    return;
-  }
+  if (!pagesReady) { alert("Survey pages not ready. Please reload."); return; }
   const target = document.getElementById(`page-${n}`);
-  if (!target) {
-    console.error(`Page ${n} is missing.`);
-    alert(`Error: Page ${n} not found.`);
-    return;
-  }
+  if (!target) { console.error(`Page ${n} missing`); return; }
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   target.classList.add("active");
   currentPage = n;
   const pct = ((n - 1) / TOTAL_PAGES * 100).toFixed(1);
   document.getElementById("progressFill").style.width = pct + "%";
-  document.getElementById("progressText").textContent = `Question ${n - 1} of ${TOTAL_PAGES}`;
+  if (n === TOTAL_PAGES) {
+    document.getElementById("progressText").textContent = "Survey Complete";
+  } else {
+    document.getElementById("progressText").textContent = `Question ${n - 1} of ${TOTAL_PAGES - 1}`;
+  }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 /* ═══════════════════════════════════════════════════
-   DEMOGRAPHICS – NEXT BUTTON ENABLER
+   DEMOGRAPHICS
 ═══════════════════════════════════════════════════ */
 function toggleNextButton() {
-  const checkbox = document.getElementById("instructionsCheckbox");
-  const btn = document.getElementById("demoNextBtn");
-  btn.disabled = !checkbox.checked;
+  document.getElementById("demoNextBtn").disabled = !document.getElementById("instructionsCheckbox").checked;
 }
 
-/* ═══════════════════════════════════════════════════
-   DEMOGRAPHICS SUBMISSION
-═══════════════════════════════════════════════════ */
 function showErr(id, show) {
   const el = document.getElementById(id);
+  if (!el) return;
   el.style.display = show ? "block" : "none";
-  if (show) {
-    const field = el.previousElementSibling;
-    if (field) field.classList.add("input-error");
-  } else {
-    const field = el.previousElementSibling;
-    if (field) field.classList.remove("input-error");
-  }
+  const input = el.previousElementSibling;
+  if (input) input.classList.toggle("input-error", show);
 }
 
 async function submitDemographics() {
+  const name = document.getElementById("d_name").value.trim();
   const age  = document.getElementById("d_age").value.trim();
-  const gend = document.getElementById("d_gender").value;
-  const eth  = document.getElementById("d_ethnicity").value;
-  const edu  = document.getElementById("d_education").value;
-  const ctr  = document.getElementById("d_country").value.trim();
-  const lang = document.getElementById("d_language").value.trim();
-  const emp  = document.querySelector("input[name='employment']:checked");
+  const gender = document.getElementById("d_gender").value;
+  const roll = document.getElementById("d_roll").value.trim();
+  const batch = document.getElementById("d_batch").value;
+  const section = document.getElementById("d_section").value;
+  const facCode = document.getElementById("d_fac_code").value.trim();
+  const email = document.getElementById("d_email").value.trim();
   const confirmed = document.getElementById("instructionsCheckbox").checked;
 
   let ok = true;
   const ageOk = age && !isNaN(age) && +age >= 18 && +age <= 99;
+  const facOk = facCode && /^\d+$/.test(facCode);
+  showErr("err_name", !name);       if (!name) ok = false;
   showErr("err_age", !ageOk);       if (!ageOk) ok = false;
-  showErr("err_gender", !gend);     if (!gend) ok = false;
-  showErr("err_ethnicity", !eth);   if (!eth) ok = false;
-  showErr("err_education", !edu);   if (!edu) ok = false;
-  showErr("err_country", !ctr);     if (!ctr) ok = false;
-  showErr("err_language", !lang);   if (!lang) ok = false;
-  showErr("err_employment", !emp);  if (!emp) ok = false;
+  showErr("err_gender", !gender);   if (!gender) ok = false;
+  showErr("err_roll", !roll);       if (!roll) ok = false;
+  showErr("err_batch", !batch);     if (!batch) ok = false;
+  showErr("err_section", !section); if (!section) ok = false;
+  showErr("err_fac_code", !facOk);  if (!facOk) ok = false;
+  showErr("err_email", !email || !email.includes("@manipal.edu"));  if (!email || !email.includes("@manipal.edu")) ok = false;
   if (!confirmed) ok = false;
 
   const pageErr = document.getElementById("demo-error");
@@ -738,22 +613,19 @@ async function submitDemographics() {
   btn.textContent = "Loading…";
 
   responses.demographics = {
-    age: +age, gender: gend, ethnicity: eth, education: edu,
-    country: ctr, language: lang, employment: emp.value,
-    artsEngagement: document.getElementById("d_arts").value || "Not answered",
+    name, age: +age, gender, rollNumber: roll, batch, section,
+    facilitatorCode: facCode, email
   };
   responses.timestamps.start = new Date().toISOString();
 
-  // Preload images now (brief loading state)
   try {
     await preloadImages(IMAGE_SRCS);
     injectImages();
   } catch (err) {
-    console.error("Image preload error:", err);
+    console.error(err);
     injectImages();
   }
 
-  // Go directly to first image page
   showPage(2);
   startImageTimer(0);
   btn.disabled = false;
@@ -800,7 +672,6 @@ function startNarrativeTimer(idx) {
     const rem = Math.max(0, totalMs - (Date.now() - t0));
     const m = Math.floor(rem / 60000);
     const s = Math.floor((rem % 60000) / 1000);
-    const pad = v => String(v).padStart(2, "0");
     const pill = document.getElementById(`timePill-${idx}`);
     const txt  = document.getElementById(`timePillTxt-${idx}`);
     if (rem <= 0) {
@@ -809,58 +680,53 @@ function startNarrativeTimer(idx) {
       txt.textContent = "✓ 3 minutes elapsed";
       clearInterval(narState[idx].iv);
     } else {
-      txt.textContent = `Time remaining: ${pad(m)}:${pad(s)}`;
+      txt.textContent = `Time remaining: ${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
     }
     checkUnlock(idx);
   }, 500);
 }
 
 function onInput(idx) {
-  const textarea = document.getElementById(`narrative-${idx}`);
-  if (!textarea) return;
-  const n = textarea.value.length;
+  const ta = document.getElementById(`narrative-${idx}`);
+  if (!ta) return;
+  const n = ta.value.length;
   const metFull = n >= NARRATIVE_CHARS;
   document.getElementById(`charInfoTxt-${idx}`).textContent = `${n} characters`;
-  document.getElementById(`charInfo-${idx}`).className = `char-info${metFull ? " met" : ""}`;
+  document.getElementById(`charInfo-${idx}`).className = `char-info${metFull?" met":""}`;
   document.getElementById(`charPillTxt-${idx}`).textContent = `${n} / ${NARRATIVE_CHARS} characters`;
-  const charPill = document.getElementById(`charPill-${idx}`);
-  if (metFull) charPill.classList.add("done");
-  else charPill.classList.remove("done");
-  if (narState[idx]) {
-    narState[idx].charsDone = metFull;
-    checkUnlock(idx);
-  }
+  const pill = document.getElementById(`charPill-${idx}`);
+  pill.classList.toggle("done", metFull);
+  if (narState[idx]) { narState[idx].charsDone = metFull; checkUnlock(idx); }
 }
 
 function checkUnlock(idx) {
   if (!narState[idx]) return;
   const { timeDone, charsDone } = narState[idx];
-  const textarea = document.getElementById(`narrative-${idx}`);
-  const charCount = textarea ? textarea.value.length : 0;
+  const ta = document.getElementById(`narrative-${idx}`);
+  const count = ta ? ta.value.length : 0;
   const btn = document.getElementById(`narBtn-${idx}`);
   const hint = document.getElementById(`hint-${idx}`);
-  const canProceed = charsDone || (timeDone && charCount >= MIN_CHARS_TIMER);
+  const canProceed = charsDone || (timeDone && count >= MIN_CHARS_TIMER);
   btn.disabled = !canProceed;
-  if (hint) {
-    if (timeDone && charCount < MIN_CHARS_TIMER) hint.classList.add("visible");
-    else hint.classList.remove("visible");
-  }
+  if (hint) hint.classList.toggle("visible", timeDone && count < MIN_CHARS_TIMER);
 }
 
 function submitNarrative(idx) {
   const text = document.getElementById(`narrative-${idx}`).value;
   const elapsed = narState[idx] ? Math.round((Date.now() - narState[idx].t0) / 1000) : 0;
   if (narState[idx]?.iv) clearInterval(narState[idx].iv);
+
   responses.narratives[idx] = {
     imageNumber: idx + 1,
-    imageLabel:  IMAGE_LABELS[idx],
-    narrative:   text,
+    imageLabel: IMAGE_LABELS[idx],
+    narrative: text,
     characterCount: text.length,
     timeSpentSeconds: elapsed,
     submittedAt: new Date().toISOString(),
   };
+
   if (idx < 8) {
-    showPage(4 + idx * 2);  // next image page
+    showPage(4 + idx * 2);
     startImageTimer(idx + 1);
   } else {
     finishSurvey();
@@ -868,29 +734,24 @@ function submitNarrative(idx) {
 }
 
 /* ═══════════════════════════════════════════════════
-   GOOGLE FORM SUBMISSION (hidden iframe method)
+   GOOGLE FORM SUBMISSION
 ═══════════════════════════════════════════════════ */
 const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSexdAHtEGKGfIFEYz99eMHP5ciDEwO2WH8uW_HC-BhEgs9wTA/formResponse";
 const GOOGLE_ENTRY_ID = "entry.1205258635";
 
 function saveToGoogle() {
-  return new Promise((resolve, reject) => {
-    // Create a hidden form and submit it via the hidden iframe
+  return new Promise((resolve) => {
     const form = document.createElement("form");
     form.method = "POST";
     form.action = GOOGLE_FORM_URL;
     form.target = "hidden_iframe";
     form.style.display = "none";
-
     const input = document.createElement("input");
     input.type = "hidden";
     input.name = GOOGLE_ENTRY_ID;
     input.value = JSON.stringify(responses, null, 2);
     form.appendChild(input);
-
     document.body.appendChild(form);
-
-    // Listen for iframe load to know submission is done
     const iframe = document.getElementById("hidden_iframe");
     const onLoad = () => {
       iframe.removeEventListener("load", onLoad);
@@ -898,16 +759,11 @@ function saveToGoogle() {
       resolve();
     };
     iframe.addEventListener("load", onLoad);
-
-    // Timeout fallback (5 seconds)
     setTimeout(() => {
       iframe.removeEventListener("load", onLoad);
-      if (document.body.contains(form)) {
-        document.body.removeChild(form);
-      }
-      resolve(); // resolve anyway — no-cors means we can't verify
+      if (document.body.contains(form)) document.body.removeChild(form);
+      resolve();
     }, 5000);
-
     form.submit();
   });
 }
@@ -916,7 +772,6 @@ async function finishSurvey() {
   responses.timestamps.end = new Date().toISOString();
   showPage(20);
 
-  document.getElementById("finalDataBox").textContent = JSON.stringify(responses, null, 2);
   document.getElementById("responseIdDisplay").textContent = `Response ID: ${responses.sessionId}`;
   document.getElementById("overlayMsg").textContent = "Saving your response…";
   document.getElementById("overlay").classList.add("active");
@@ -927,27 +782,34 @@ async function finishSurvey() {
     document.getElementById("submitStatus").innerHTML =
       `<span class="status-badge ok">✓ Response saved successfully</span>`;
   } catch (err) {
-    console.error("Google submission error:", err);
+    console.error(err);
     document.getElementById("overlay").classList.remove("active");
     document.getElementById("submitStatus").innerHTML =
-      `<span class="status-badge fail">⚠ Could not save automatically. Please download your response below and share it manually.</span>
-       <div style="font-size:11px;color:var(--text-subtle);margin-top:6px;">Error: ${err.message}</div>`;
+      `<span class="status-badge fail">⚠ Could not save automatically. Please download your response below or send a copy via email.</span>`;
   }
 }
 
 /* ═══════════════════════════════════════════════════
-   EXPORT
+   EMAIL COPY & EXPORT
 ═══════════════════════════════════════════════════ */
+function sendEmailCopy() {
+  const email = responses.demographics.email || "";
+  const subject = encodeURIComponent("TAT - Assessment 6 – Your Responses");
+  const body = encodeURIComponent(JSON.stringify(responses, null, 2));
+  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+}
+
 function downloadJSON() {
   const blob = new Blob([JSON.stringify(responses, null, 2)], { type: "application/json" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-  a.download = `survey_${responses.sessionId.slice(0,8)}.json`; a.click();
+  a.download = `tat_assessment_${responses.sessionId.slice(0,8)}.json`; a.click();
 }
+
 function downloadCSV() {
   const d = responses.demographics;
   const rows = [
-    ["session_id","age","gender","ethnicity","education","country","language","employment","arts_engagement","survey_start","survey_end"],
-    [responses.sessionId, d.age, d.gender, d.ethnicity, d.education, d.country, d.language, d.employment, d.artsEngagement, responses.timestamps.start, responses.timestamps.end],
+    ["session_id","name","age","gender","roll_number","batch","section","facilitator_code","email","start","end"],
+    [responses.sessionId, d.name, d.age, d.gender, d.rollNumber, d.batch, d.section, d.facilitatorCode, d.email, responses.timestamps.start, responses.timestamps.end],
     [],
     ["image_number","image_label","character_count","time_spent_seconds","submitted_at","narrative"],
   ];
@@ -956,12 +818,7 @@ function downloadCSV() {
   });
   const blob = new Blob([rows.map(r=>r.join(",")).join("\n")], { type: "text/csv" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-  a.download = `survey_${responses.sessionId.slice(0,8)}.csv`; a.click();
-}
-function copyData() {
-  navigator.clipboard.writeText(JSON.stringify(responses, null, 2))
-    .then(() => alert("Copied to clipboard."))
-    .catch(() => alert("Please manually select and copy the text from the box above."));
+  a.download = `tat_assessment_${responses.sessionId.slice(0,8)}.csv`; a.click();
 }
 </script>
 </body>
