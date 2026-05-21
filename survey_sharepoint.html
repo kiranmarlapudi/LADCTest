@@ -625,7 +625,8 @@ async function submitDemographics() {
   showErr("err_roll", !roll);       if (!roll) ok = false;
   showErr("err_batch", !batch);     if (!batch) ok = false;
   showErr("err_section", !section); if (!section) ok = false;
-  showErr("err_email", !email || !email.includes("@manipal.edu"));  if (!email || !email.includes("@manipal.edu")) ok = false;
+  const emailOk = email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+   showErr("err_email", !emailOk);  if (!emailOk) ok = false;
   showErr("err_fac_code", !facOk);  if (!facOk) ok = false;
   if (!confirmed) ok = false;
 
