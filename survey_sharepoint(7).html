@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual Narrative Survey</title>
+<style>
+/* ═══════════════════════════════════════════
+   FLUENT UI / MICROSOFT FORMS DESIGN SYSTEM
+═══════════════════════════════════════════ */
+:root {
+  --ms-blue:       #0078D4;
+  --ms-blue-dark:  #106EBE;
+  --ms-blue-light: #EFF6FC;
+  --ms-purple:     #6264A7;
+  --bg:            #FAF9F8;
+  --surface:       #FFFFFF;
+  --border:        #EDEBE9;
+  --border-dark:   #C8C6C4;
+  --text:          #323130;
+  --text-subtle:   #605E5C;
+  --text-disabled: #A19F9D;
+  --success:       #107C10;
+  --success-bg:    #F1FAF1;
+  --warn:          #D13438;
+  --focus:         0 0 0 2px #0078D4;
+  --radius:        2px;
+  --shadow-card:   0 1.6px 3.6px rgba(0,0,0,.132), 0 .3px .9px rgba(0,0,0,.108);
+  --font:          "Segoe UI", "Segoe UI Web (West European)", system-ui, -apple-system, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── MS FORMS HEADER ── */
+.ms-header { background: var(--ms-purple); height: 6px; width: 100%; }
+.ms-banner {
+  background: #fff; border-bottom: 1px solid var(--border);
+  padding: 12px 24px; display: flex; align-items: center; gap: 12px;
+}
+.ms-banner-logo {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--ms-purple); font-size: 15px; font-weight: 600;
+}
+.ms-banner-logo svg { width: 20px; height: 20px; }
+.ms-banner-sep { width: 1px; height: 20px; background: var(--border-dark); }
+.ms-banner-title { font-size: 13px; color: var(--text-subtle); }
+
+/* ── PROGRESS ── */
+.ms-progress {
+  background: #fff; border-bottom: 1px solid var(--border);
+  padding: 8px 24px; display: flex; align-items: center; gap: 12px;
+}
+.ms-progress-bar { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.ms-progress-fill {
+  height: 100%; background: var(--ms-blue); border-radius: 99px; transition: width 0.4s ease;
+}
+.ms-progress-text { font-size: 12px; color: var(--text-subtle); white-space: nowrap; }
+
+/* ── PAGE LAYOUT ── */
+.page { display: none; max-width: 680px; margin: 32px auto; padding: 0 16px 80px; }
+.page.active { display: block; animation: msSlide .25s ease; }
+@keyframes msSlide { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── CARD ── */
+.ms-card {
+  background: var(--surface); border-radius: 4px; box-shadow: var(--shadow-card);
+  overflow: hidden; margin-bottom: 16px;
+}
+.ms-card-accent { height: 5px; background: var(--ms-purple); }
+.ms-card-body { padding: 28px 32px 32px; }
+
+.ms-card-title { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 6px; line-height: 1.25; }
+.ms-card-desc { font-size: 14px; color: var(--text-subtle); margin-bottom: 0; line-height: 1.6; }
+
+/* ── ATTENTION CALLOUT ── */
+.image-callout {
+  background: #FFF4CE;
+  border-left: 5px solid #FFD335;
+  padding: 12px 16px;
+  margin-top: 12px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #323130;
+  border-radius: 2px;
+}
+
+/* ── VISUAL WARNING ── */
+.visual-warning {
+  background: #FDE7E9;
+  border: 1px solid #F1707B;
+  color: #A4252A;
+  padding: 10px 14px;
+  border-radius: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+/* ── QUESTION CARD ── */
+.ms-question {
+  background: var(--surface); border-radius: 4px; box-shadow: var(--shadow-card);
+  padding: 20px 24px; margin-bottom: 12px;
+}
+.ms-question-label {
+  font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; display: flex; gap: 4px; align-items: baseline;
+}
+.ms-required { color: var(--warn); font-size: 12px; }
+
+/* ── INPUTS ── */
+input[type="text"], input[type="number"], input[type="email"], select, textarea {
+  width: 100%; font-family: var(--font); font-size: 14px; color: var(--text);
+  background: var(--surface); border: 1px solid var(--border-dark); border-radius: var(--radius);
+  padding: 8px 10px; outline: none; transition: border-color .15s; appearance: none;
+}
+input:hover, select:hover, textarea:hover { border-color: #979593; }
+input:focus, select:focus, textarea:focus { border-color: var(--ms-blue); box-shadow: var(--focus); }
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23605E5C'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 28px; cursor: pointer;
+}
+textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
+.input-error { border-color: var(--warn) !important; }
+
+/* ── RADIO / CHECKBOX ── */
+.ms-choices { display: flex; flex-direction: column; gap: 6px; }
+.ms-choice {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+  border: 1px solid transparent; border-radius: var(--radius); cursor: pointer;
+  transition: background .12s; font-size: 14px;
+}
+.ms-choice:hover { background: var(--ms-blue-light); border-color: #C7E0F4; }
+.ms-choice input[type="radio"], .ms-choice input[type="checkbox"] {
+  width: 16px; height: 16px; accent-color: var(--ms-blue); flex-shrink: 0;
+  border: none; box-shadow: none; padding: 0;
+}
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 500px) { .two-col { grid-template-columns: 1fr; } }
+
+/* ── BUTTONS ── */
+.ms-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--ms-blue); color: #fff; border: 1px solid var(--ms-blue);
+  border-radius: var(--radius); padding: 8px 20px; font-family: var(--font);
+  font-size: 14px; font-weight: 600; cursor: pointer; transition: background .15s;
+  min-width: 80px; justify-content: center;
+}
+.ms-btn:hover:not(:disabled) { background: var(--ms-blue-dark); border-color: var(--ms-blue-dark); }
+.ms-btn:disabled { background: var(--border-dark); border-color: var(--border-dark); color: var(--text-disabled); cursor: not-allowed; }
+.ms-btn-outline { background: transparent; color: var(--ms-blue); border: 1px solid var(--ms-blue); }
+.ms-btn-outline:hover:not(:disabled) { background: var(--ms-blue-light); }
+
+/* ── IMAGE PAGE ── */
+.image-frame {
+  width: 100%; aspect-ratio: 16/10; background: #1B1B1B; border-radius: var(--radius);
+  overflow: hidden; position: relative; margin: 16px 0;
+}
+.image-frame img { width: 100%; height: 100%; object-fit: contain; display: none; }
+.image-frame img.loaded { display: block; }
+.img-placeholder {
+  width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; background: linear-gradient(135deg, #1B1B1B, #2D2D2D);
+  color: rgba(255,255,255,0.4); font-size: 13px; gap: 10px; text-align: center; padding: 20px;
+}
+.img-placeholder-num { font-size: 56px; font-weight: 700; color: rgba(255,255,255,0.08); line-height: 1; }
+
+/* Countdown ring */
+.countdown-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; margin: 12px 0 4px; }
+.countdown-ring { position: relative; width: 72px; height: 72px; }
+.countdown-ring svg { transform: rotate(-90deg); }
+.ring-track { fill:none; stroke:var(--border); stroke-width:5; }
+.ring-fill { fill:none; stroke:var(--ms-blue); stroke-width:5; stroke-linecap:round; transition: stroke-dashoffset .9s linear; }
+.ring-label { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700; color:var(--text); }
+.countdown-note { font-size:12px; color:var(--text-subtle); text-align:center; }
+
+/* ── NARRATIVE CONSTRAINTS ── */
+.constraint-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.constraint-pill {
+  display:flex; align-items:center; gap:6px; border:1px solid var(--border-dark);
+  border-radius:99px; padding:4px 12px; font-size:12px; color:var(--text-subtle); background:var(--surface);
+  transition: all .2s;
+}
+.constraint-pill.done { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+.pill-dot { width:7px; height:7px; border-radius:50%; background:var(--border-dark); flex-shrink:0; transition: background .2s; }
+.constraint-pill.done .pill-dot { background: var(--success); }
+.char-info { display:flex; justify-content:space-between; margin-top:5px; font-size:12px; color:var(--text-subtle); }
+.char-info.met { color: var(--success); }
+.submit-area { display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:16px; }
+
+.unlock-hint {
+  font-size: 12px;
+  color: var(--text-subtle);
+  margin-top: 6px;
+  display: none;
+}
+.unlock-hint.visible { display: block; }
+
+/* ── ERROR MSG ── */
+.field-error { font-size:12px; color:var(--warn); margin-top:4px; display:none; }
+.page-error {
+  background:#FDE7E9; border:1px solid #F1707B; border-radius:var(--radius);
+  padding:10px 14px; font-size:13px; color:#A4252A; margin-bottom:12px; display:none;
+}
+
+/* ── SUBMISSION OVERLAY ── */
+.overlay {
+  position:fixed; inset:0; background:rgba(255,255,255,.85);
+  display:none; flex-direction:column; align-items:center; justify-content:center;
+  z-index:999; gap:16px; font-size:15px; color:var(--text-subtle);
+}
+.overlay.active { display:flex; }
+.spinner {
+  width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--ms-blue);
+  border-radius:50%; animation:spin .7s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── THANK YOU ── */
+.ty-icon {
+  width:60px; height:60px; border-radius:50%; background:var(--success); display:flex;
+  align-items:center; justify-content:center; margin-bottom:16px;
+}
+.ty-icon svg { width:30px; height:30px; stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+.response-id { font-size:12px; color:var(--text-subtle); margin-top:12px; font-family:monospace; }
+.data-preview {
+  background:var(--bg); border:1px solid var(--border); border-radius:var(--radius);
+  padding:14px; font-size:12px; font-family:monospace; max-height:220px; overflow-y:auto;
+  white-space:pre-wrap; word-break:break-word; margin-top:16px; color:var(--text-subtle);
+}
+.btn-row { display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+.status-badge {
+  display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:99px;
+  font-size:12px; font-weight:600;
+}
+.status-badge.ok { background:var(--success-bg); color:var(--success); }
+.status-badge.fail { background:#FDE7E9; color:var(--warn); }
+</style>
+</head>
+<body>
+
+<!-- ══ LOADING OVERLAY ══ -->
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <span id="overlayMsg">Submitting your response…</span>
+</div>
+
+<!-- ══ MS HEADER ══ -->
+<div class="ms-header"></div>
+<div class="ms-banner">
+  <div class="ms-banner-logo">
+    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="16" height="16" rx="2" fill="#6264A7"/>
+      <rect x="5" y="6" width="10" height="1.5" rx=".75" fill="white"/>
+      <rect x="5" y="9.25" width="10" height="1.5" rx=".75" fill="white"/>
+      <rect x="5" y="12.5" width="6" height="1.5" rx=".75" fill="white"/>
+    </svg>
+    Microsoft Forms
+  </div>
+  <div class="ms-banner-sep"></div>
+  <span class="ms-banner-title">Visual Narrative Survey</span>
+</div>
+<div class="ms-progress">
+  <div class="ms-progress-bar"><div class="ms-progress-fill" id="progressFill" style="width:0%"></div></div>
+  <span class="ms-progress-text" id="progressText">Question 0 of 19</span>
+</div>
+
+<!-- ═══ PAGE 1 — DEMOGRAPHICS ═══ -->
+<div class="page active" id="page-1">
+  <div class="ms-card">
+    <div class="ms-card-accent"></div>
+    <div class="ms-card-body">
+      <div class="ms-card-title">Visual Narrative Survey</div>
+      <div class="ms-card-desc">
+        Thank you for participating. This survey asks you to view a series of images and write short narratives in response to each one. Please complete all demographic fields before beginning.<br><br>
+        <strong>Note:</strong> Once you advance past each page you cannot return. Please read instructions carefully.
+      </div>
+    </div>
+  </div>
+
+  <div class="ms-question">
+    <div style="font-size:13px;color:var(--text-subtle);background:#FFF4CE;border:1px solid #FFD335;border-radius:2px;padding:8px 12px;margin-bottom:16px;">
+      ⚠️ <strong>Informed Consent:</strong> By completing this survey, you agree that your anonymous responses may be used for research purposes. You may close this page at any time to withdraw.
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="ms-question">
+      <div class="ms-question-label">Age <span class="ms-required">*</span></div>
+      <input type="number" id="d_age" min="18" max="99" placeholder="e.g. 28">
+      <div class="field-error" id="err_age">Please enter a valid age (18–99).</div>
+    </div>
+    <div class="ms-question">
+      <div class="ms-question-label">Gender Identity <span class="ms-required">*</span></div>
+      <select id="d_gender">
+        <option value="">Select an option</option>
+        <option>Man</option><option>Woman</option><option>Non-binary / Gender non-conforming</option>
+        <option>Genderqueer / Genderfluid</option><option>Transgender man</option><option>Transgender woman</option>
+        <option>Prefer to self-describe</option><option>Prefer not to say</option>
+      </select>
+      <div class="field-error" id="err_gender">Please select an option.</div>
+    </div>
+  </div>
+
+  <div class="ms-question">
+    <div class="ms-question-label">Ethnicity / Cultural Background <span class="ms-required">*</span></div>
+    <select id="d_ethnicity">
+      <option value="">Select an option</option>
+      <option>Asian / Asian Indian</option><option>Black / African / Caribbean</option><option>East Asian</option>
+      <option>Hispanic / Latino</option><option>Middle Eastern / North African</option>
+      <option>Mixed / Multiple ethnic groups</option><option>South Asian</option><option>Southeast Asian</option>
+      <option>White / European</option><option>Prefer to self-describe</option><option>Prefer not to say</option>
+    </select>
+    <div class="field-error" id="err_ethnicity">Please select an option.</div>
+  </div>
+
+  <div class="ms-question">
+    <div class="ms-question-label">Highest Level of Education Completed <span class="ms-required">*</span></div>
+    <select id="d_education">
+      <option value="">Select an option</option>
+      <option>Less than high school</option><option>High school diploma / GED</option>
+      <option>Some college, no degree</option><option>Associate degree</option><option>Bachelor's degree</option>
+      <option>Master's degree</option><option>Doctoral degree (PhD, EdD, etc.)</option>
+      <option>Professional degree (MD, JD, etc.)</option><option>Prefer not to say</option>
+    </select>
+    <div class="field-error" id="err_education">Please select an option.</div>
+  </div>
+
+  <div class="two-col">
+    <div class="ms-question">
+      <div class="ms-question-label">Country of Residence <span class="ms-required">*</span></div>
+      <input type="text" id="d_country" placeholder="e.g. India">
+      <div class="field-error" id="err_country">Please enter your country.</div>
+    </div>
+    <div class="ms-question">
+      <div class="ms-question-label">Primary Language <span class="ms-required">*</span></div>
+      <input type="text" id="d_language" placeholder="e.g. English">
+      <div class="field-error" id="err_language">Please enter your primary language.</div>
+    </div>
+  </div>
+
+  <div class="ms-question">
+    <div class="ms-question-label">Employment Status <span class="ms-required">*</span></div>
+    <div class="ms-choices" id="d_employment">
+      <label class="ms-choice"><input type="radio" name="employment" value="Employed full-time"> Employed full-time</label>
+      <label class="ms-choice"><input type="radio" name="employment" value="Employed part-time"> Employed part-time</label>
+      <label class="ms-choice"><input type="radio" name="employment" value="Self-employed / Freelance"> Self-employed / Freelance</label>
+      <label class="ms-choice"><input type="radio" name="employment" value="Student"> Student</label>
+      <label class="ms-choice"><input type="radio" name="employment" value="Unemployed / Looking for work"> Unemployed / Looking for work</label>
+      <label class="ms-choice"><input type="radio" name="employment" value="Retired"> Retired</label>
+      <label class="ms-choice"><input type="radio" name="employment" value="Prefer not to say"> Prefer not to say</label>
+    </div>
+    <div class="field-error" id="err_employment">Please select an option.</div>
+  </div>
+
+  <div class="ms-question">
+    <div class="ms-question-label">How often do you engage with visual art?</div>
+    <select id="d_arts">
+      <option value="">Select an option</option>
+      <option>Never</option><option>Rarely (a few times a year)</option><option>Sometimes (monthly)</option>
+      <option>Often (weekly)</option><option>Very often (daily)</option>
+    </select>
+  </div>
+
+  <div class="page-error" id="demo-error">Please complete all required fields before continuing.</div>
+  <button class="ms-btn" id="demoNextBtn" onclick="submitDemographics()">Next ›</button>
+</div>
+
+<!-- Pages 2–19 built by JS -->
+
+<!-- ═══ PAGE 20 — THANK YOU ═══ -->
+<div class="page" id="page-20">
+  <div class="ms-card">
+    <div class="ms-card-accent" style="background:var(--success)"></div>
+    <div class="ms-card-body" style="text-align:center; padding:40px 32px;">
+      <div class="ty-icon" style="margin:0 auto 16px;">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+      </div>
+      <div class="ms-card-title">Survey Complete</div>
+      <div class="ms-card-desc" style="margin-top:8px;">
+        Your response has been recorded. Thank you sincerely for your time and thoughtful participation.
+      </div>
+      <div id="submitStatus" style="margin-top:16px;"></div>
+      <div class="response-id" id="responseIdDisplay"></div>
+    </div>
+  </div>
+
+  <div class="ms-question">
+    <div class="ms-question-label">Your Response (Reference Copy)</div>
+    <div class="data-preview" id="finalDataBox"></div>
+    <div class="btn-row">
+      <button class="ms-btn" onclick="downloadJSON()">⬇ Download JSON</button>
+      <button class="ms-btn ms-btn-outline" onclick="downloadCSV()">⬇ Download CSV</button>
+      <button class="ms-btn ms-btn-outline" onclick="copyData()">Copy to Clipboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   ██████  CONFIGURATION  ██████
+   ═══════════════════════════════════════════════════ */
+const IMAGE_SRCS = [
+  "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image1.png",
+  "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image2.png",
+  "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image3.png",
+  "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image4.png",
+  "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image5.png",
+  "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image6.png",
+  "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image7.png",
+  "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image8.png",
+  "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image9.png",
+];
+
+const IMAGE_LABELS = [
+  "Stimulus Image 1","Stimulus Image 2","Stimulus Image 3",
+  "Stimulus Image 4","Stimulus Image 5","Stimulus Image 6",
+  "Stimulus Image 7","Stimulus Image 8","Stimulus Image 9",
+];
+
+/* ═══ TIMING & CONSTRAINTS ═══ */
+const IMAGE_SECS      = 20;
+const NARRATIVE_SECS  = 180;
+const NARRATIVE_CHARS = 350;
+const MIN_CHARS_TIMER = 150;
+const TOTAL_PAGES     = 19;
+
+/* ═══════════════════════════════════════════════════
+   GLOBAL STATE
+═══════════════════════════════════════════════════ */
+let currentPage = 1;
+const sessionId = crypto.randomUUID ? crypto.randomUUID() : `session-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+const responses = { sessionId, demographics: {}, narratives: [], timestamps: { start: null, end: null } };
+let pagesReady = false;
+
+/* ═══════════════════════════════════════════════════
+   BUILD IMAGE + NARRATIVE PAGES
+═══════════════════════════════════════════════════ */
+(function buildPages() {
+  try {
+    const thankyou = document.getElementById("page-20");
+    const body = document.body;
+
+    for (let i = 0; i < 9; i++) {
+      const imgPageN = 2 + i * 2;
+      const narPageN = 3 + i * 2;
+
+      /* ── Image Page ── */
+      const imgPage = document.createElement("div");
+      imgPage.className = "page";
+      imgPage.id = `page-${imgPageN}`;
+      imgPage.innerHTML = `
+        <div class="ms-card">
+          <div class="ms-card-accent"></div>
+          <div class="ms-card-body">
+            <div style="font-size:12px;color:var(--text-subtle);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Image ${i+1} of 9</div>
+            <div class="ms-card-title" style="font-size:20px;">${IMAGE_LABELS[i]}</div>
+            <div class="image-callout">👁️ <strong>Please observe this image carefully.</strong> You will write a narrative response about it on the next screen.</div>
+            <!-- Visual warning added here -->
+            <div class="visual-warning">
+              <span style="font-size:16px;">⚠️</span>
+              <span><strong>Warning:</strong> The next page will require you to write a narrative response. Reflect on what you see, feel, and associate with this image. You cannot return to this image once you proceed.</span>
+            </div>
+          </div>
+        </div>
+        <div class="ms-question">
+          <div class="image-frame" id="frame-${i}">
+            <div class="img-placeholder">
+              <div class="img-placeholder-num">${i+1}</div>
+              <div id="imgLoadMsg-${i}">Loading image…</div>
+            </div>
+          </div>
+          <div class="countdown-wrap">
+            <div class="countdown-ring" id="ring-${i}">
+              <svg width="72" height="72" viewBox="0 0 72 72">
+                <circle class="ring-track" cx="36" cy="36" r="30"/>
+                <circle class="ring-fill" id="ringArc-${i}" cx="36" cy="36" r="30"
+                  stroke-dasharray="${(2*Math.PI*30).toFixed(2)}" stroke-dashoffset="0"/>
+              </svg>
+              <div class="ring-label" id="ringNum-${i}">${IMAGE_SECS}</div>
+            </div>
+            <div class="countdown-note">Advancing automatically in <strong id="ringNumText-${i}">${IMAGE_SECS}</strong> seconds. Please stay on this page.</div>
+            <div class="image-callout" style="margin-top:12px;">👁️ <strong>Please observe this image carefully.</strong> You will write a narrative response about it on the next screen.</div>
+          </div>
+        </div>`;
+      body.insertBefore(imgPage, thankyou);
+
+      /* ── Narrative Page ── */
+      const narPage = document.createElement("div");
+      narPage.className = "page";
+      narPage.id = `page-${narPageN}`;
+      narPage.innerHTML = `
+        <div class="ms-card">
+          <div class="ms-card-accent"></div>
+          <div class="ms-card-body">
+            <div style="font-size:12px;color:var(--text-subtle);margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Response ${i+1} of 9</div>
+            <div class="ms-card-title" style="font-size:20px;">Write Your Narrative</div>
+            <div class="ms-card-desc">Describe what you observed, what the image made you think or feel, and any associations it brought to mind.</div>
+          </div>
+        </div>
+        <div class="ms-question">
+          <div class="constraint-row">
+            <div class="constraint-pill" id="charPill-${i}">
+              <div class="pill-dot"></div>
+              <span id="charPillTxt-${i}">0 / ${NARRATIVE_CHARS} characters</span>
+            </div>
+            <div class="constraint-pill" id="timePill-${i}">
+              <div class="pill-dot"></div>
+              <span id="timePillTxt-${i}">Time remaining: 3:00</span>
+            </div>
+          </div>
+          <div class="ms-question-label">Your narrative <span class="ms-required">*</span></div>
+          <textarea id="narrative-${i}" rows="9" placeholder="Begin writing your response here…" oninput="onInput(${i})"></textarea>
+          <div class="char-info" id="charInfo-${i}"><span id="charInfoTxt-${i}">0 characters</span><span>${NARRATIVE_CHARS} target</span></div>
+          <div class="submit-area">
+            <button class="ms-btn" id="narBtn-${i}" disabled onclick="submitNarrative(${i})">Next ›</button>
+          </div>
+          <div class="unlock-hint" id="hint-${i}">Write at least ${MIN_CHARS_TIMER} characters to continue (or reach ${NARRATIVE_CHARS} characters to skip the timer).</div>
+        </div>`;
+      body.insertBefore(narPage, thankyou);
+
+      // Disable paste on this textarea
+      const textarea = document.getElementById(`narrative-${i}`);
+      if (textarea) {
+        textarea.addEventListener('paste', (e) => e.preventDefault());
+      }
+    }
+    pagesReady = true;
+    console.log("Survey pages built successfully. Pasting disabled on all narrative fields.");
+  } catch (e) {
+    console.error("buildPages failed:", e);
+    pagesReady = false;
+    alert("Survey page structure could not be created. Please check the configuration and reload the page.");
+  }
+})();
+
+/* ═══════════════════════════════════════════════════
+   IMAGE PRELOADER
+═══════════════════════════════════════════════════ */
+function preloadImages(srcArray) {
+  const promises = srcArray.map(src => {
+    return new Promise(resolve => {
+      if (!src || !src.trim()) {
+        console.warn("Empty image URL, skipping.");
+        resolve({ src, status: 'skipped' });
+        return;
+      }
+      const img = new Image();
+      img.crossOrigin = 'anonymous'; // for GitHub raw URLs
+      img.onload = () => resolve({ src, status: 'loaded' });
+      img.onerror = () => {
+        console.warn("Image failed to preload:", src);
+        resolve({ src, status: 'failed' });
+      };
+      img.src = src;
+    });
+  });
+  return Promise.all(promises);
+}
+
+/* ═══════════════════════════════════════════════════
+   INJECT IMAGES
+═══════════════════════════════════════════════════ */
+function injectImages() {
+  IMAGE_SRCS.forEach((src, i) => {
+    const frame = document.getElementById(`frame-${i}`);
+    if (!frame) return;
+    const msgEl = document.getElementById(`imgLoadMsg-${i}`);
+    if (!src || !src.trim()) {
+      if (msgEl) msgEl.textContent = "No image URL set.";
+      return;
+    }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.alt = IMAGE_LABELS[i];
+    img.onload = () => {
+      const placeholder = frame.querySelector('.img-placeholder');
+      if (placeholder) placeholder.style.display = 'none';
+      img.classList.add('loaded');
+      frame.appendChild(img);
+      if (msgEl) msgEl.textContent = "";
+    };
+    img.onerror = () => {
+      if (msgEl) msgEl.textContent = "Image could not be loaded. Check the URL.";
+      console.error("Image load error:", src);
+    };
+    img.src = src;
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════ */
+function showPage(n) {
+  if (!pagesReady) {
+    alert("The survey pages are not ready. Please check the configuration and reload.");
+    return;
+  }
+  const target = document.getElementById(`page-${n}`);
+  if (!target) {
+    console.error(`Page ${n} is missing.`);
+    alert(`Error: Page ${n} not found. The survey may be misconfigured.`);
+    return;
+  }
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  target.classList.add("active");
+  currentPage = n;
+  const pct = ((n - 1) / TOTAL_PAGES * 100).toFixed(1);
+  document.getElementById("progressFill").style.width = pct + "%";
+  document.getElementById("progressText").textContent = `Question ${n - 1} of ${TOTAL_PAGES}`;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ═══════════════════════════════════════════════════
+   DEMOGRAPHICS
+═══════════════════════════════════════════════════ */
+function showErr(id, show) {
+  const el = document.getElementById(id);
+  el.style.display = show ? "block" : "none";
+  if (show) {
+    const field = el.previousElementSibling;
+    if (field) field.classList.add("input-error");
+  } else {
+    const field = el.previousElementSibling;
+    if (field) field.classList.remove("input-error");
+  }
+}
+
+async function submitDemographics() {
+  const age  = document.getElementById("d_age").value.trim();
+  const gend = document.getElementById("d_gender").value;
+  const eth  = document.getElementById("d_ethnicity").value;
+  const edu  = document.getElementById("d_education").value;
+  const ctr  = document.getElementById("d_country").value.trim();
+  const lang = document.getElementById("d_language").value.trim();
+  const emp  = document.querySelector("input[name='employment']:checked");
+
+  let ok = true;
+  const ageOk = age && !isNaN(age) && +age >= 18 && +age <= 99;
+  showErr("err_age", !ageOk);       if (!ageOk) ok = false;
+  showErr("err_gender", !gend);     if (!gend) ok = false;
+  showErr("err_ethnicity", !eth);   if (!eth) ok = false;
+  showErr("err_education", !edu);   if (!edu) ok = false;
+  showErr("err_country", !ctr);     if (!ctr) ok = false;
+  showErr("err_language", !lang);   if (!lang) ok = false;
+  showErr("err_employment", !emp);  if (!emp) ok = false;
+
+  const pageErr = document.getElementById("demo-error");
+  pageErr.style.display = ok ? "none" : "block";
+  if (!ok) return;
+
+  const btn = document.getElementById("demoNextBtn");
+  btn.disabled = true;
+  btn.textContent = "Loading…";
+
+  responses.demographics = {
+    age: +age, gender: gend, ethnicity: eth, education: edu,
+    country: ctr, language: lang, employment: emp.value,
+    artsEngagement: document.getElementById("d_arts").value || "Not answered",
+  };
+  responses.timestamps.start = new Date().toISOString();
+
+  try {
+    console.log("Preloading images…");
+    const results = await preloadImages(IMAGE_SRCS);
+    const failed = results.filter(r => r.status === 'failed');
+    if (failed.length) {
+      console.warn(`${failed.length} image(s) failed to preload.`);
+    }
+    injectImages();
+  } catch (err) {
+    console.error("Image preload error:", err);
+    injectImages();
+  }
+
+  showPage(2);
+  startImageTimer(0);
+  btn.disabled = false;
+  btn.textContent = "Next ›";
+}
+
+/* ═══════════════════════════════════════════════════
+   IMAGE COUNTDOWN
+═══════════════════════════════════════════════════ */
+const imgTimers = {};
+function startImageTimer(idx) {
+  const arc = document.getElementById(`ringArc-${idx}`);
+  const numEl = document.getElementById(`ringNum-${idx}`);
+  const txtEl = document.getElementById(`ringNumText-${idx}`);
+  if (!arc || !numEl) {
+    console.error("Timer elements missing for image", idx);
+    return;
+  }
+  const circ = 2 * Math.PI * 30;
+  let rem = IMAGE_SECS;
+  arc.style.strokeDashoffset = "0";
+  numEl.textContent = rem;
+  if (txtEl) txtEl.textContent = rem;
+  if (imgTimers[idx]) clearInterval(imgTimers[idx]);
+  imgTimers[idx] = setInterval(() => {
+    rem--;
+    numEl.textContent = rem;
+    if (txtEl) txtEl.textContent = rem;
+    arc.style.strokeDashoffset = ((1 - rem / IMAGE_SECS) * circ).toFixed(2);
+    if (rem <= 0) {
+      clearInterval(imgTimers[idx]);
+      showPage(3 + idx * 2);
+      startNarrativeTimer(idx);
+    }
+  }, 1000);
+}
+
+/* ═══════════════════════════════════════════════════
+   NARRATIVE TIMER + CHARACTER TRACKING
+═══════════════════════════════════════════════════ */
+const narState = {};
+function startNarrativeTimer(idx) {
+  const t0 = Date.now();
+  const totalMs = NARRATIVE_SECS * 1000;
+  narState[idx] = { t0, timeDone: false, charsDone: false, iv: null };
+  narState[idx].iv = setInterval(() => {
+    const rem = Math.max(0, totalMs - (Date.now() - t0));
+    const m = Math.floor(rem / 60000);
+    const s = Math.floor((rem % 60000) / 1000);
+    const pad = v => String(v).padStart(2, "0");
+    const pill = document.getElementById(`timePill-${idx}`);
+    const txt  = document.getElementById(`timePillTxt-${idx}`);
+    if (rem <= 0) {
+      narState[idx].timeDone = true;
+      pill.classList.add("done");
+      txt.textContent = "✓ 3 minutes elapsed";
+      clearInterval(narState[idx].iv);
+    } else {
+      txt.textContent = `Time remaining: ${pad(m)}:${pad(s)}`;
+    }
+    checkUnlock(idx);
+  }, 500);
+}
+
+function onInput(idx) {
+  const textarea = document.getElementById(`narrative-${idx}`);
+  if (!textarea) return;
+  const n = textarea.value.length;
+  const metFull = n >= NARRATIVE_CHARS;
+
+  document.getElementById(`charInfoTxt-${idx}`).textContent = `${n} characters`;
+  document.getElementById(`charInfo-${idx}`).className = `char-info${metFull ? " met" : ""}`;
+  document.getElementById(`charPillTxt-${idx}`).textContent = `${n} / ${NARRATIVE_CHARS} characters`;
+  const charPill = document.getElementById(`charPill-${idx}`);
+  if (metFull) charPill.classList.add("done");
+  else charPill.classList.remove("done");
+
+  if (narState[idx]) {
+    narState[idx].charsDone = metFull;
+    checkUnlock(idx);
+  }
+}
+
+function checkUnlock(idx) {
+  if (!narState[idx]) return;
+  const { timeDone, charsDone } = narState[idx];
+  const textarea = document.getElementById(`narrative-${idx}`);
+  const charCount = textarea ? textarea.value.length : 0;
+  const btn = document.getElementById(`narBtn-${idx}`);
+  const hint = document.getElementById(`hint-${idx}`);
+
+  const canProceed = charsDone || (timeDone && charCount >= MIN_CHARS_TIMER);
+  btn.disabled = !canProceed;
+
+  if (hint) {
+    if (timeDone && charCount < MIN_CHARS_TIMER) {
+      hint.classList.add("visible");
+    } else {
+      hint.classList.remove("visible");
+    }
+  }
+}
+
+function submitNarrative(idx) {
+  const text = document.getElementById(`narrative-${idx}`).value;
+  const elapsed = narState[idx] ? Math.round((Date.now() - narState[idx].t0) / 1000) : 0;
+  if (narState[idx]?.iv) clearInterval(narState[idx].iv);
+
+  responses.narratives[idx] = {
+    imageNumber: idx + 1,
+    imageLabel:  IMAGE_LABELS[idx],
+    narrative:   text,
+    characterCount: text.length,
+    timeSpentSeconds: elapsed,
+    submittedAt: new Date().toISOString(),
+  };
+
+  if (idx < 8) {
+    showPage(4 + idx * 2);
+    startImageTimer(idx + 1);
+  } else {
+    finishSurvey();
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   MICROSOFT FORMS SUBMISSION
+═══════════════════════════════════════════════════ */
+const FORMS_POST_URL = "https://forms.guest.usercontent.microsoft/formapi/api/29bebd42-f1ff-4c3d-9688-067e3460dc1f/users/f7345359-82f2-4923-ab53-9b788e1bb7e9/forms('Qr2-Kf_xPUyWiAZ-NGDcH1lTNPfygiNJq1ObeI4bt-lUREtNMDZCUERCUFZVRzVTTEFNNlJOMDFQNS4u')/responses";
+const FORMS_QUESTION_ID = "rfce8eeffc7104b03a328256205242974";
+
+async function saveToForms() {
+  const body = {
+    [FORMS_QUESTION_ID]: JSON.stringify(responses, null, 2)
+  };
+  const r = await fetch(FORMS_POST_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  if (!r.ok) {
+    const errText = await r.text();
+    throw new Error(`Forms submission failed (${r.status}): ${errText}`);
+  }
+}
+
+async function finishSurvey() {
+  responses.timestamps.end = new Date().toISOString();
+  showPage(20);
+
+  document.getElementById("finalDataBox").textContent = JSON.stringify(responses, null, 2);
+  document.getElementById("responseIdDisplay").textContent = `Response ID: ${responses.sessionId}`;
+  document.getElementById("overlayMsg").textContent = "Saving your response…";
+  document.getElementById("overlay").classList.add("active");
+
+  try {
+    await saveToForms();
+    document.getElementById("overlay").classList.remove("active");
+    document.getElementById("submitStatus").innerHTML =
+      `<span class="status-badge ok">✓ Response saved successfully</span>`;
+  } catch (err) {
+    console.error("Forms submission error:", err);
+    document.getElementById("overlay").classList.remove("active");
+    document.getElementById("submitStatus").innerHTML =
+      `<span class="status-badge fail">⚠ Could not save automatically. Please download your response below and share it manually.</span>
+       <div style="font-size:11px;color:var(--text-subtle);margin-top:6px;">Error: ${err.message}</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   EXPORT
+═══════════════════════════════════════════════════ */
+function downloadJSON() {
+  const blob = new Blob([JSON.stringify(responses, null, 2)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `survey_${responses.sessionId.slice(0,8)}.json`; a.click();
+}
+function downloadCSV() {
+  const d = responses.demographics;
+  const rows = [
+    ["session_id","age","gender","ethnicity","education","country","language","employment","arts_engagement","survey_start","survey_end"],
+    [responses.sessionId, d.age, d.gender, d.ethnicity, d.education, d.country, d.language, d.employment, d.artsEngagement, responses.timestamps.start, responses.timestamps.end],
+    [],
+    ["image_number","image_label","character_count","time_spent_seconds","submitted_at","narrative"],
+  ];
+  responses.narratives.forEach(n => {
+    rows.push([n.imageNumber, n.imageLabel, n.characterCount, n.timeSpentSeconds, n.submittedAt, `"${(n.narrative||"").replace(/"/g,'""')}"`]);
+  });
+  const blob = new Blob([rows.map(r=>r.join(",")).join("\n")], { type: "text/csv" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `survey_${responses.sessionId.slice(0,8)}.csv`; a.click();
+}
+function copyData() {
+  navigator.clipboard.writeText(JSON.stringify(responses, null, 2))
+    .then(() => alert("Copied to clipboard."))
+    .catch(() => alert("Please manually select and copy the text from the box above."));
+}
+</script>
+</body>
+</html>
