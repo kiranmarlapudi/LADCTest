@@ -303,6 +303,110 @@ font-weight:900;
 margin-top:15px;
 }
 
+/* HOME PAGE */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
+    text-align: center;
+    padding: 20px;
+}
+
+.home-title {
+    font-size: 72px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fbbf24, #8b5cf6, #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+    letter-spacing: 5px;
+}
+
+.home-subtitle {
+    font-size: 42px;
+    font-weight: 700;
+    color: #c4b5fd;
+    margin-bottom: 15px;
+}
+
+.home-phase {
+    font-size: 32px;
+    font-weight: 600;
+    color: #fbbf24;
+    margin-bottom: 40px;
+    opacity: 0.9;
+}
+
+.home-teams {
+    display: flex;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+.home-team-btn {
+    padding: 20px 50px;
+    font-size: 28px;
+    font-weight: 700;
+    background: rgba(255,255,255,.1);
+    border: 2px solid rgba(255,255,255,.2);
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.home-team-btn:hover {
+    background: rgba(255,255,255,.2);
+    transform: scale(1.05);
+    border-color: #fbbf24;
+    box-shadow: 0 0 30px rgba(251,191,36,.2);
+}
+
+.home-team-btn.team1:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 30px rgba(139,92,246,.3);
+}
+
+.home-team-btn.team2:hover {
+    border-color: #38bdf8;
+    box-shadow: 0 0 30px rgba(56,189,248,.3);
+}
+
+.home-team-btn.team3:hover {
+    border-color: #f472b6;
+    box-shadow: 0 0 30px rgba(244,114,182,.3);
+}
+
+.home-final-btn {
+    padding: 20px 50px;
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border: none;
+    border-radius: 20px;
+    color: #111;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.home-final-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(251,191,36,.4);
+}
+
+.home-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
 
 .footer{
 
@@ -341,7 +445,44 @@ text-shadow:
 
 }
 
+/* Celebration Animation - Subtle */
+.celebration-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9998;
+    overflow: hidden;
+}
 
+.sparkle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #fbbf24;
+    border-radius: 50%;
+    opacity: 0;
+    animation: floatUp 4s ease-in infinite;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 0;
+        transform: translateY(100vh) scale(0);
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-100vh) scale(1);
+    }
+}
 
 </style>
 
@@ -350,6 +491,8 @@ text-shadow:
 
 <body>
 
+<!-- Celebration Container -->
+<div id="celebrationContainer" class="celebration-container"></div>
 
 <div class="header">
 
@@ -401,10 +544,27 @@ class="total-score">
 
 
 
+<!-- HOME PAGE -->
+<div id="homeView" class="main">
+    <div class="home-container">
+        <div class="home-title">HR CONCLAVE 2026</div>
+        <div class="home-subtitle">Phase 3</div>
+        <div class="home-phase">Case Presentation</div>
+        <div class="home-buttons">
+            <div class="home-teams">
+                <a href="?team=1" class="home-team-btn team1">Team 1</a>
+                <a href="?team=2" class="home-team-btn team2">Team 2</a>
+                <a href="?team=3" class="home-team-btn team3">Team 3</a>
+            </div>
+            <a href="?final=true" class="home-final-btn">🏆 Final Scores</a>
+        </div>
+    </div>
+</div>
 
 
+<!-- TEAM VIEW -->
 <div id="normalView"
-class="main">
+class="main" style="display:none">
 
 
 <div class="side">
@@ -431,9 +591,7 @@ class="main">
 </div>
 
 
-
-
-
+<!-- FINAL VIEW -->
 <div id="finalView"
 style="display:none">
 
@@ -450,6 +608,10 @@ id="leaderboard">
 
 
 <div class="footer">
+
+<a href="?">🏠 Home</a>
+
+|
 
 <a href="?team=1">Team 1</a>
 
@@ -523,6 +685,29 @@ const isFinal =
 params.get("final")==="true";
 const currentTeam =
 params.get("team");
+const isHome = !currentTeam && !isFinal;
+
+// Show/hide appropriate views
+if (isHome) {
+    document.getElementById('homeView').style.display = 'flex';
+    document.getElementById('normalView').style.display = 'none';
+    document.getElementById('finalView').style.display = 'none';
+    document.getElementById('totalArea').style.display = 'none';
+    document.getElementById('teamName').innerHTML = '🏠 HOME';
+    document.querySelector('.live').style.display = 'none';
+} else if (isFinal) {
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('normalView').style.display = 'none';
+    document.getElementById('finalView').style.display = 'block';
+    document.getElementById('totalArea').style.display = 'none';
+    document.querySelector('.live').style.display = 'block';
+} else {
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('normalView').style.display = 'flex';
+    document.getElementById('finalView').style.display = 'none';
+    document.getElementById('totalArea').style.display = 'block';
+    document.querySelector('.live').style.display = 'block';
+}
 
 window.addEventListener("load",()=>{
 
@@ -535,7 +720,8 @@ if(
 (currentTeam==="1" && href.includes("team=1")) ||
 (currentTeam==="2" && href.includes("team=2")) ||
 (currentTeam==="3" && href.includes("team=3")) ||
-(isFinal && href.includes("final=true"))
+(isFinal && href.includes("final=true")) ||
+(isHome && href.includes("?"))
 ){
 link.style.color="#fbbf24";
 }
@@ -550,6 +736,7 @@ params.get("team") || "1";
 
 
 let chart;
+let celebrationInterval = null;
 
 
 
@@ -594,13 +781,11 @@ r.split(",")
 .map(c=>c.replace(/"/g,"").trim())
 );
 
-console.log(`Data for ${sheetName}:`, rows); // Debug log
+console.log(`Data for ${sheetName}:`, rows);
 
-// Find the data - look for any row with data in columns L and M (index 11 and 12)
 const labels = [];
 const scores = [];
 
-// First, try to find a header row with "Pillar" or similar
 let startRow = -1;
 for(let i = 0; i < rows.length; i++){
     if(rows[i] && rows[i].length > 11){
@@ -612,18 +797,15 @@ for(let i = 0; i < rows.length; i++){
     }
 }
 
-// If no header found, try row 10 (0-indexed)
 if(startRow === -1){
     startRow = 10;
 }
 
-// Extract data from the identified start row
 for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
     if(rows[i] && rows[i].length > 12){
         const label = rows[i][11] ? rows[i][11].trim() : '';
         const score = Number(rows[i][12]);
         
-        // Only add if label is not empty and score is a valid number
         if(label && label !== '' && !isNaN(score) && score >= 0){
             labels.push(label);
             scores.push(score);
@@ -631,7 +813,6 @@ for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
     }
 }
 
-// If no data found with the above method, scan all rows for data
 if(labels.length === 0){
     console.log('No data found with header method, scanning all rows...');
     for(let i = 0; i < rows.length; i++){
@@ -639,9 +820,7 @@ if(labels.length === 0){
             const label = rows[i][11] ? rows[i][11].trim() : '';
             const score = Number(rows[i][12]);
             
-            // Check if this looks like a data row (has a label and a valid score)
             if(label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50){
-                // Avoid picking up header rows or summary rows
                 if(!label.toLowerCase().includes('total') && 
                    !label.toLowerCase().includes('sum') &&
                    !label.toLowerCase().includes('average')){
@@ -654,7 +833,6 @@ if(labels.length === 0){
     }
 }
 
-// If still no data, use fallback
 if(labels.length === 0){
     console.log('No data found, using fallback');
     const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
@@ -664,42 +842,32 @@ if(labels.length === 0){
     }
 }
 
-// Ensure we have exactly 5 items (pad if necessary)
 while(labels.length < 5){
     labels.push(`Item ${labels.length + 1}`);
     scores.push(0);
 }
 
-// Take only first 5 items
 const finalLabels = labels.slice(0, 5);
 const finalScores = scores.slice(0, 5);
 
 const total = finalScores.reduce((a,b)=>a+b,0);
 
-
-
 document.getElementById("teamName")
 .innerHTML =
 "TEAM "+selectedTeam;
 
-
-
 document.getElementById("totalScore")
 .innerHTML =
 total;
-
-
 
 drawChart(finalLabels, finalScores);
 
 }
 catch(err){
     console.error("Error loading team data:", err);
-    // Show error state with fallback data
     document.getElementById("teamName").innerHTML = "TEAM "+selectedTeam;
     document.getElementById("totalScore").innerHTML = "0";
     
-    // Show fallback chart with zeros
     const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
     drawChart(fallbackLabels, [0,0,0,0,0]);
 }
@@ -828,19 +996,76 @@ color:"#fff"
 
 });
 
-
+// Add score labels on top of bars
+chart.update();
 
 }
 
 
 
 /* ======================
- FINAL PAGE - NO CONFETTI
+ FINAL PAGE - SUBTLE CELEBRATION
 ====================== */
 
 
+function startSubtleCelebration() {
+    // Clear any existing celebration
+    if (celebrationInterval) {
+        clearInterval(celebrationInterval);
+        celebrationInterval = null;
+    }
+    
+    const container = document.getElementById('celebrationContainer');
+    container.innerHTML = '';
+    
+    // Create subtle sparkles - only 15 total
+    for (let i = 0; i < 15; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.style.left = Math.random() * 100 + '%';
+        sparkle.style.animationDelay = Math.random() * 5 + 's';
+        sparkle.style.animationDuration = (3 + Math.random() * 3) + 's';
+        sparkle.style.width = (3 + Math.random() * 5) + 'px';
+        sparkle.style.height = sparkle.style.width;
+        sparkle.style.background = ['#fbbf24', '#8b5cf6', '#38bdf8', '#f472b6', '#34d399'][Math.floor(Math.random() * 5)];
+        container.appendChild(sparkle);
+    }
+    
+    // Subtle glow pulse on the champion card
+    const championCard = document.querySelector('.first');
+    if (championCard) {
+        championCard.style.animation = 'pulseGlow 3s ease-in-out infinite';
+    }
+    
+    // Add keyframe animation for pulse
+    const styleSheet = document.createElement("style");
+    styleSheet.textContent = `
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(251,191,36,0.3); }
+            50% { box-shadow: 0 0 40px rgba(251,191,36,0.6); }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+}
+
+function stopCelebration() {
+    if (celebrationInterval) {
+        clearInterval(celebrationInterval);
+        celebrationInterval = null;
+    }
+    const container = document.getElementById('celebrationContainer');
+    container.innerHTML = '';
+    
+    // Remove pulse animation from champion card
+    const championCard = document.querySelector('.first');
+    if (championCard) {
+        championCard.style.animation = 'none';
+    }
+}
+
 async function showFinal(){
 
+document.getElementById('homeView').style.display = 'none';
 document.getElementById("normalView")
 .style.display="none";
 
@@ -853,6 +1078,8 @@ document.getElementById("finalView")
 document.getElementById("teamName")
 .innerHTML =
 "🏆 FINAL LEADERBOARD";
+
+document.querySelector('.live').style.display = 'block';
 
 // Hide side images on final page
 const sideElements = document.querySelectorAll(".side");
@@ -889,7 +1116,6 @@ c.replace(/"/g,"").trim()
 )
 );
 
-// Use the same data extraction logic as loadTeam
 const scores = [];
 let startRow = -1;
 for(let i = 0; i < rows.length; i++){
@@ -915,7 +1141,6 @@ for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
     }
 }
 
-// If no scores found, scan all rows
 if(scores.length === 0){
     for(let i = 0; i < rows.length; i++){
         if(rows[i] && rows[i].length > 12){
@@ -933,7 +1158,6 @@ if(scores.length === 0){
     }
 }
 
-// Pad with zeros if needed
 while(scores.length < 5){
     scores.push(0);
 }
@@ -961,12 +1185,10 @@ score:0
 
 }
 
-// Sort by score descending
 results.sort(
 (a,b)=>b.score-a.score
 );
 
-// Ensure we have 3 results
 while(results.length < 3){
     results.push({
         team: `Team ${results.length + 1}`,
@@ -1033,8 +1255,8 @@ ${results[2].score}
 
 `;
 
-
-
+// Start subtle celebration
+startSubtleCelebration();
 
 }
 
@@ -1042,25 +1264,26 @@ ${results[2].score}
 
 
 // Main execution
-if(isFinal){
+if (isHome) {
+    // Home page - nothing to load
+    stopCelebration();
+} else if(isFinal){
 
 showFinal();
 
 setInterval(
 showFinal,
 5000
-); // Update every 5 seconds
+);
 
-}
-
-else{
+} else {
 
 loadTeam();
 
 setInterval(
 loadTeam,
 2000
-); // Update every 2 seconds
+);
 
 }
 
