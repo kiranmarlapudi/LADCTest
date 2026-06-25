@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>HR Conclave - Team 1 Dashboard</title>
+<title>HR Conclave 2026 - Team 1 Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -39,27 +39,47 @@ linear-gradient(
 color:white;
 }
 
+/* HEADER */
+
 .header{
 text-align:center;
-padding:25px 20px 10px;
+padding:15px 20px 5px;
+}
+
+.event-logo{
+width:140px;
+height:140px;
+object-fit:contain;
+display:block;
+margin:auto;
+margin-bottom:10px;
 }
 
 .badge{
+
 display:inline-block;
-padding:6px 18px;
+
+padding:12px 28px;
+
 border-radius:999px;
+
 background:rgba(139,92,246,.15);
+
 border:1px solid rgba(139,92,246,.35);
+
 color:#c4b5fd;
-font-size:12px;
-letter-spacing:2px;
-text-transform:uppercase;
+
+font-size:28px;
+
+font-weight:700;
+
+letter-spacing:3px;
 }
 
 .team-title{
-font-size:54px;
+font-size:52px;
 font-weight:700;
-margin-top:10px;
+margin-top:12px;
 }
 
 .live{
@@ -84,10 +104,12 @@ animation:pulse 1s infinite;
 100%{opacity:1}
 }
 
+/* TOTAL SCORE */
+
 .total-box{
 text-align:center;
-margin-top:15px;
-margin-bottom:20px;
+margin-top:8px;
+margin-bottom:10px;
 }
 
 .total-label{
@@ -96,17 +118,67 @@ opacity:.7;
 }
 
 .total-score{
-font-size:64px;
+font-size:42px;
 font-weight:700;
 color:#fbbf24;
 }
 
-.chart-card{
+/* MAIN DASHBOARD */
 
-width:95%;
-height:600px;
+.dashboard-row{
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+gap:20px;
+
+width:98%;
 
 margin:auto;
+}
+
+/* SIDE PANELS */
+
+.side-panel{
+
+width:240px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+}
+
+.side-image{
+
+width:100%;
+
+height:520px;
+
+object-fit:contain;
+
+background:
+rgba(255,255,255,.04);
+
+border:
+1px solid rgba(255,255,255,.08);
+
+border-radius:20px;
+
+padding:10px;
+}
+
+/* CHART */
+
+.chart-card{
+
+flex:1;
+
+height:620px;
 
 background:
 rgba(255,255,255,.05);
@@ -116,7 +188,7 @@ border:
 
 border-radius:24px;
 
-padding:25px;
+padding:20px;
 
 backdrop-filter:blur(12px);
 }
@@ -128,7 +200,7 @@ height:100% !important;
 
 .footer{
 position:fixed;
-bottom:12px;
+bottom:10px;
 width:100%;
 text-align:center;
 font-size:12px;
@@ -142,8 +214,15 @@ opacity:.5;
 
 <div class="header">
 
+<img
+id="eventLogo"
+class="event-logo"
+src=""
+alt="Logo"
+>
+
 <div class="badge">
-HR CONCLAVE 2025
+HR CONCLAVE 2026
 </div>
 
 <div class="team-title">
@@ -158,17 +237,41 @@ LIVE SCORING
 </div>
 
 <div class="total-box">
+
 <div class="total-label">
 TOTAL SCORE
 </div>
 
-<div id="totalScore" class="total-score">
+<div
+id="totalScore"
+class="total-score">
 0
 </div>
+
+</div>
+
+<div class="dashboard-row">
+
+<div class="side-panel">
+<img
+id="leftImage"
+class="side-image"
+src=""
+alt="Left Image">
 </div>
 
 <div class="chart-card">
 <canvas id="scoreChart"></canvas>
+</div>
+
+<div class="side-panel">
+<img
+id="rightImage"
+class="side-image"
+src=""
+alt="Right Image">
+</div>
+
 </div>
 
 <div class="footer">
@@ -177,11 +280,36 @@ Auto Refreshing Every Second
 
 <script>
 
+/* ==========================
+   IMAGE URLS
+   Replace these with your
+   GitHub RAW image links
+========================== */
+
+const EVENT_LOGO = " https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image5.png";
+const LEFT_IMAGE = " https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image7.png";
+const RIGHT_IMAGE = "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image9.png";
+
+
+
+/* ==========================
+   GOOGLE SHEET
+========================== */
+
 const SHEET_ID =
 "1zfoi-RiQ2_djE64bg3DMQXD7KBaz0j8ko54tPrQ9nf8";
 
 const SHEET_NAME =
 "Team 1";
+
+document.getElementById("eventLogo").src =
+EVENT_LOGO;
+
+document.getElementById("leftImage").src =
+LEFT_IMAGE;
+
+document.getElementById("rightImage").src =
+RIGHT_IMAGE;
 
 let chart = null;
 
@@ -194,7 +322,7 @@ const url =
 
 const response =
 await fetch(
-url + "&t=" + Date.now()
+url + "&nocache=" + Date.now()
 );
 
 const csv =
@@ -215,8 +343,8 @@ cell.replace(/"/g,"").trim()
 /*
 L11:M15
 
-L column = index 11
-M column = index 12
+L = column 11
+M = column 12
 
 Row 11 = index 10
 Row 15 = index 14
@@ -241,9 +369,9 @@ scores.reduce(
 0
 );
 
-document
-.getElementById("totalScore")
-.innerText = total;
+document.getElementById(
+"totalScore"
+).innerText = total;
 
 renderChart(
 labels,
@@ -256,6 +384,7 @@ catch(err){
 console.error(err);
 
 }
+
 }
 
 function renderChart(
@@ -264,7 +393,9 @@ scores
 ){
 
 const ctx =
-document.getElementById("scoreChart");
+document.getElementById(
+"scoreChart"
+);
 
 if(chart){
 chart.destroy();
@@ -315,7 +446,7 @@ x:{
 ticks:{
 color:"#ffffff",
 font:{
-size:14,
+size:15,
 weight:"bold"
 }
 },
@@ -333,7 +464,10 @@ max:
 Math.max(...scores)+10,
 
 ticks:{
-color:"#ffffff"
+color:"#ffffff",
+font:{
+size:14
+}
 },
 
 grid:{
@@ -358,7 +492,7 @@ ctx.fillStyle =
 "#ffffff";
 
 ctx.font =
-"bold 18px Segoe UI";
+"bold 20px Segoe UI";
 
 chart
 .getDatasetMeta(0)
@@ -377,7 +511,6 @@ bar.y - 12
 });
 
 ctx.restore();
-
 }
 }]
 });
