@@ -9,8 +9,6 @@
 <title>HR Conclave 2026 Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-
 
 <style>
 
@@ -491,11 +489,11 @@ const EVENT_LOGO =
 
 
 const LEFT_IMAGE =
-"https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png";
+"https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image7.png";
 
 
 const RIGHT_IMAGE =
-"https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png";
+"https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image9.png";
 
 
 
@@ -596,53 +594,61 @@ r.split(",")
 .map(c=>c.replace(/"/g,"").trim())
 );
 
+console.log(`Data for ${sheetName}:`, rows); // Debug log
 
-
-// Find the row containing "Pillar" or "Category" to locate the data
-let startRow = -1;
-for(let i = 0; i < rows.length; i++){
-    if(rows[i][0] && (rows[i][0].includes("Pillar") || rows[i][0].includes("Category") || rows[i][0].includes("Parameter"))){
-        startRow = i + 1; // Start from next row
-        break;
-    }
-}
-
-// If no header found, use default rows 10-15
-if(startRow === -1){
-    startRow = 10;
-}
-
-// Get data rows (5 rows of data)
-const data = [];
+// Find the data - look for any row with data in columns L and M (index 11 and 12)
 const labels = [];
 const scores = [];
 
-for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
-    if(rows[i] && rows[i].length > 12){
-        const label = rows[i][11] ? rows[i][11].trim() : `Item ${i - startRow + 1}`;
-        const score = Number(rows[i][12]) || 0;
-        
-        // Only add if label is not empty
-        if(label && label !== ""){
-            labels.push(label);
-            scores.push(score);
-            data.push(rows[i]);
+// First, try to find a header row with "Pillar" or similar
+let startRow = -1;
+for(let i = 0; i < rows.length; i++){
+    if(rows[i] && rows[i].length > 11){
+        const colL = rows[i][11] ? rows[i][11].toLowerCase() : '';
+        if(colL.includes('pillar') || colL.includes('category') || colL.includes('parameter') || colL.includes('criteria')){
+            startRow = i + 1;
+            break;
         }
     }
 }
 
-// If no data found, try to find any numeric data in column 13 (index 12)
+// If no header found, try row 10 (0-indexed)
+if(startRow === -1){
+    startRow = 10;
+}
+
+// Extract data from the identified start row
+for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
+    if(rows[i] && rows[i].length > 12){
+        const label = rows[i][11] ? rows[i][11].trim() : '';
+        const score = Number(rows[i][12]);
+        
+        // Only add if label is not empty and score is a valid number
+        if(label && label !== '' && !isNaN(score) && score >= 0){
+            labels.push(label);
+            scores.push(score);
+        }
+    }
+}
+
+// If no data found with the above method, scan all rows for data
 if(labels.length === 0){
+    console.log('No data found with header method, scanning all rows...');
     for(let i = 0; i < rows.length; i++){
         if(rows[i] && rows[i].length > 12){
+            const label = rows[i][11] ? rows[i][11].trim() : '';
             const score = Number(rows[i][12]);
-            if(!isNaN(score) && score > 0){
-                const label = rows[i][11] ? rows[i][11].trim() : `Item ${labels.length + 1}`;
-                if(label && label !== ""){
+            
+            // Check if this looks like a data row (has a label and a valid score)
+            if(label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50){
+                // Avoid picking up header rows or summary rows
+                if(!label.toLowerCase().includes('total') && 
+                   !label.toLowerCase().includes('sum') &&
+                   !label.toLowerCase().includes('average')){
                     labels.push(label);
                     scores.push(score);
+                    if(labels.length >= 5) break;
                 }
-                if(labels.length >= 5) break;
             }
         }
     }
@@ -650,16 +656,25 @@ if(labels.length === 0){
 
 // If still no data, use fallback
 if(labels.length === 0){
-    // Use default labels
-    const defaultLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
+    console.log('No data found, using fallback');
+    const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
     for(let i = 0; i < 5; i++){
-        labels.push(defaultLabels[i]);
+        labels.push(fallbackLabels[i]);
         scores.push(0);
     }
 }
 
-const total =
-scores.reduce((a,b)=>a+b,0);
+// Ensure we have exactly 5 items (pad if necessary)
+while(labels.length < 5){
+    labels.push(`Item ${labels.length + 1}`);
+    scores.push(0);
+}
+
+// Take only first 5 items
+const finalLabels = labels.slice(0, 5);
+const finalScores = scores.slice(0, 5);
+
+const total = finalScores.reduce((a,b)=>a+b,0);
 
 
 
@@ -675,16 +690,16 @@ total;
 
 
 
-drawChart(labels,scores);
+drawChart(finalLabels, finalScores);
 
 }
 catch(err){
     console.error("Error loading team data:", err);
-    // Show error state
-    document.getElementById("teamName").innerHTML = "TEAM "+selectedTeam+" (Error loading)";
+    // Show error state with fallback data
+    document.getElementById("teamName").innerHTML = "TEAM "+selectedTeam;
     document.getElementById("totalScore").innerHTML = "0";
     
-    // Show fallback chart
+    // Show fallback chart with zeros
     const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
     drawChart(fallbackLabels, [0,0,0,0,0]);
 }
@@ -820,7 +835,7 @@ color:"#fff"
 
 
 /* ======================
- FINAL PAGE - DYNAMIC
+ FINAL PAGE - NO CONFETTI
 ====================== */
 
 
@@ -838,6 +853,10 @@ document.getElementById("finalView")
 document.getElementById("teamName")
 .innerHTML =
 "🏆 FINAL LEADERBOARD";
+
+// Hide side images on final page
+const sideElements = document.querySelectorAll(".side");
+sideElements.forEach(el => el.style.display = "none");
 
 const teams = [
 "Team 1",
@@ -870,12 +889,16 @@ c.replace(/"/g,"").trim()
 )
 );
 
-// Find the data using the same logic as loadTeam
+// Use the same data extraction logic as loadTeam
+const scores = [];
 let startRow = -1;
 for(let i = 0; i < rows.length; i++){
-    if(rows[i][0] && (rows[i][0].includes("Pillar") || rows[i][0].includes("Category") || rows[i][0].includes("Parameter"))){
-        startRow = i + 1;
-        break;
+    if(rows[i] && rows[i].length > 11){
+        const colL = rows[i][11] ? rows[i][11].toLowerCase() : '';
+        if(colL.includes('pillar') || colL.includes('category') || colL.includes('parameter') || colL.includes('criteria')){
+            startRow = i + 1;
+            break;
+        }
     }
 }
 
@@ -883,28 +906,34 @@ if(startRow === -1){
     startRow = 10;
 }
 
-const scores = [];
 for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
     if(rows[i] && rows[i].length > 12){
-        const score = Number(rows[i][12]) || 0;
-        scores.push(score);
+        const score = Number(rows[i][12]);
+        if(!isNaN(score) && score >= 0){
+            scores.push(score);
+        }
     }
 }
 
-// If no scores found, try to find any numeric data in column 13
+// If no scores found, scan all rows
 if(scores.length === 0){
     for(let i = 0; i < rows.length; i++){
         if(rows[i] && rows[i].length > 12){
+            const label = rows[i][11] ? rows[i][11].trim() : '';
             const score = Number(rows[i][12]);
-            if(!isNaN(score) && score > 0){
-                scores.push(score);
-                if(scores.length >= 5) break;
+            if(label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50){
+                if(!label.toLowerCase().includes('total') && 
+                   !label.toLowerCase().includes('sum') &&
+                   !label.toLowerCase().includes('average')){
+                    scores.push(score);
+                    if(scores.length >= 5) break;
+                }
             }
         }
     }
 }
 
-// If still no scores, use zeros
+// Pad with zeros if needed
 while(scores.length < 5){
     scores.push(0);
 }
@@ -932,6 +961,7 @@ score:0
 
 }
 
+// Sort by score descending
 results.sort(
 (a,b)=>b.score-a.score
 );
@@ -1003,37 +1033,6 @@ ${results[2].score}
 
 `;
 
-// Remove side images if they exist
-const sideElements = document.querySelectorAll(".side");
-sideElements.forEach(el => el.style.display = "none");
-
-celebrate();
-
-}
-
-
-
-
-function celebrate(){
-
-
-setInterval(()=>{
-
-
-confetti({
-
-particleCount:80,
-
-spread:100,
-
-origin:{
-y:.6
-}
-
-});
-
-
-},2500);
 
 
 
@@ -1042,14 +1041,15 @@ y:.6
 
 
 
+// Main execution
 if(isFinal){
 
 showFinal();
 
 setInterval(
 showFinal,
-1000
-);
+5000
+); // Update every 5 seconds
 
 }
 
@@ -1059,8 +1059,8 @@ loadTeam();
 
 setInterval(
 loadTeam,
-1000
-);
+2000
+); // Update every 2 seconds
 
 }
 
