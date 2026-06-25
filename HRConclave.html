@@ -230,12 +230,12 @@ width:100%!important;
 .leaderboard{
 width:90%;
 max-width:1200px;
-margin:20px auto;
+margin:auto;
 }
 
 .first{
-background:
-linear-gradient(
+
+background:linear-gradient(
 135deg,
 #fbbf24,
 #f59e0b
@@ -245,17 +245,20 @@ color:#111;
 
 padding:40px;
 
-margin-bottom:25px;
+margin-bottom:30px;
 
-border-radius:30px;
 }
 
 .podium-row{
+
 display:flex;
+
 gap:25px;
+
 }
 
 .second{
+
 flex:1;
 
 background:
@@ -267,10 +270,10 @@ linear-gradient(
 
 color:#111;
 
-border-radius:30px;
 }
 
 .third{
+
 flex:1;
 
 background:
@@ -280,27 +283,34 @@ linear-gradient(
 #92400e
 );
 
-border-radius:30px;
 }
 
 .winner-card{
-padding:35px;
+
+border-radius:30px;
+
+padding:30px;
+
 text-align:center;
+
 }
 
 .position{
-font-size:34px;
+
+font-size:32px;
 font-weight:800;
 }
 
 .team-name-final{
-font-size:52px;
+
+font-size:48px;
 font-weight:800;
 margin-top:15px;
 }
 
 .team-score-final{
-font-size:88px;
+
+font-size:72px;
 font-weight:900;
 margin-top:15px;
 }
@@ -703,152 +713,59 @@ color:"#fff"
 /* ======================
  FINAL PAGE
 ====================== */
-async function showFinal(){
 
-document.getElementById("normalView")
-.style.display="none";
 
-document.getElementById("totalArea")
-.style.display="none";
+function showFinal(){
 
-document.getElementById("finalView")
-.style.display="block";
-
-document.getElementById("teamName")
-.innerHTML =
-"🏆 FINAL LEADERBOARD";
-
-const teams = [
-"Team 1",
-"Team 2",
-"Team 3"
-];
-
-const results = [];
-
-for(const teamName of teams){
-
-try{
-
-const url =
-`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(teamName)}`;
-
-const response =
-await fetch(url + "&t=" + Date.now());
-
-const csv =
-await response.text();
-
-const rows =
-csv.trim()
-.split("\n")
-.map(r =>
-r.split(",")
-.map(c =>
-c.replace(/"/g,"").trim()
-)
-);
-
-const dataRows =
-rows.slice(10,15);
-
-const scores =
-dataRows.map(r =>
-Number(r[12]) || 0
-);
-
-const total =
-scores.reduce(
-(a,b)=>a+b,
-0
-);
-
-results.push({
-team:teamName,
-score:total
-});
-
-}
-catch(err){
-
-console.error(
-teamName,
-err
-);
-
-}
-
-}
-
-results.sort(
-(a,b)=>b.score-a.score
-);
-
-document.getElementById("leaderboard")
-.innerHTML =
-
-`
+document.getElementById("leaderboard").innerHTML = `
 
 <div class="winner-card first">
 
-<div class="position">
-🏆 CHAMPION
-</div>
+    <div class="position">🏆 CHAMPION</div>
 
-<div class="team-name-final">
-${results[0].team}
-</div>
+    <div class="team-name-final">
+        ${scores[0].team}
+    </div>
 
-<div class="team-score-final">
-${results[0].score}
-</div>
+    <div class="team-score-final">
+        ${scores[0].score}
+    </div>
 
 </div>
 
 <div class="podium-row">
 
-<div class="winner-card second">
+    <div class="winner-card second">
 
-<div class="position">
-🥈 SECOND PLACE
-</div>
+        <div class="position">🥈 SECOND</div>
 
-<div class="team-name-final">
-${results[1].team}
-</div>
+        <div class="team-name-final">
+            ${scores[1].team}
+        </div>
 
-<div class="team-score-final">
-${results[1].score}
-</div>
+        <div class="team-score-final">
+            ${scores[1].score}
+        </div>
 
-</div>
+    </div>
 
-<div class="winner-card third">
+    <div class="winner-card third">
 
-<div class="position">
-🥉 THIRD PLACE
-</div>
+        <div class="position">🥉 THIRD</div>
 
-<div class="team-name-final">
-${results[2].team}
-</div>
+        <div class="team-name-final">
+            ${scores[2].team}
+        </div>
 
-<div class="team-score-final">
-${results[2].score}
-</div>
+        <div class="team-score-final">
+            ${scores[2].score}
+        </div>
 
-</div>
+    </div>
 
 </div>
 
 `;
-
-document.querySelector(".side")?.remove();
-
-celebrate();
-
-}
-
 
 
 
@@ -935,6 +852,13 @@ y:.6
 }
 
 
+
+
+if(isFinal){
+
+showFinal();
+
+}
 
 else{
 
