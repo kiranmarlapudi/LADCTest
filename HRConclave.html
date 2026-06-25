@@ -246,6 +246,8 @@ padding:40px;
 margin-bottom:25px;
 
 border-radius:30px;
+position: relative;
+overflow: hidden;
 }
 
 .podium-row{
@@ -408,15 +410,18 @@ margin-top:15px;
     gap: 15px;
 }
 
+/* FOOTER - Always visible */
 .footer{
 
 position:fixed;
 
 bottom:12px;
 
-left:15px;
+left:0;
+right:0;
+text-align:center;
 
-font-size:13px;
+font-size:14px;
 
 z-index:9999;
 
@@ -428,7 +433,7 @@ color:#c4b5fd;
 
 text-decoration:none;
 
-margin:0 6px;
+margin:0 10px;
 
 font-weight:600;
 
@@ -445,43 +450,61 @@ text-shadow:
 
 }
 
-/* Celebration Animation - Subtle */
-.celebration-container {
-    position: fixed;
+.footer .separator {
+    color: rgba(255,255,255,0.3);
+}
+
+/* Floating Sparkles - Only on Champion Card */
+.sparkle-container {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 9998;
     overflow: hidden;
+    border-radius: 30px;
 }
 
-.sparkle {
+.sparkle-particle {
     position: absolute;
-    width: 6px;
-    height: 6px;
-    background: #fbbf24;
+    width: 4px;
+    height: 4px;
+    background: #ffffff;
     border-radius: 50%;
     opacity: 0;
-    animation: floatUp 4s ease-in infinite;
+    animation: floatSparkle 5s ease-in infinite;
 }
 
-@keyframes floatUp {
+@keyframes floatSparkle {
     0% {
         opacity: 0;
-        transform: translateY(100vh) scale(0);
+        transform: translateY(100%) scale(0) rotate(0deg);
     }
     10% {
+        opacity: 0.8;
+    }
+    50% {
         opacity: 1;
+        transform: translateY(-50%) scale(1) rotate(180deg);
     }
     90% {
-        opacity: 1;
+        opacity: 0.8;
     }
     100% {
         opacity: 0;
-        transform: translateY(-100vh) scale(1);
+        transform: translateY(-100%) scale(0) rotate(360deg);
     }
+}
+
+/* Pulse glow for champion */
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 30px rgba(251,191,36,0.3); }
+    50% { box-shadow: 0 0 60px rgba(251,191,36,0.7), 0 0 100px rgba(251,191,36,0.2); }
+}
+
+.first.glow-pulse {
+    animation: pulseGlow 3s ease-in-out infinite;
 }
 
 </style>
@@ -490,9 +513,6 @@ text-shadow:
 
 
 <body>
-
-<!-- Celebration Container -->
-<div id="celebrationContainer" class="celebration-container"></div>
 
 <div class="header">
 
@@ -607,23 +627,24 @@ id="leaderboard">
 
 
 
+<!-- FOOTER - Always visible -->
 <div class="footer">
 
 <a href="?">🏠 Home</a>
 
-|
+<span class="separator">|</span>
 
 <a href="?team=1">Team 1</a>
 
-|
+<span class="separator">|</span>
 
 <a href="?team=2">Team 2</a>
 
-|
+<span class="separator">|</span>
 
 <a href="?team=3">Team 3</a>
 
-|
+<span class="separator">|</span>
 
 <a href="?final=true">🏆 Final Scores</a>
 
@@ -693,7 +714,7 @@ if (isHome) {
     document.getElementById('normalView').style.display = 'none';
     document.getElementById('finalView').style.display = 'none';
     document.getElementById('totalArea').style.display = 'none';
-    document.getElementById('teamName').innerHTML = '🏠 HOME';
+    document.getElementById('teamName').innerHTML = '🏠';
     document.querySelector('.live').style.display = 'none';
 } else if (isFinal) {
     document.getElementById('homeView').style.display = 'none';
@@ -709,6 +730,7 @@ if (isHome) {
     document.querySelector('.live').style.display = 'block';
 }
 
+// Highlight active link in footer
 window.addEventListener("load",()=>{
 
 document.querySelectorAll(".footer a")
@@ -721,9 +743,10 @@ if(
 (currentTeam==="2" && href.includes("team=2")) ||
 (currentTeam==="3" && href.includes("team=3")) ||
 (isFinal && href.includes("final=true")) ||
-(isHome && href.includes("?"))
+(isHome && href === "?")
 ){
 link.style.color="#fbbf24";
+link.style.fontWeight="800";
 }
 });
 
@@ -736,7 +759,7 @@ params.get("team") || "1";
 
 
 let chart;
-let celebrationInterval = null;
+let sparkleInterval = null;
 
 
 
@@ -1004,62 +1027,50 @@ chart.update();
 
 
 /* ======================
- FINAL PAGE - SUBTLE CELEBRATION
+ FINAL PAGE - SUBTLE SPARKLES ON CHAMPION ONLY
 ====================== */
 
 
-function startSubtleCelebration() {
-    // Clear any existing celebration
-    if (celebrationInterval) {
-        clearInterval(celebrationInterval);
-        celebrationInterval = null;
-    }
+function addSparklesToChampion() {
+    // Remove any existing sparkle containers
+    const existingContainers = document.querySelectorAll('.sparkle-container');
+    existingContainers.forEach(container => container.remove());
     
-    const container = document.getElementById('celebrationContainer');
-    container.innerHTML = '';
+    const championCard = document.querySelector('.first');
+    if (!championCard) return;
     
-    // Create subtle sparkles - only 15 total
+    // Add glow pulse class
+    championCard.classList.add('glow-pulse');
+    
+    // Create sparkle container
+    const sparkleContainer = document.createElement('div');
+    sparkleContainer.className = 'sparkle-container';
+    championCard.appendChild(sparkleContainer);
+    
+    // Create exactly 15 sparkles
+    const colors = ['#ffffff', '#fbbf24', '#ffd700', '#fff5e6', '#ffe4b5'];
     for (let i = 0; i < 15; i++) {
         const sparkle = document.createElement('div');
-        sparkle.className = 'sparkle';
-        sparkle.style.left = Math.random() * 100 + '%';
-        sparkle.style.animationDelay = Math.random() * 5 + 's';
-        sparkle.style.animationDuration = (3 + Math.random() * 3) + 's';
+        sparkle.className = 'sparkle-particle';
+        sparkle.style.left = (10 + Math.random() * 80) + '%';
+        sparkle.style.top = (10 + Math.random() * 80) + '%';
+        sparkle.style.animationDelay = (Math.random() * 5) + 's';
+        sparkle.style.animationDuration = (4 + Math.random() * 3) + 's';
         sparkle.style.width = (3 + Math.random() * 5) + 'px';
         sparkle.style.height = sparkle.style.width;
-        sparkle.style.background = ['#fbbf24', '#8b5cf6', '#38bdf8', '#f472b6', '#34d399'][Math.floor(Math.random() * 5)];
-        container.appendChild(sparkle);
+        sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        sparkle.style.boxShadow = `0 0 6px ${sparkle.style.background}`;
+        sparkleContainer.appendChild(sparkle);
     }
-    
-    // Subtle glow pulse on the champion card
-    const championCard = document.querySelector('.first');
-    if (championCard) {
-        championCard.style.animation = 'pulseGlow 3s ease-in-out infinite';
-    }
-    
-    // Add keyframe animation for pulse
-    const styleSheet = document.createElement("style");
-    styleSheet.textContent = `
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(251,191,36,0.3); }
-            50% { box-shadow: 0 0 40px rgba(251,191,36,0.6); }
-        }
-    `;
-    document.head.appendChild(styleSheet);
 }
 
-function stopCelebration() {
-    if (celebrationInterval) {
-        clearInterval(celebrationInterval);
-        celebrationInterval = null;
-    }
-    const container = document.getElementById('celebrationContainer');
-    container.innerHTML = '';
+function removeSparkles() {
+    const existingContainers = document.querySelectorAll('.sparkle-container');
+    existingContainers.forEach(container => container.remove());
     
-    // Remove pulse animation from champion card
     const championCard = document.querySelector('.first');
     if (championCard) {
-        championCard.style.animation = 'none';
+        championCard.classList.remove('glow-pulse');
     }
 }
 
@@ -1255,8 +1266,10 @@ ${results[2].score}
 
 `;
 
-// Start subtle celebration
-startSubtleCelebration();
+// Add sparkles to champion card
+setTimeout(() => {
+    addSparklesToChampion();
+}, 100);
 
 }
 
@@ -1265,8 +1278,8 @@ startSubtleCelebration();
 
 // Main execution
 if (isHome) {
-    // Home page - nothing to load
-    stopCelebration();
+    // Home page - remove any sparkles
+    removeSparkles();
 } else if(isFinal){
 
 showFinal();
