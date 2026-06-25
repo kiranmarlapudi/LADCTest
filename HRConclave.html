@@ -1,19 +1,373 @@
 <!DOCTYPE html>
-<html> <head> <meta charset="utf-8"> <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HR Conclave Live Scoreboard</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style> *{ margin:0; padding:0; box-sizing:border-box; } body{ font-family:'Segoe UI',sans-serif; height:100vh; overflow:hidden; background: radial-gradient(circle at top left, rgba(139,92,246,.15), transparent 30%), radial-gradient(circle at bottom right, rgba(56,189,248,.15), transparent 30%), linear-gradient( 135deg, #14081f 0%, #24133d 40%, #102340 100%); color:white; } .header{ padding:30px 20px 10px; text-align:center; } .badge{ display:inline-block; padding:6px 18px; border-radius:50px; background:rgba(139,92,246,.15); border:1px solid rgba(139,92,246,.4); color:#c4b5fd; font-size:12px; letter-spacing:2px; text-transform:uppercase; } .team-name{ font-size:54px; font-weight:700; margin-top:12px; } .live{ margin-top:10px; color:#4ade80; font-size:14px; } .live-dot{ display:inline-block; width:10px; height:10px; background:#4ade80; border-radius:50%; margin-right:8px; animation:pulse 1s infinite; } @keyframes pulse{ 0%{opacity:1} 50%{opacity:.4} 100%{opacity:1} } .total{ text-align:center; margin-top:10px; margin-bottom:20px; } .total-label{ font-size:14px; opacity:.7; } .total-score{ font-size:60px; font-weight:700; color:#fbbf24; } .chart-card{ width:94%; height:560px; margin:auto; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius:24px; padding:20px; } canvas{ width:100% !important; height:100% !important; } .footer{ position:fixed; bottom:15px; width:100%; text-align:center; font-size:12px; opacity:.4; } </style>
-</head>
-<body>
-<div class="header">
-<div class="badge"> HR CONCLAVE 2025 </div>
-<div id="teamName" class="team-name"> TEAM 1 </div>
-<div class="live"> <span class="live-dot"></span> LIVE REFRESHING </div>
-</div>
-<div class="total"> <div class="total-label">TOTAL SCORE</div> <div id="totalScore" class="total-score">0</div> </div>
-<div class="chart-card"> <canvas id="scoreChart"></canvas> </div>
-<div class="footer"> Auto Synced From Google Sheets </div>
-<script> const SHEET_URL = "https://docs.google.com/spreadsheets/d/1AaSU85vaMCaaFta1Nxq_HIy48BRkbXLcgzWTqNiVx_o/edit?usp=sharing"; let chart; async function loadSheet(){ try{ const sheetId = SHEET_URL.match( /\/d\/([a-zA-Z0-9_-]+)/ )[1]; const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv`; const response = await fetch( csvUrl + "&t=" + Date.now() ); const csv = await response.text(); const rows = csv .trim() .split("\n") .map(row => row .split(",") .map(cell => cell .replace(/"/g,"") .trim() ) ); const teamName = rows[0][1] || "TEAM"; document .getElementById("teamName") .innerText = teamName; const dataRows = rows.slice(10, 15); const labels = dataRows.map(r => r[11]); // Column L
-const scores = dataRows.map(r => Number(r[12]) || 0); const total = scores.reduce( (a,b)=>a+b, 0 ); document .getElementById("totalScore") .innerText = total; renderChart( labels, scores ); } catch(err){ console.log(err); } } function renderChart( labels, scores ){ const ctx = document .getElementById("scoreChart"); if(chart){ chart.destroy(); } chart = new Chart(ctx,{ type:"bar", data:{ labels:labels, datasets:[{ data:scores, borderRadius:16, borderSkipped:false, backgroundColor:[ "#8b5cf6", "#38bdf8", "#f472b6", "#34d399", "#fbbf24" ] }] }, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } }, scales:{ x:{ ticks:{ color:"#fff", font:{ size:14, weight:"bold" } }, grid:{ display:false } }, y:{ beginAtZero:true, max:100, ticks:{ color:"#fff", font:{ size:13 } }, grid:{ color: "rgba(255,255,255,.08)" } } } }, plugins:[{ id:"valueLabels", afterDatasetsDraw(chart){ const {ctx} = chart; ctx.save(); ctx.fillStyle="#ffffff"; ctx.font= "bold 18px Segoe UI"; chart .getDatasetMeta(0) .data .forEach((bar,index)=>{ ctx.textAlign="center"; ctx.fillText( scores[index], bar.x, bar.y - 12 ); }); ctx.restore(); } }] }); } loadSheet(); setInterval( loadSheet, 1000 ); </script>
-</body> </html>
 
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HR Conclave - Team 1 Live Scoreboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Segoe UI',sans-serif;
+height:100vh;
+overflow:hidden;
+
+background:
+radial-gradient(circle at top left,
+rgba(139,92,246,.15),
+transparent 35%),
+
+radial-gradient(circle at bottom right,
+rgba(56,189,248,.15),
+transparent 35%),
+
+linear-gradient(
+135deg,
+#13071f 0%,
+#251341 45%,
+#10233f 100%);
+
+color:#fff;
+}
+
+.header{
+text-align:center;
+padding:25px 20px 10px;
+}
+
+.badge{
+display:inline-block;
+padding:6px 18px;
+border-radius:30px;
+background:rgba(139,92,246,.15);
+border:1px solid rgba(139,92,246,.4);
+color:#c4b5fd;
+font-size:12px;
+letter-spacing:2px;
+text-transform:uppercase;
+}
+
+.team-title{
+font-size:52px;
+font-weight:700;
+margin-top:10px;
+}
+
+.live{
+margin-top:10px;
+color:#4ade80;
+font-size:14px;
+}
+
+.live-dot{
+display:inline-block;
+width:10px;
+height:10px;
+background:#4ade80;
+border-radius:50%;
+margin-right:8px;
+animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+0%{opacity:1}
+50%{opacity:.3}
+100%{opacity:1}
+}
+
+.total-box{
+text-align:center;
+margin-top:10px;
+margin-bottom:20px;
+}
+
+.total-label{
+font-size:14px;
+opacity:.7;
+}
+
+.total-score{
+font-size:62px;
+font-weight:700;
+color:#fbbf24;
+}
+
+.chart-card{
+width:95%;
+height:600px;
+margin:auto;
+
+background:
+rgba(255,255,255,.04);
+
+border:
+1px solid rgba(255,255,255,.08);
+
+border-radius:24px;
+
+padding:25px;
+}
+
+canvas{
+width:100% !important;
+height:100% !important;
+}
+
+.footer{
+position:fixed;
+bottom:12px;
+width:100%;
+text-align:center;
+font-size:12px;
+opacity:.4;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+<div class="badge">
+HR CONCLAVE 2025
+</div>
+
+<div class="team-title">
+TEAM 1
+</div>
+
+<div class="live">
+<span class="live-dot"></span>
+LIVE SCORING
+</div>
+
+</div>
+
+<div class="total-box">
+<div class="total-label">TOTAL SCORE</div>
+<div class="total-score" id="totalScore">0</div>
+</div>
+
+<div class="chart-card">
+<canvas id="chart"></canvas>
+</div>
+
+<div class="footer">
+Auto-refreshing every second
+</div>
+
+<script>
+
+const SHEET_ID =
+"1zfoi-RiQ2_djE64bg3DMQXD7KBaz0j8ko54tPrQ9nf8";
+
+const SHEET_NAME =
+"Team 1";
+
+let chart;
+
+async function loadScores(){
+
+try{
+
+const url =
+`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+
+const response =
+await fetch(
+url + "&nocache=" + Date.now()
+);
+
+const csv =
+await response.text();
+
+const rows =
+csv
+.trim()
+.split("\n")
+.map(row =>
+row
+.split(",")
+.map(cell =>
+cell.replace(/"/g,"").trim()
+)
+);
+
+const labels =
+rows.map(r => r[0]);
+
+const scores =
+rows.map(r => Number(r[1]) || 0);
+
+const total =
+scores.reduce(
+(a,b)=>a+b,
+0
+);
+
+document
+.getElementById("totalScore")
+.innerText = total;
+
+drawChart(
+labels,
+scores
+);
+
+}
+catch(err){
+
+console.error(err);
+
+}
+
+}
+
+function drawChart(
+labels,
+scores
+){
+
+const ctx =
+document.getElementById("chart");
+
+if(chart){
+chart.destroy();
+}
+
+chart =
+new Chart(ctx,{
+
+type:"bar",
+
+data:{
+
+labels:labels,
+
+datasets:[{
+
+data:scores,
+
+backgroundColor:[
+"#8b5cf6",
+"#38bdf8",
+"#f472b6",
+"#34d399",
+"#fbbf24"
+],
+
+borderRadius:18,
+borderSkipped:false
+
+}]
+},
+
+options:{
+
+responsive:true,
+
+maintainAspectRatio:false,
+
+plugins:{
+
+legend:{
+display:false
+}
+
+},
+
+scales:{
+
+x:{
+
+ticks:{
+color:"#fff",
+font:{
+size:14,
+weight:"bold"
+}
+},
+
+grid:{
+display:false
+}
+},
+
+y:{
+
+beginAtZero:true,
+
+max:100,
+
+ticks:{
+color:"#fff"
+},
+
+grid:{
+color:
+"rgba(255,255,255,.08)"
+}
+}
+}
+},
+
+plugins:[{
+
+id:"valueLabels",
+
+afterDatasetsDraw(chart){
+
+const {ctx} = chart;
+
+ctx.save();
+
+ctx.fillStyle="#fff";
+
+ctx.font =
+"bold 18px Segoe UI";
+
+chart
+.getDatasetMeta(0)
+.data
+.forEach((bar,index)=>{
+
+ctx.textAlign =
+"center";
+
+ctx.fillText(
+scores[index],
+bar.x,
+bar.y - 10
+);
+
+});
+
+ctx.restore();
+}
+}]
+});
+}
+
+loadScores();
+
+setInterval(
+loadScores,
+1000
+);
+
+</script>
+
+</body>
+</html>
