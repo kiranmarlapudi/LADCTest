@@ -228,49 +228,81 @@ width:100%!important;
 /* FINAL */
 
 .leaderboard{
-
-width:700px;
-
-margin:30px auto;
-
+width:90%;
+max-width:1200px;
+margin:20px auto;
 }
 
+.first{
+background:
+linear-gradient(
+135deg,
+#fbbf24,
+#f59e0b
+);
 
-.rank-card{
+color:#111;
 
+padding:40px;
+
+margin-bottom:25px;
+
+border-radius:30px;
+}
+
+.podium-row{
 display:flex;
+gap:25px;
+}
 
-justify-content:space-between;
-
-align-items:center;
+.second{
+flex:1;
 
 background:
-rgba(255,255,255,.08);
+linear-gradient(
+135deg,
+#cbd5e1,
+#94a3b8
+);
 
-padding:25px;
+color:#111;
 
-margin:15px;
-
-border-radius:20px;
-
-font-size:30px;
-
+border-radius:30px;
 }
 
+.third{
+flex:1;
 
-.rank{
+background:
+linear-gradient(
+135deg,
+#d97706,
+#92400e
+);
 
-font-size:40px;
-
+border-radius:30px;
 }
 
+.winner-card{
+padding:35px;
+text-align:center;
+}
 
-.points{
+.position{
+font-size:34px;
+font-weight:800;
+}
 
-color:#fbbf24;
+.team-name-final{
+font-size:52px;
+font-weight:800;
+margin-top:15px;
+}
 
-font-weight:700;
-
+.team-score-final{
+font-size:88px;
+font-weight:900;
+margin-top:15px;
 }
 
 
@@ -720,103 +752,153 @@ color:"#fff"
 
 
 /* ======================
- FINAL PAGE
+ FINAL PAGE - DYNAMIC
 ====================== */
 
 
-function showFinal(){
-
+async function showFinal(){
 
 document.getElementById("normalView")
 .style.display="none";
 
-
 document.getElementById("totalArea")
 .style.display="none";
-
 
 document.getElementById("finalView")
 .style.display="block";
 
-
-
 document.getElementById("teamName")
 .innerHTML =
-"FINAL LEADERBOARD";
+"🏆 FINAL LEADERBOARD";
 
-
-
-const scores=[
-
-{
-team:"Team 1",
-score:299
-},
-
-{
-team:"Team 2",
-score:318
-},
-
-{
-team:"Team 3",
-score:281
-}
-
+const teams = [
+"Team 1",
+"Team 2",
+"Team 3"
 ];
 
+const results = [];
 
+for(const teamName of teams){
 
-scores.sort(
-(a,b)=>b.score-a.score
+try{
+
+const url =
+`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(teamName)}`;
+
+const response =
+await fetch(url + "&t=" + Date.now());
+
+const csv =
+await response.text();
+
+const rows =
+csv.trim()
+.split("\n")
+.map(r =>
+r.split(",")
+.map(c =>
+c.replace(/"/g,"").trim()
+)
 );
 
+const dataRows =
+rows.slice(10,15);
 
+const scores =
+dataRows.map(r =>
+Number(r[12]) || 0
+);
 
-const medals=[
-"🥇",
-"🥈",
-"🥉"
-];
+const total =
+scores.reduce(
+(a,b)=>a+b,
+0
+);
 
+results.push({
+team:teamName,
+score:total
+});
 
+}
+catch(err){
+
+console.error(
+teamName,
+err
+);
+
+}
+
+}
+
+results.sort(
+(a,b)=>b.score-a.score
+);
 
 document.getElementById("leaderboard")
 .innerHTML =
 
-scores.map((x,i)=>`
+`
 
-<div class="rank-card">
+<div class="winner-card first">
 
-<div>
+<div class="position">
+🏆 CHAMPION
+</div>
 
-<span class="rank">
+<div class="team-name-final">
+${results[0].team}
+</div>
 
-${medals[i]}
-
-</span>
-
-${x.team}
+<div class="team-score-final">
+${results[0].score}
+</div>
 
 </div>
 
+<div class="podium-row">
 
-<div class="points">
+<div class="winner-card second">
 
-${x.score}
+<div class="position">
+🥈 SECOND PLACE
+</div>
+
+<div class="team-name-final">
+${results[1].team}
+</div>
+
+<div class="team-score-final">
+${results[1].score}
+</div>
 
 </div>
 
+<div class="winner-card third">
+
+<div class="position">
+🥉 THIRD PLACE
+</div>
+
+<div class="team-name-final">
+${results[2].team}
+</div>
+
+<div class="team-score-final">
+${results[2].score}
+</div>
 
 </div>
 
-`).join("");
+</div>
 
+`;
 
+document.querySelector(".side")?.remove();
 
 celebrate();
-
-
 
 }
 
@@ -855,6 +937,11 @@ if(isFinal){
 
 showFinal();
 
+setInterval(
+showFinal,
+1000
+);
+
 }
 
 else{
@@ -871,7 +958,6 @@ loadTeam,
 
 
 </script>
-
 
 </body>
 
