@@ -713,59 +713,152 @@ color:"#fff"
 /* ======================
  FINAL PAGE
 ====================== */
+async function showFinal(){
 
+document.getElementById("normalView")
+.style.display="none";
 
-function showFinal(){
+document.getElementById("totalArea")
+.style.display="none";
 
-document.getElementById("leaderboard").innerHTML = `
+document.getElementById("finalView")
+.style.display="block";
+
+document.getElementById("teamName")
+.innerHTML =
+"🏆 FINAL LEADERBOARD";
+
+const teams = [
+"Team 1",
+"Team 2",
+"Team 3"
+];
+
+const results = [];
+
+for(const teamName of teams){
+
+try{
+
+const url =
+`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(teamName)}`;
+
+const response =
+await fetch(url + "&t=" + Date.now());
+
+const csv =
+await response.text();
+
+const rows =
+csv.trim()
+.split("\n")
+.map(r =>
+r.split(",")
+.map(c =>
+c.replace(/"/g,"").trim()
+)
+);
+
+const dataRows =
+rows.slice(10,15);
+
+const scores =
+dataRows.map(r =>
+Number(r[12]) || 0
+);
+
+const total =
+scores.reduce(
+(a,b)=>a+b,
+0
+);
+
+results.push({
+team:teamName,
+score:total
+});
+
+}
+catch(err){
+
+console.error(
+teamName,
+err
+);
+
+}
+
+}
+
+results.sort(
+(a,b)=>b.score-a.score
+);
+
+document.getElementById("leaderboard")
+.innerHTML =
+
+`
 
 <div class="winner-card first">
 
-    <div class="position">🏆 CHAMPION</div>
+<div class="position">
+🏆 CHAMPION
+</div>
 
-    <div class="team-name-final">
-        ${scores[0].team}
-    </div>
+<div class="team-name-final">
+${results[0].team}
+</div>
 
-    <div class="team-score-final">
-        ${scores[0].score}
-    </div>
+<div class="team-score-final">
+${results[0].score}
+</div>
 
 </div>
 
 <div class="podium-row">
 
-    <div class="winner-card second">
+<div class="winner-card second">
 
-        <div class="position">🥈 SECOND</div>
+<div class="position">
+🥈 SECOND PLACE
+</div>
 
-        <div class="team-name-final">
-            ${scores[1].team}
-        </div>
+<div class="team-name-final">
+${results[1].team}
+</div>
 
-        <div class="team-score-final">
-            ${scores[1].score}
-        </div>
+<div class="team-score-final">
+${results[1].score}
+</div>
 
-    </div>
+</div>
 
-    <div class="winner-card third">
+<div class="winner-card third">
 
-        <div class="position">🥉 THIRD</div>
+<div class="position">
+🥉 THIRD PLACE
+</div>
 
-        <div class="team-name-final">
-            ${scores[2].team}
-        </div>
+<div class="team-name-final">
+${results[2].team}
+</div>
 
-        <div class="team-score-final">
-            ${scores[2].score}
-        </div>
+<div class="team-score-final">
+${results[2].score}
+</div>
 
-    </div>
+</div>
 
 </div>
 
 `;
+
+document.querySelector(".side")?.remove();
+
+celebrate();
+
+}
+
 
 
 
