@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>HR Conclave - Team 1 Live Scoreboard</title>
+<title>HR Conclave - Team 1 Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -24,7 +23,7 @@ overflow:hidden;
 
 background:
 radial-gradient(circle at top left,
-rgba(139,92,246,.15),
+rgba(139,92,246,.20),
 transparent 35%),
 
 radial-gradient(circle at bottom right,
@@ -33,11 +32,11 @@ transparent 35%),
 
 linear-gradient(
 135deg,
-#13071f 0%,
-#251341 45%,
-#10233f 100%);
+#12081f 0%,
+#24123f 45%,
+#112442 100%);
 
-color:#fff;
+color:white;
 }
 
 .header{
@@ -48,9 +47,9 @@ padding:25px 20px 10px;
 .badge{
 display:inline-block;
 padding:6px 18px;
-border-radius:30px;
+border-radius:999px;
 background:rgba(139,92,246,.15);
-border:1px solid rgba(139,92,246,.4);
+border:1px solid rgba(139,92,246,.35);
 color:#c4b5fd;
 font-size:12px;
 letter-spacing:2px;
@@ -58,23 +57,23 @@ text-transform:uppercase;
 }
 
 .team-title{
-font-size:52px;
+font-size:54px;
 font-weight:700;
 margin-top:10px;
 }
 
 .live{
 margin-top:10px;
-color:#4ade80;
 font-size:14px;
+color:#4ade80;
 }
 
 .live-dot{
 display:inline-block;
 width:10px;
 height:10px;
-background:#4ade80;
 border-radius:50%;
+background:#4ade80;
 margin-right:8px;
 animation:pulse 1s infinite;
 }
@@ -87,7 +86,7 @@ animation:pulse 1s infinite;
 
 .total-box{
 text-align:center;
-margin-top:10px;
+margin-top:15px;
 margin-bottom:20px;
 }
 
@@ -97,18 +96,20 @@ opacity:.7;
 }
 
 .total-score{
-font-size:62px;
+font-size:64px;
 font-weight:700;
 color:#fbbf24;
 }
 
 .chart-card{
+
 width:95%;
 height:600px;
+
 margin:auto;
 
 background:
-rgba(255,255,255,.04);
+rgba(255,255,255,.05);
 
 border:
 1px solid rgba(255,255,255,.08);
@@ -116,6 +117,8 @@ border:
 border-radius:24px;
 
 padding:25px;
+
+backdrop-filter:blur(12px);
 }
 
 canvas{
@@ -129,11 +132,10 @@ bottom:12px;
 width:100%;
 text-align:center;
 font-size:12px;
-opacity:.4;
+opacity:.5;
 }
 
 </style>
-
 </head>
 
 <body>
@@ -156,16 +158,21 @@ LIVE SCORING
 </div>
 
 <div class="total-box">
-<div class="total-label">TOTAL SCORE</div>
-<div class="total-score" id="totalScore">0</div>
+<div class="total-label">
+TOTAL SCORE
+</div>
+
+<div id="totalScore" class="total-score">
+0
+</div>
 </div>
 
 <div class="chart-card">
-<canvas id="chart"></canvas>
+<canvas id="scoreChart"></canvas>
 </div>
 
 <div class="footer">
-Auto-refreshing every second
+Auto Refreshing Every Second
 </div>
 
 <script>
@@ -176,9 +183,9 @@ const SHEET_ID =
 const SHEET_NAME =
 "Team 1";
 
-let chart;
+let chart = null;
 
-async function loadScores(){
+async function loadData(){
 
 try{
 
@@ -187,7 +194,7 @@ const url =
 
 const response =
 await fetch(
-url + "&nocache=" + Date.now()
+url + "&t=" + Date.now()
 );
 
 const csv =
@@ -205,11 +212,28 @@ cell.replace(/"/g,"").trim()
 )
 );
 
+/*
+L11:M15
+
+L column = index 11
+M column = index 12
+
+Row 11 = index 10
+Row 15 = index 14
+*/
+
+const dataRows =
+rows.slice(10,15);
+
 const labels =
-rows.map(r => r[0]);
+dataRows.map(
+r => r[11]
+);
 
 const scores =
-rows.map(r => Number(r[1]) || 0);
+dataRows.map(
+r => Number(r[12]) || 0
+);
 
 const total =
 scores.reduce(
@@ -221,7 +245,7 @@ document
 .getElementById("totalScore")
 .innerText = total;
 
-drawChart(
+renderChart(
 labels,
 scores
 );
@@ -232,16 +256,15 @@ catch(err){
 console.error(err);
 
 }
-
 }
 
-function drawChart(
+function renderChart(
 labels,
 scores
 ){
 
 const ctx =
-document.getElementById("chart");
+document.getElementById("scoreChart");
 
 if(chart){
 chart.destroy();
@@ -277,15 +300,12 @@ borderSkipped:false
 options:{
 
 responsive:true,
-
 maintainAspectRatio:false,
 
 plugins:{
-
 legend:{
 display:false
 }
-
 },
 
 scales:{
@@ -293,7 +313,7 @@ scales:{
 x:{
 
 ticks:{
-color:"#fff",
+color:"#ffffff",
 font:{
 size:14,
 weight:"bold"
@@ -309,10 +329,11 @@ y:{
 
 beginAtZero:true,
 
-max:100,
+max:
+Math.max(...scores)+10,
 
 ticks:{
-color:"#fff"
+color:"#ffffff"
 },
 
 grid:{
@@ -333,7 +354,8 @@ const {ctx} = chart;
 
 ctx.save();
 
-ctx.fillStyle="#fff";
+ctx.fillStyle =
+"#ffffff";
 
 ctx.font =
 "bold 18px Segoe UI";
@@ -349,21 +371,23 @@ ctx.textAlign =
 ctx.fillText(
 scores[index],
 bar.x,
-bar.y - 10
+bar.y - 12
 );
 
 });
 
 ctx.restore();
+
 }
 }]
 });
+
 }
 
-loadScores();
+loadData();
 
 setInterval(
-loadScores,
+loadData,
 1000
 );
 
