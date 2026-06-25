@@ -278,13 +278,36 @@ font-weight:700;
 
 position:fixed;
 
-bottom:10px;
+bottom:12px;
 
 left:15px;
 
-font-size:12px;
+font-size:13px;
 
-opacity:.5;
+z-index:9999;
+
+}
+
+.footer a{
+
+color:#c4b5fd;
+
+text-decoration:none;
+
+margin:0 6px;
+
+font-weight:600;
+
+transition:.2s;
+
+}
+
+.footer a:hover{
+
+color:#ffffff;
+
+text-shadow:
+0 0 10px rgba(255,255,255,.6);
 
 }
 
@@ -398,7 +421,19 @@ id="leaderboard">
 
 <div class="footer">
 
-Team 1 | Team 2 | Team 3 | Final Scores
+<a href="?team=1">Team 1</a>
+
+|
+
+<a href="?team=2">Team 2</a>
+
+|
+
+<a href="?team=3">Team 3</a>
+
+|
+
+<a href="?final=true">🏆 Final Scores</a>
 
 </div>
 
@@ -456,7 +491,27 @@ window.location.search
 
 const isFinal =
 params.get("final")==="true";
+const currentTeam =
+params.get("team");
 
+window.addEventListener("load",()=>{
+
+document.querySelectorAll(".footer a")
+.forEach(link=>{
+
+const href = link.getAttribute("href");
+
+if(
+(currentTeam==="1" && href.includes("team=1")) ||
+(currentTeam==="2" && href.includes("team=2")) ||
+(currentTeam==="3" && href.includes("team=3")) ||
+(isFinal && href.includes("final=true"))
+){
+link.style.color="#fbbf24";
+}
+});
+
+});
 
 
 const selectedTeam =
