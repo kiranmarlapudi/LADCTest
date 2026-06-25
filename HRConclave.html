@@ -574,6 +574,8 @@ const url =
 
 
 
+try{
+
 const response =
 await fetch(
 url+"&t="+Date.now()
@@ -596,20 +598,65 @@ r.split(",")
 
 
 
-const data =
-rows.slice(10,15);
+// Find the row containing "Pillar" or "Category" to locate the data
+let startRow = -1;
+for(let i = 0; i < rows.length; i++){
+    if(rows[i][0] && (rows[i][0].includes("Pillar") || rows[i][0].includes("Category") || rows[i][0].includes("Parameter"))){
+        startRow = i + 1; // Start from next row
+        break;
+    }
+}
 
+// If no header found, use default rows 10-15
+if(startRow === -1){
+    startRow = 10;
+}
 
+// Get data rows (5 rows of data)
+const data = [];
+const labels = [];
+const scores = [];
 
-const labels =
-data.map(r=>r[11]);
+for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
+    if(rows[i] && rows[i].length > 12){
+        const label = rows[i][11] ? rows[i][11].trim() : `Item ${i - startRow + 1}`;
+        const score = Number(rows[i][12]) || 0;
+        
+        // Only add if label is not empty
+        if(label && label !== ""){
+            labels.push(label);
+            scores.push(score);
+            data.push(rows[i]);
+        }
+    }
+}
 
+// If no data found, try to find any numeric data in column 13 (index 12)
+if(labels.length === 0){
+    for(let i = 0; i < rows.length; i++){
+        if(rows[i] && rows[i].length > 12){
+            const score = Number(rows[i][12]);
+            if(!isNaN(score) && score > 0){
+                const label = rows[i][11] ? rows[i][11].trim() : `Item ${labels.length + 1}`;
+                if(label && label !== ""){
+                    labels.push(label);
+                    scores.push(score);
+                }
+                if(labels.length >= 5) break;
+            }
+        }
+    }
+}
 
-
-const scores =
-data.map(r=>Number(r[12]));
-
-
+// If still no data, use fallback
+if(labels.length === 0){
+    // Use default labels
+    const defaultLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
+    for(let i = 0; i < 5; i++){
+        labels.push(defaultLabels[i]);
+        scores.push(0);
+    }
+}
 
 const total =
 scores.reduce((a,b)=>a+b,0);
@@ -629,6 +676,19 @@ total;
 
 
 drawChart(labels,scores);
+
+}
+catch(err){
+    console.error("Error loading team data:", err);
+    // Show error state
+    document.getElementById("teamName").innerHTML = "TEAM "+selectedTeam+" (Error loading)";
+    document.getElementById("totalScore").innerHTML = "0";
+    
+    // Show fallback chart
+    const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
+    drawChart(fallbackLabels, [0,0,0,0,0]);
+}
+
 
 
 
@@ -695,6 +755,14 @@ plugins:{
 
 legend:{
 display:false
+},
+
+tooltip:{
+    callbacks: {
+        label: function(context) {
+            return context.parsed.y + ' points';
+        }
+    }
 }
 
 },
@@ -726,7 +794,7 @@ y:{
 
 beginAtZero:true,
 
-max:100,
+max:Math.max(100, ...scores) + 10,
 
 
 ticks:{
@@ -754,7 +822,13 @@ color:"#fff"
 /* ======================
  FINAL PAGE - DYNAMIC
 ====================== */
+/* ======================
+ FINAL PAGE - DYNAMIC
+====================== */
 
+let confettiInterval = null;
+let confettiCount = 0;
+const MAX_CONFETTI_BURSTS = 10; // Limit total bursts
 
 async function showFinal(){
 
@@ -802,19 +876,46 @@ c.replace(/"/g,"").trim()
 )
 );
 
-const dataRows =
-rows.slice(10,15);
+// Find the data using the same logic as loadTeam
+let startRow = -1;
+for(let i = 0; i < rows.length; i++){
+    if(rows[i][0] && (rows[i][0].includes("Pillar") || rows[i][0].includes("Category") || rows[i][0].includes("Parameter"))){
+        startRow = i + 1;
+        break;
+    }
+}
 
-const scores =
-dataRows.map(r =>
-Number(r[12]) || 0
-);
+if(startRow === -1){
+    startRow = 10;
+}
 
-const total =
-scores.reduce(
-(a,b)=>a+b,
-0
-);
+const scores = [];
+for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
+    if(rows[i] && rows[i].length > 12){
+        const score = Number(rows[i][12]) || 0;
+        scores.push(score);
+    }
+}
+
+// If no scores found, try to find any numeric data in column 13
+if(scores.length === 0){
+    for(let i = 0; i < rows.length; i++){
+        if(rows[i] && rows[i].length > 12){
+            const score = Number(rows[i][12]);
+            if(!isNaN(score) && score > 0){
+                scores.push(score);
+                if(scores.length >= 5) break;
+            }
+        }
+    }
+}
+
+// If still no scores, use zeros
+while(scores.length < 5){
+    scores.push(0);
+}
+
+const total = scores.slice(0,5).reduce((a,b)=>a+b,0);
 
 results.push({
 team:teamName,
@@ -828,6 +929,10 @@ console.error(
 teamName,
 err
 );
+results.push({
+team:teamName,
+score:0
+});
 
 }
 
@@ -836,6 +941,14 @@ err
 results.sort(
 (a,b)=>b.score-a.score
 );
+
+// Ensure we have 3 results
+while(results.length < 3){
+    results.push({
+        team: `Team ${results.length + 1}`,
+        score: 0
+    });
+}
 
 document.getElementById("leaderboard")
 .innerHTML =
@@ -896,64 +1009,84 @@ ${results[2].score}
 
 `;
 
-document.querySelector(".side")?.remove();
+// Remove side images if they exist
+const sideElements = document.querySelectorAll(".side");
+sideElements.forEach(el => el.style.display = "none");
 
-celebrate();
+// Start minimal celebration
+startMinimalCelebration();
 
 }
 
-
-
-
-function celebrate(){
-
-
-setInterval(()=>{
-
-
-confetti({
-
-particleCount:80,
-
-spread:100,
-
-origin:{
-y:.6
+function startMinimalCelebration() {
+    // Clear any existing interval
+    if (confettiInterval) {
+        clearInterval(confettiInterval);
+        confettiInterval = null;
+    }
+    
+    // Reset counter
+    confettiCount = 0;
+    
+    // Initial burst with fewer particles
+    confetti({
+        particleCount: 30,
+        spread: 60,
+        origin: { y: 0.5 }
+    });
+    
+    // Schedule bursts with decreasing frequency
+    confettiInterval = setInterval(() => {
+        confettiCount++;
+        
+        // Stop after maximum bursts
+        if (confettiCount >= MAX_CONFETTI_BURSTS) {
+            clearInterval(confettiInterval);
+            confettiInterval = null;
+            return;
+        }
+        
+        // Reduce particle count as time goes on
+        let particleCount = 25 - (confettiCount * 2);
+        if (particleCount < 8) particleCount = 8;
+        
+        // Random position for variety
+        const originX = 0.2 + (Math.random() * 0.6);
+        
+        confetti({
+            particleCount: particleCount,
+            spread: 50,
+            origin: { 
+                x: originX,
+                y: 0.5 + (Math.random() * 0.2)
+            },
+            startVelocity: 25,
+            decay: 0.92
+        });
+        
+    }, 3000); // Every 3 seconds instead of 2.5
+    
+    // Stop after 30 seconds (10 bursts)
+    setTimeout(() => {
+        if (confettiInterval) {
+            clearInterval(confettiInterval);
+            confettiInterval = null;
+        }
+    }, 30000);
 }
 
+function celebrate() {
+    // This function is kept for compatibility but we use startMinimalCelebration instead
+    startMinimalCelebration();
+}
+
+// Clean up on page unload
+window.addEventListener('beforeunload', function() {
+    if (confettiInterval) {
+        clearInterval(confettiInterval);
+        confettiInterval = null;
+    }
 });
-
-
-},2500);
-
-
-
-}
-
-
-
-
-if(isFinal){
-
-showFinal();
-
-setInterval(
-showFinal,
-1000
-);
-
-}
-
-else{
-
-loadTeam();
-
-setInterval(
-loadTeam,
-1000
-);
-
-}
 
 
 
