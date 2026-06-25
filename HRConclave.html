@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Survey Dashboard</title>
+    <!-- Tailwind CSS for clean styling -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- PapaParse to parse CSV stream directly from Google -->
+    <script src="https://cloudflare.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans p-6">
 
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-teal-400">Live Survey Metrics</h1>
+            <p class="text-gray-400 mt-2">Real-time stats synced from Google Sheets</p>
+        </header>
+
+        <!-- KPI Scorecards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-md">
+                <h3 class="text-gray-400 text-sm font-semibold uppercase">Total Survey Responses</h3>
+                <p id="total-responses" class="text-4xl font-extrabold text-white mt-2">Loading...</p>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-md">
+                <h3 class="text-gray-400 text-sm font-semibold uppercase">Latest Submission</h3>
+                <p id="latest-timestamp" class="text-lg font-medium text-teal-300 mt-2">Loading...</p>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-md">
+                <h2 class="text-xl font-bold mb-4 text-gray-200">Question 1 Feedback</h2>
+                <div class="h-64 flex items-center justify-center">
+                    <canvas id="chartQuestion1"></canvas>
+                </div>
+            </div>
+            <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 shadow-md">
+                <h2 class="text-xl font-bold mb-4 text-gray-200">Question 2 Feedback</h2>
+                <div class="h-64 flex items-center justify-center">
+                    <canvas id="chartQuestion2"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // PASTE YOUR PUBLISHED GOOGLE SHEET CSV URL HERE
+        const csvUrl = "YOUR_PUBLISHED_CSV_URL_HERE";
+
+        async function fetchAndRenderData() {
+            try {
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
+                
+                // Parse CSV text into JSON Objects
+                Papa.parse(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        processDashboardData(results.data);
+                    }
+                });
+            } catch (error) {
+                console.error("Error fetching live dashboard metrics:", error);
+            }
+        }
+
+        function processDashboardData(data) {
+            if (!data || data.length === 0) return;
+
+            // 1. Update KPI Cards
+            document.getElementById('total-responses').innerText = data.length;
+            const lastRow = data[data.length - 1];
+            // Assumes your first column header is 'Timestamp'
+            document.getElementById('latest-timestamp').innerText = lastRow['Timestamp'] || 'N/A';
+
+            // 2. Aggregate Data for Question 1 (e.g. Column header: "Satisfied?")
+            // Change "Satisfied?" to match your exact Google Form column header text
+            const q1Counts = {};
+            data.forEach(row => {
+                const answer = row["Satisfied?"] || "No Answer";
+                q1Counts[answer] = (q1Counts[answer] || 0) + 1;
+            });
+
+            // 3. Render Chart 1 (Bar Chart Example)
+            new Chart(document.getElementById('chartQuestion1'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(q1Counts),
+                    datasets: [{
+                        label: 'Votes',
+                        data: Object.values(q1Counts),
+                        backgroundColor: 'rgba(45, 212, 191, 0.6)',
+                        borderColor: 'rgba(45, 212, 191, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, grid: { color: '#374151' } } }
+                }
+            });
+
+            // 4. Aggregate Data for Question 2 (e.g. Column header: "Role")
+            const q2Counts = {};
+            data.forEach(row => {
+                const answer = row["Role"] || "No Answer";
+                q2Counts[answer] = (q2Counts[answer] || 0) + 1;
+            });
+
+            // 5. Render Chart 2 (Doughnut Chart Example)
+            new Chart(document.getElementById('chartQuestion2'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(q2Counts),
+                    datasets: [{
+                        data: Object.values(q2Counts),
+                        backgroundColor: ['#f43f5e', '#3b82f6', '#eab308', '#a855f7']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Run fetch on load
+        fetchAndRenderData();
+        // Optional: Auto-refresh data every 60 seconds
+        setInterval(fetchAndRenderData, 60000);
+    </script>
+</body>
+</html>
