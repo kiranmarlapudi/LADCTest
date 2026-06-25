@@ -9,6 +9,8 @@
 <title>HR Conclave 2026 Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Add Chart.js Data Labels Plugin -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
 <style>
 
@@ -655,7 +657,8 @@ id="leaderboard">
 
 
 <script>
-
+// Register the datalabels plugin
+Chart.register(ChartDataLabels);
 
 /* ======================
    SETTINGS
@@ -963,6 +966,21 @@ legend:{
 display:false
 },
 
+// THIS IS THE KEY PART - Data Labels Plugin Configuration
+datalabels: {
+    color: '#ffffff',
+    anchor: 'end',
+    align: 'end',
+    font: {
+        weight: 'bold',
+        size: 18
+    },
+    formatter: function(value) {
+        return value + '';
+    },
+    offset: 2
+},
+
 tooltip:{
     callbacks: {
         label: function(context) {
@@ -1000,7 +1018,7 @@ y:{
 
 beginAtZero:true,
 
-max:Math.max(100, ...scores) + 10,
+max:Math.max(100, ...scores) + 15,
 
 
 ticks:{
@@ -1019,7 +1037,7 @@ color:"#fff"
 
 });
 
-// Add score labels on top of bars
+// Update the chart to render labels
 chart.update();
 
 }
