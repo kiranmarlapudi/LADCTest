@@ -228,92 +228,89 @@ width:100%!important;
 /* FINAL */
 
 .leaderboard{
-width:90%;
-max-width:1200px;
-margin:auto;
-}
 
-.first{
+width:700px;
 
-background:linear-gradient(
-135deg,
-#fbbf24,
-#f59e0b
-);
-
-color:#111;
-
-padding:40px;
-
-margin-bottom:30px;
+margin:30px auto;
 
 }
 
-.podium-row{
+
+.rank-card{
 
 display:flex;
 
-gap:25px;
+justify-content:space-between;
 
-}
-
-.second{
-
-flex:1;
+align-items:center;
 
 background:
-linear-gradient(
-135deg,
-#cbd5e1,
-#94a3b8
-);
+rgba(255,255,255,.08);
 
-color:#111;
+padding:25px;
 
-}
+margin:15px;
 
-.third{
+border-radius:20px;
 
-flex:1;
-
-background:
-linear-gradient(
-135deg,
-#d97706,
-#92400e
-);
+font-size:30px;
 
 }
 
-.winner-card{
 
-border-radius:30px;
+.rank{
 
-padding:30px;
-
-text-align:center;
+font-size:40px;
 
 }
 
-.position{
 
-font-size:32px;
-font-weight:800;
+.points{
+
+color:#fbbf24;
+
+font-weight:700;
+
 }
 
-.team-name-final{
 
-font-size:48px;
-font-weight:800;
-margin-top:15px;
+.footer{
+
+position:fixed;
+
+bottom:12px;
+
+left:15px;
+
+font-size:13px;
+
+z-index:9999;
+
 }
 
-.team-score-final{
+.footer a{
 
-font-size:72px;
-font-weight:900;
-margin-top:15px;
+color:#c4b5fd;
+
+text-decoration:none;
+
+margin:0 6px;
+
+font-weight:600;
+
+transition:.2s;
+
 }
+
+.footer a:hover{
+
+color:#ffffff;
+
+text-shadow:
+0 0 10px rgba(255,255,255,.6);
+
+}
+
 
 
 </style>
@@ -566,7 +563,19 @@ r.split(",")
 );
 
 
-const data 
+
+const data =
+rows.slice(10,15);
+
+
+
+const labels =
+data.map(r=>r[11]);
+
+
+
+const scores =
+data.map(r=>Number(r[12]));
 
 
 
@@ -717,56 +726,44 @@ color:"#fff"
 
 function showFinal(){
 
-document.getElementById("leaderboard").innerHTML = `
 
-<div class="winner-card first">
+document.getElementById("normalView")
+.style.display="none";
 
-    <div class="position">🏆 CHAMPION</div>
 
-    <div class="team-name-final">
-        ${scores[0].team}
-    </div>
+document.getElementById("totalArea")
+.style.display="none";
 
-    <div class="team-score-final">
-        ${scores[0].score}
-    </div>
 
-</div>
+document.getElementById("finalView")
+.style.display="block";
 
-<div class="podium-row">
 
-    <div class="winner-card second">
 
-        <div class="position">🥈 SECOND</div>
+document.getElementById("teamName")
+.innerHTML =
+"FINAL LEADERBOARD";
 
-        <div class="team-name-final">
-            ${scores[1].team}
-        </div>
 
-        <div class="team-score-final">
-            ${scores[1].score}
-        </div>
 
-    </div>
+const scores=[
 
-    <div class="winner-card third">
+{
+team:"Team 1",
+score:299
+},
 
-        <div class="position">🥉 THIRD</div>
+{
+team:"Team 2",
+score:318
+},
 
-        <div class="team-name-final">
-            ${scores[2].team}
-        </div>
+{
+team:"Team 3",
+score:281
+}
 
-        <div class="team-score-final">
-            ${scores[2].score}
-        </div>
-
-    </div>
-
-</div>
-
-`;
-
+];
 
 
 
