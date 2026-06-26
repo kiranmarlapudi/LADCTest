@@ -324,11 +324,18 @@
       background-clip: text;
     }
 
+    .result-sub {
+      font-size: 1.1rem;
+      color: #1f3857;
+      margin-bottom: 1.5rem;
+      font-weight: 500;
+    }
+
     .indices-list {
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      margin: 2rem 0 1rem;
+      margin: 1.5rem 0 1rem;
       background: rgba(255,255,255,0.3);
       padding: 1.8rem 2.2rem;
       border-radius: 2rem;
@@ -359,6 +366,13 @@
       background: rgba(255,255,255,0.4);
       padding: 0.1rem 1rem;
       border-radius: 40px;
+    }
+
+    .index-item.highlight {
+      background: rgba(26, 92, 255, 0.08);
+      border-radius: 12px;
+      padding: 0.3rem 0.8rem;
+      margin: 0 -0.8rem;
     }
 
     .error-msg {
@@ -457,12 +471,13 @@
   <div class="result-page" id="resultPage">
     <div class="result-greeting">Dear <span id="resultNameDisplay">—</span>,</div>
     <div class="result-primary">Your Primary Leadership Archetype is: <span id="resultPrimaryStyle">Transformational</span>.</div>
+    <div class="result-sub" id="resultSubText"></div>
 
     <div class="indices-list" id="indicesList">
-      <div class="index-item"><span class="label">Autocratic/Authoritative:</span> <span class="value" id="indexAutocratic">0%</span></div>
-      <div class="index-item"><span class="label">Democratic:</span> <span class="value" id="indexDemocratic">0%</span></div>
-      <div class="index-item"><span class="label">Transformational:</span> <span class="value" id="indexTransformational">0%</span></div>
-      <div class="index-item"><span class="label">Laissez-Faire:</span> <span class="value" id="indexLaissezFaire">0%</span></div>
+      <div class="index-item" id="indexAutocraticItem"><span class="label">Autocratic/Authoritative:</span> <span class="value" id="indexAutocratic">0%</span></div>
+      <div class="index-item" id="indexDemocraticItem"><span class="label">Democratic:</span> <span class="value" id="indexDemocratic">0%</span></div>
+      <div class="index-item" id="indexTransformationalItem"><span class="label">Transformational:</span> <span class="value" id="indexTransformational">0%</span></div>
+      <div class="index-item" id="indexLaissezFaireItem"><span class="label">Laissez-Faire:</span> <span class="value" id="indexLaissezFaire">0%</span></div>
     </div>
   </div>
 </div>
@@ -573,12 +588,7 @@
       if (currentPage === 1) showPage(0);
     });
 
-    // ---------- SCORING (based on new key) ----------
-    // Authoritative: Q2,Q6,Q10,Q13,Q18,Q23 → indices 1,5,9,12,17,22
-    // Democratic: Q4,Q5,Q9,Q14,Q17,Q21 → indices 3,4,8,13,16,20
-    // Laissez-faire: Q3,Q8,Q12,Q15,Q20,Q24 → indices 2,7,11,14,19,23
-    // Transformational: Q1,Q7,Q11,Q16,Q19,Q22 → indices 0,6,10,15,18,21
-
+    // ---------- IMPROVED SCORING WITH TIE-BREAKING ----------
     function computeScores(answers) {
       const authIndices = [1,5,9,12,17,22];
       const demoIndices = [3,4,8,13,16,20];
@@ -598,29 +608,74 @@
       const laissezRaw = avg(laissezIndices);
       const transRaw = avg(transIndices);
 
-      // Convert to percentage: (raw/7)*100
+      // Convert to percentage
       const toPct = (raw) => Math.round((raw / 7) * 100);
       const authPct = toPct(authRaw);
       const demoPct = toPct(demoRaw);
       const laissezPct = toPct(laissezRaw);
       const transPct = toPct(transRaw);
 
-      // Primary: highest percentage
-      const map = [
-        { style: 'Transformational', pct: transPct },
-        { style: 'Democratic', pct: demoPct },
-        { style: 'Laissez-Faire', pct: laissezPct },
-        { style: 'Autocratic/Authoritative', pct: authPct }
+      // Store raw scores for tie-breaking
+      const styles = [
+        { name: 'Transformational', pct: transPct, raw: transRaw },
+        { name: 'Democratic', pct: demoPct, raw: demoRaw },
+        { name: 'Laissez-Faire', pct: laissezPct, raw: laissezRaw },
+        { name: 'Autocratic/Authoritative', pct: authPct, raw: authRaw }
       ];
-      map.sort((a,b) => b.pct - a.pct);
-      const primary = map[0].style;
+
+      // Sort by percentage (descending), then by raw score (descending) for tie-breaking
+      styles.sort((a, b) => {
+        if (b.pct !== a.pct) return b.pct - a.pct;
+        return b.raw - a.raw; // higher raw score wins ties
+      });
+
+      // Check if there's a tie (within 2 percentage points)
+      const topTwo = styles.slice(0, 2);
+      const isTie = Math.abs(topTwo[0].pct - topTwo[1].pct) <= 2;
+
+      let primary = styles[0].name;
+      let subText = '';
+
+      if (isTie && topTwo[0].pct === topTwo[1].pct) {
+        // Exact tie - use raw score to break
+        if (topTwo[0].raw === topTwo[1].raw) {
+          // Still tied - check third
+          const topThree = styles.slice(0, 3);
+          if (topThree[0].pct === topThree[2].pct && topThree[0].raw === topThree[2].raw) {
+            primary = 'Mixed (Multiple Styles)';
+            subText = 'You show an equal balance across multiple leadership styles.';
+          } else {
+            primary = `${topTwo[0].name} & ${topTwo[1].name}`;
+            subText = `You show a balanced blend of ${topTwo[0].name} and ${topTwo[1].name} leadership styles.`;
+          }
+        } else {
+          // Raw score breaks the tie
+          primary = styles[0].name;
+          subText = `You show a slightly stronger tendency toward ${styles[0].name} over ${styles[1].name}.`;
+        }
+      } else if (isTie) {
+        // Close tie (within 2%)
+        primary = `${topTwo[0].name} (Primary)`;
+        subText = `You show strong ${topTwo[0].name} tendencies with notable ${topTwo[1].name} influence.`;
+      } else {
+        // Clear winner
+        const diff = topTwo[0].pct - topTwo[1].pct;
+        if (diff > 15) {
+          subText = `You have a strong, clear preference for ${topTwo[0].name} leadership.`;
+        } else {
+          subText = `You show a preference for ${topTwo[0].name} leadership with some ${topTwo[1].name} influence.`;
+        }
+      }
 
       return {
         autocratic: authPct,
         democratic: demoPct,
         transformational: transPct,
         laissezFaire: laissezPct,
-        primary: primary
+        primary: primary,
+        subText: subText,
+        isTie: isTie,
+        rawScores: { authRaw, demoRaw, laissezRaw, transRaw }
       };
     }
 
@@ -631,10 +686,15 @@
     const resultPage = document.getElementById('resultPage');
     const resultNameDisplay = document.getElementById('resultNameDisplay');
     const resultPrimaryStyle = document.getElementById('resultPrimaryStyle');
+    const resultSubText = document.getElementById('resultSubText');
     const indexAutocratic = document.getElementById('indexAutocratic');
     const indexDemocratic = document.getElementById('indexDemocratic');
     const indexTransformational = document.getElementById('indexTransformational');
     const indexLaissezFaire = document.getElementById('indexLaissezFaire');
+    const indexAutocraticItem = document.getElementById('indexAutocraticItem');
+    const indexDemocraticItem = document.getElementById('indexDemocraticItem');
+    const indexTransformationalItem = document.getElementById('indexTransformationalItem');
+    const indexLaissezFaireItem = document.getElementById('indexLaissezFaireItem');
 
     function clearErrors() { errorContainer.innerHTML = ''; }
     function showError(msg) { errorContainer.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`; }
@@ -673,10 +733,34 @@
       
       resultNameDisplay.textContent = name;
       resultPrimaryStyle.textContent = scores.primary;
+      resultSubText.textContent = scores.subText;
+      
       indexAutocratic.textContent = `${scores.autocratic}%`;
       indexDemocratic.textContent = `${scores.democratic}%`;
       indexTransformational.textContent = `${scores.transformational}%`;
       indexLaissezFaire.textContent = `${scores.laissezFaire}%`;
+
+      // Highlight the primary style(s)
+      [indexAutocraticItem, indexDemocraticItem, indexTransformationalItem, indexLaissezFaireItem].forEach(el => {
+        el.classList.remove('highlight');
+      });
+      
+      const primaryLower = scores.primary.toLowerCase();
+      if (primaryLower.includes('autocratic')) indexAutocraticItem.classList.add('highlight');
+      if (primaryLower.includes('democratic')) indexDemocraticItem.classList.add('highlight');
+      if (primaryLower.includes('transformational')) indexTransformationalItem.classList.add('highlight');
+      if (primaryLower.includes('laissez')) indexLaissezFaireItem.classList.add('highlight');
+      
+      // If multiple styles are mentioned (e.g., "Transformational & Democratic")
+      if (scores.primary.includes('&')) {
+        const styles = scores.primary.split('&').map(s => s.trim().toLowerCase());
+        styles.forEach(style => {
+          if (style.includes('autocratic')) indexAutocraticItem.classList.add('highlight');
+          if (style.includes('democratic')) indexDemocraticItem.classList.add('highlight');
+          if (style.includes('transformational')) indexTransformationalItem.classList.add('highlight');
+          if (style.includes('laissez')) indexLaissezFaireItem.classList.add('highlight');
+        });
+      }
 
       surveyContent.classList.add('hidden');
       resultPage.classList.add('active');
@@ -687,7 +771,6 @@
     // Enter key on name field triggers submit if on page 2
     document.getElementById('respondentName').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
-        // if on page 2, submit; else go to page 2
         if (currentPage === 1) {
           e.preventDefault();
           submitBtn.click();
