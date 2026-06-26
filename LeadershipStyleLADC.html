@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leadership Archetype Survey</title>
+  <title>Leadership Style Survey</title>
   <!-- Google Font & modern backdrop -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,28 +37,27 @@
       transition: all 0.2s ease;
     }
 
-    h1 {
-      font-weight: 600;
-      font-size: 2.2rem;
-      letter-spacing: -0.02em;
-      color: #0b1e33;
-      margin-bottom: 0.3rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+    /* Logo */
+    .logo-container {
+      text-align: center;
+      margin-bottom: 1.8rem;
+    }
+    .logo-container img {
+      max-width: 220px;
+      height: auto;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.3);
+      padding: 6px 12px;
+      backdrop-filter: blur(2px);
     }
 
-    .subhead {
-      font-size: 1rem;
-      color: #2c3e5c;
-      border-left: 4px solid #3b7cff;
-      padding-left: 1rem;
-      margin-top: -0.2rem;
-      margin-bottom: 2.2rem;
-      font-weight: 450;
-      background: rgba(59, 124, 255, 0.04);
-      border-radius: 0 12px 12px 0;
-      line-height: 1.5;
+    h1 {
+      font-weight: 700;
+      font-size: 2.6rem;
+      letter-spacing: -0.02em;
+      color: #0b1e33;
+      margin-bottom: 1.8rem;
+      text-align: center;
     }
 
     .field-name {
@@ -70,17 +69,17 @@
       font-weight: 600;
       color: #0b1e33;
       margin-bottom: 0.5rem;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       letter-spacing: -0.01em;
     }
 
     .field-name input {
       width: 100%;
-      max-width: 380px;
-      padding: 0.9rem 1.2rem;
+      max-width: 400px;
+      padding: 1rem 1.4rem;
       border: 1.5px solid #d9e2ef;
       border-radius: 40px;
-      font-size: 1rem;
+      font-size: 1.1rem;
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(2px);
       transition: 0.2s;
@@ -95,20 +94,53 @@
       background: white;
     }
 
+    /* Page navigation */
+    .page-indicator {
+      display: flex;
+      justify-content: center;
+      gap: 0.8rem;
+      margin-bottom: 1.8rem;
+    }
+    .page-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #d0dcee;
+      transition: 0.2s;
+    }
+    .page-dot.active {
+      background: #1a5cff;
+      width: 28px;
+      border-radius: 20px;
+    }
+
+    .survey-page {
+      display: none;
+      animation: fadeIn 0.25s ease;
+    }
+    .survey-page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0.5; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .question-grid {
       display: flex;
       flex-direction: column;
-      gap: 0.9rem;
-      margin: 2rem 0 2.5rem;
+      gap: 1.2rem;
+      margin: 1.5rem 0 2rem;
     }
 
     .question-item {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      background: rgba(255, 255, 255, 0.5);
+      background: rgba(255, 255, 255, 0.6);
       backdrop-filter: blur(2px);
-      padding: 0.6rem 1.2rem 0.6rem 1.5rem;
+      padding: 0.9rem 1.5rem 0.9rem 1.8rem;
       border-radius: 60px;
       border: 1px solid rgba(255, 255, 255, 0.7);
       box-shadow: 0 2px 6px rgba(0,0,0,0.02);
@@ -116,45 +148,45 @@
     }
 
     .question-item:hover {
-      background: rgba(255, 255, 255, 0.75);
+      background: rgba(255, 255, 255, 0.8);
       border-color: #cbd8ec;
     }
 
     .q-text {
       flex: 1 1 220px;
-      font-weight: 500;
-      color: #13273f;
-      font-size: 0.95rem;
+      font-weight: 600;
+      color: #0b1e33;
+      font-size: 1.05rem;
       letter-spacing: -0.01em;
-      padding-right: 0.5rem;
+      padding-right: 0.8rem;
       line-height: 1.4;
     }
 
     .q-options {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.1rem 0.1rem;
+      gap: 0.2rem 0.1rem;
       justify-content: flex-end;
-      flex: 2 1 380px;
+      flex: 2 1 400px;
     }
 
     .option-item {
       display: flex;
       align-items: center;
-      gap: 0.15rem;
+      gap: 0.2rem;
       background: transparent;
-      padding: 0.1rem 0.4rem;
+      padding: 0.2rem 0.5rem;
       border-radius: 30px;
       transition: 0.1s;
-      font-size: 0.78rem;
+      font-size: 0.85rem;
       font-weight: 500;
       color: #1f3857;
     }
 
     .option-item input[type="radio"] {
       appearance: none;
-      width: 17px;
-      height: 17px;
+      width: 20px;
+      height: 20px;
       border: 2px solid #b6c9e2;
       border-radius: 50%;
       margin: 0;
@@ -177,10 +209,17 @@
 
     .option-item label {
       cursor: pointer;
-      padding-right: 2px;
+      padding-right: 3px;
       color: #1f3857;
-      font-weight: 450;
-      font-size: 0.7rem;
+      font-weight: 500;
+      font-size: 0.85rem;
+    }
+
+    .option-label {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: #4a6582;
+      margin-left: 2px;
     }
 
     .mandatory-star {
@@ -189,16 +228,35 @@
       font-weight: 600;
     }
 
-    .submit-area {
+    .nav-area {
       display: flex;
-      justify-content: flex-end;
-      margin-top: 0.8rem;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+      gap: 1rem;
+    }
+
+    .btn-nav {
+      background: #eef4fc;
+      border: 1px solid #d3e0f0;
+      padding: 0.8rem 2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: #0b1e33;
+      cursor: pointer;
+      transition: 0.15s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-nav:hover {
+      background: #dce8f8;
     }
 
     .btn-submit {
       background: #0b1e33;
       border: none;
-      padding: 1rem 3.2rem;
+      padding: 0.9rem 2.8rem;
       border-radius: 60px;
       color: white;
       font-weight: 600;
@@ -207,10 +265,8 @@
       box-shadow: 0 8px 20px -6px rgba(11, 30, 51, 0.25);
       cursor: pointer;
       transition: 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
       border: 1px solid rgba(255, 255, 255, 0.1);
+      font-family: 'Inter', sans-serif;
     }
 
     .btn-submit:hover {
@@ -237,22 +293,23 @@
 
     .result-page.active {
       display: block;
+      animation: fadeIn 0.3s ease;
     }
 
     .result-greeting {
-      font-size: 2.2rem;
+      font-size: 2.4rem;
       font-weight: 600;
       color: #0b1e33;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.5rem;
       letter-spacing: -0.02em;
     }
 
     .result-primary {
-      font-size: 1.8rem;
+      font-size: 2rem;
       font-weight: 700;
       color: #0b1e33;
-      margin: 1rem 0 1.8rem 0;
-      padding: 0.6rem 1.2rem;
+      margin: 1.2rem 0 2rem 0;
+      padding: 0.8rem 1.5rem;
       background: linear-gradient(145deg, #edf3fc, #dce8f8);
       display: inline-block;
       border-radius: 60px;
@@ -267,64 +324,53 @@
       background-clip: text;
     }
 
-    .indices-grid {
+    .indices-list {
       display: flex;
-      flex-wrap: wrap;
-      gap: 1.2rem 2.5rem;
-      margin: 1.8rem 0 0.5rem;
+      flex-direction: column;
+      gap: 1rem;
+      margin: 2rem 0 1rem;
       background: rgba(255,255,255,0.3);
-      padding: 1.5rem 2rem;
+      padding: 1.8rem 2.2rem;
       border-radius: 2rem;
       backdrop-filter: blur(2px);
       border: 1px solid rgba(255,255,255,0.3);
     }
 
     .index-item {
-      font-size: 1.1rem;
+      font-size: 1.3rem;
       font-weight: 500;
       color: #0b1e33;
       display: flex;
       align-items: baseline;
-      gap: 0.4rem;
+      gap: 0.6rem;
+      flex-wrap: wrap;
     }
 
     .index-item .label {
       font-weight: 450;
       color: #1f3857;
+      min-width: 180px;
     }
 
     .index-item .value {
       font-weight: 700;
-      font-size: 1.3rem;
+      font-size: 1.5rem;
       color: #1a3f6e;
       background: rgba(255,255,255,0.4);
-      padding: 0.1rem 0.8rem;
+      padding: 0.1rem 1rem;
       border-radius: 40px;
     }
 
-    .result-sub {
-      margin-top: 1.8rem;
-      color: #1f3857;
-      font-weight: 450;
-      opacity: 0.7;
-      font-size: 0.95rem;
-    }
-
-    .back-link {
-      margin-top: 1.8rem;
-      display: inline-block;
-      background: #eef4fc;
-      padding: 0.6rem 2.2rem;
+    .error-msg {
+      color: #b13e3e;
+      background: #ffe9e9;
+      padding: 0.6rem 1.5rem;
       border-radius: 40px;
-      color: #0b1e33;
       font-weight: 500;
-      text-decoration: none;
-      border: 1px solid #d3e0f0;
-      transition: 0.15s;
-    }
-
-    .back-link:hover {
-      background: #dce8f8;
+      font-size: 1rem;
+      display: inline-block;
+      margin-top: 0.5rem;
+      border: 1px solid #ffcdcd;
     }
 
     /* hidden */
@@ -332,80 +378,98 @@
       display: none;
     }
 
-    .error-msg {
-      color: #b13e3e;
-      background: #ffe9e9;
-      padding: 0.5rem 1.2rem;
-      border-radius: 40px;
-      font-weight: 500;
-      font-size: 0.95rem;
-      display: inline-block;
-      margin-top: 0.5rem;
-      border: 1px solid #ffcdcd;
-    }
-
     /* responsive */
-    @media (max-width: 720px) {
+    @media (max-width: 820px) {
       .survey-wrapper { padding: 1.8rem 1.2rem; }
       .question-item {
         border-radius: 28px;
-        padding: 0.8rem 1rem;
+        padding: 1rem 1.2rem;
         flex-direction: column;
         align-items: stretch;
       }
-      .q-text { flex: 1 1 auto; margin-bottom: 0.4rem; font-size: 0.9rem; }
-      .q-options { justify-content: center; gap: 0.1rem; }
-      .option-item { padding: 0.1rem 0.2rem; font-size: 0.7rem; }
-      .option-item input[type="radio"] { width: 16px; height: 16px; }
-      .btn-submit { width: 100%; justify-content: center; padding: 1rem; }
-      .result-greeting { font-size: 1.8rem; }
-      .result-primary { font-size: 1.4rem; }
-      .indices-grid { flex-direction: column; gap: 0.8rem; padding: 1.2rem; }
-      .index-item { font-size: 1rem; }
+      .q-text { flex: 1 1 auto; margin-bottom: 0.6rem; font-size: 1rem; }
+      .q-options { justify-content: center; gap: 0.2rem; }
+      .option-item { padding: 0.1rem 0.3rem; }
+      .option-item input[type="radio"] { width: 18px; height: 18px; }
+      .btn-submit { width: 100%; justify-content: center; }
+      .nav-area { flex-wrap: wrap; justify-content: center; }
+      .result-greeting { font-size: 2rem; }
+      .result-primary { font-size: 1.6rem; }
+      .indices-list { padding: 1.2rem; }
+      .index-item { font-size: 1.1rem; }
+      .index-item .value { font-size: 1.2rem; }
+      .logo-container img { max-width: 160px; }
+    }
+
+    @media (max-width: 480px) {
+      .option-item label { font-size: 0.75rem; }
+      .option-item { padding: 0.1rem 0.2rem; }
+      .q-text { font-size: 0.95rem; }
+      h1 { font-size: 2rem; }
     }
   </style>
 </head>
 <body>
 
 <div class="survey-wrapper" id="appContainer">
+  <!-- LOGO -->
+  <div class="logo-container">
+    <img src="https://github.com/kiranmarlapudi/LADCTest/blob/main/tapmi-bengaluru-2024-logo.png?raw=true" alt="Tapmi Bengaluru Logo">
+  </div>
+
   <!-- SURVEY CONTENT -->
   <div class="survey-content" id="surveyContent">
-    <h1>⚡ Leadership Archetype</h1>
-    <div class="subhead">24 statements · 7-point scale · all fields required</div>
+    <h1>Leadership Style</h1>
 
     <div class="field-name">
       <label for="respondentName">Your name <span class="mandatory-star">*</span></label>
       <input type="text" id="respondentName" placeholder="e.g. Alex Rivera" autocomplete="name">
     </div>
 
-    <div class="question-grid" id="questionGrid"></div>
-
-    <div class="submit-area">
-      <button class="btn-submit" id="submitBtn">📊 See my archetype</button>
+    <!-- Page dots -->
+    <div class="page-indicator">
+      <span class="page-dot active" data-page="0"></span>
+      <span class="page-dot" data-page="1"></span>
     </div>
-    <div id="errorContainer" style="text-align: right; margin-top: 0.5rem;"></div>
+
+    <!-- Page 1 (questions 1-12) -->
+    <div class="survey-page active" data-page="0">
+      <div class="question-grid" id="page1Grid"></div>
+      <div class="nav-area">
+        <span></span>
+        <button class="btn-nav" id="nextPageBtn">Next →</button>
+      </div>
+    </div>
+
+    <!-- Page 2 (questions 13-24) -->
+    <div class="survey-page" data-page="1">
+      <div class="question-grid" id="page2Grid"></div>
+      <div class="nav-area">
+        <button class="btn-nav" id="prevPageBtn">← Back</button>
+        <button class="btn-submit" id="submitBtn">View my leadership style</button>
+      </div>
+    </div>
+
+    <div id="errorContainer" style="text-align: center; margin-top: 0.5rem;"></div>
   </div>
 
   <!-- RESULT PAGE -->
   <div class="result-page" id="resultPage">
-    <div class="result-greeting" id="resultGreeting">Dear <span id="resultNameDisplay">—</span>,</div>
+    <div class="result-greeting">Dear <span id="resultNameDisplay">—</span>,</div>
     <div class="result-primary">Your Primary Leadership Archetype is: <span id="resultPrimaryStyle">Transformational</span>.</div>
 
-    <div class="indices-grid" id="indicesGrid">
+    <div class="indices-list" id="indicesList">
       <div class="index-item"><span class="label">Autocratic/Authoritative:</span> <span class="value" id="indexAutocratic">0%</span></div>
       <div class="index-item"><span class="label">Democratic:</span> <span class="value" id="indexDemocratic">0%</span></div>
       <div class="index-item"><span class="label">Transformational:</span> <span class="value" id="indexTransformational">0%</span></div>
       <div class="index-item"><span class="label">Laissez-Faire:</span> <span class="value" id="indexLaissezFaire">0%</span></div>
     </div>
-
-    <div class="result-sub">based on your responses · leadership tendency profile</div>
-    <a href="#" class="back-link" id="backToSurvey">← retake survey</a>
   </div>
 </div>
 
 <script>
   (function() {
-    // ---------- QUESTION BANK ----------
+    // ---------- QUESTION BANK (24) ----------
     const questions = [
       "I spend time coaching team members to achieve their potential.",
       "I monitor team performance closely to ensure compliance.",
@@ -433,61 +497,93 @@
       "I believe team members generally prefer to work with minimal input from me."
     ];
 
-    // ---------- RENDER ----------
-    const grid = document.getElementById('questionGrid');
+    // ---------- RENDER PAGES ----------
+    const page1Grid = document.getElementById('page1Grid');
+    const page2Grid = document.getElementById('page2Grid');
+
     const optionValues = [1,2,3,4,5,6,7];
-    const labels = ['Strongly Disagree','Disagree','Slightly Disagree','Neutral','Slightly Agree','Agree','Strongly Agree'];
+    const shortLabels = ['1<br><span class="option-label">Strongly<br>Disagree</span>', 
+                         '2<br><span class="option-label">Disagree</span>',
+                         '3<br><span class="option-label">Slightly<br>Disagree</span>',
+                         '4<br><span class="option-label">Neutral</span>',
+                         '5<br><span class="option-label">Slightly<br>Agree</span>',
+                         '6<br><span class="option-label">Agree</span>',
+                         '7<br><span class="option-label">Strongly<br>Agree</span>'];
 
-    questions.forEach((q, idx) => {
-      const item = document.createElement('div');
-      item.className = 'question-item';
+    function renderQuestions(startIdx, endIdx, container) {
+      for (let idx = startIdx; idx < endIdx; idx++) {
+        const q = questions[idx];
+        const item = document.createElement('div');
+        item.className = 'question-item';
 
-      const qText = document.createElement('div');
-      qText.className = 'q-text';
-      qText.innerHTML = `${idx+1}. ${q} <span class="mandatory-star">*</span>`;
+        const qText = document.createElement('div');
+        qText.className = 'q-text';
+        qText.innerHTML = `${idx+1}. ${q} <span class="mandatory-star">*</span>`;
 
-      const optionsDiv = document.createElement('div');
-      optionsDiv.className = 'q-options';
-      const nameAttr = `q${idx}`;
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'q-options';
+        const nameAttr = `q${idx}`;
 
-      for (let i = 0; i < optionValues.length; i++) {
-        const val = optionValues[i];
-        const opt = document.createElement('div');
-        opt.className = 'option-item';
+        for (let i = 0; i < optionValues.length; i++) {
+          const val = optionValues[i];
+          const opt = document.createElement('div');
+          opt.className = 'option-item';
 
-        const radio = document.createElement('input');
-        radio.type = 'radio';
-        radio.name = nameAttr;
-        radio.value = val;
-        radio.id = `${nameAttr}_${val}`;
+          const radio = document.createElement('input');
+          radio.type = 'radio';
+          radio.name = nameAttr;
+          radio.value = val;
+          radio.id = `${nameAttr}_${val}`;
 
-        const label = document.createElement('label');
-        label.htmlFor = `${nameAttr}_${val}`;
-        label.textContent = val; // show number
+          const label = document.createElement('label');
+          label.htmlFor = `${nameAttr}_${val}`;
+          label.innerHTML = shortLabels[i];
 
-        opt.appendChild(radio);
-        opt.appendChild(label);
-        optionsDiv.appendChild(opt);
+          opt.appendChild(radio);
+          opt.appendChild(label);
+          optionsDiv.appendChild(opt);
+        }
+
+        item.appendChild(qText);
+        item.appendChild(optionsDiv);
+        container.appendChild(item);
       }
+    }
 
-      item.appendChild(qText);
-      item.appendChild(optionsDiv);
-      grid.appendChild(item);
+    renderQuestions(0, 12, page1Grid);
+    renderQuestions(12, 24, page2Grid);
+
+    // ---------- PAGE NAVIGATION ----------
+    const pages = document.querySelectorAll('.survey-page');
+    const dots = document.querySelectorAll('.page-dot');
+    let currentPage = 0;
+
+    function showPage(index) {
+      pages.forEach((p, i) => p.classList.toggle('active', i === index));
+      dots.forEach((d, i) => d.classList.toggle('active', i === index));
+      currentPage = index;
+      clearErrors();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('nextPageBtn').addEventListener('click', function() {
+      if (currentPage === 0) showPage(1);
+    });
+    document.getElementById('prevPageBtn').addEventListener('click', function() {
+      if (currentPage === 1) showPage(0);
     });
 
-    // ---------- SCORING ----------
+    // ---------- SCORING (based on new key) ----------
+    // Authoritative: Q2,Q6,Q10,Q13,Q18,Q23 → indices 1,5,9,12,17,22
+    // Democratic: Q4,Q5,Q9,Q14,Q17,Q21 → indices 3,4,8,13,16,20
+    // Laissez-faire: Q3,Q8,Q12,Q15,Q20,Q24 → indices 2,7,11,14,19,23
+    // Transformational: Q1,Q7,Q11,Q16,Q19,Q22 → indices 0,6,10,15,18,21
+
     function computeScores(answers) {
-      // answers: array of 24 numbers (1-7)
-      // Indices (0-based)
-      // Autocratic/Authoritative: Q2,Q6,Q10,Q13,Q18,Q23 → indices 1,5,9,12,17,22
       const authIndices = [1,5,9,12,17,22];
-      // Democratic (participative): Q4,Q8,Q9,Q21,Q3?  (Q3 trust, Q4 vote, Q8 decide, Q9 consensus, Q21 facilitator)
-      // We'll use: Q4, Q8, Q9, Q21, Q3, Q12?  -> better: Q3, Q4, Q8, Q9, Q12, Q21
-      const demoIndices = [2,3,7,8,11,20]; 
-      // Transformational: Q1,Q5,Q7,Q11,Q14,Q16,Q19,Q22  (coaching, support, vision, outside box, ownership, mentoring)
-      const transIndices = [0,4,6,10,13,15,18,21];
-      // Laissez-Faire: Q15,Q20,Q24, Q12?  Q15 minimal direction, Q20 stay out, Q24 minimal input, Q12 evaluate own work
-      const laissezIndices = [14,19,23,11]; // Q12 index11 added
+      const demoIndices = [3,4,8,13,16,20];
+      const laissezIndices = [2,7,11,14,19,23];
+      const transIndices = [0,6,10,15,18,21];
 
       const avg = (indices) => {
         let sum = 0, count = 0;
@@ -497,27 +593,26 @@
         return count > 0 ? sum / count : 0;
       };
 
-      // raw averages (1-7)
       const authRaw = avg(authIndices);
       const demoRaw = avg(demoIndices);
-      const transRaw = avg(transIndices);
       const laissezRaw = avg(laissezIndices);
+      const transRaw = avg(transIndices);
 
-      // convert to percentage: (raw-1)/6 * 100
-      const toPct = (raw) => Math.round(((raw - 1) / 6) * 100);
+      // Convert to percentage: (raw/7)*100
+      const toPct = (raw) => Math.round((raw / 7) * 100);
       const authPct = toPct(authRaw);
       const demoPct = toPct(demoRaw);
-      const transPct = toPct(transRaw);
       const laissezPct = toPct(laissezRaw);
+      const transPct = toPct(transRaw);
 
-      // primary: highest percentage, tie-break: Transformational > Democratic > Laissez > Autocratic
+      // Primary: highest percentage
       const map = [
         { style: 'Transformational', pct: transPct },
         { style: 'Democratic', pct: demoPct },
         { style: 'Laissez-Faire', pct: laissezPct },
         { style: 'Autocratic/Authoritative', pct: authPct }
       ];
-      map.sort((a,b) => b.pct - a.pct || (a.style === 'Transformational' ? -1 : 1));
+      map.sort((a,b) => b.pct - a.pct);
       const primary = map[0].style;
 
       return {
@@ -540,7 +635,6 @@
     const indexDemocratic = document.getElementById('indexDemocratic');
     const indexTransformational = document.getElementById('indexTransformational');
     const indexLaissezFaire = document.getElementById('indexLaissezFaire');
-    const backLink = document.getElementById('backToSurvey');
 
     function clearErrors() { errorContainer.innerHTML = ''; }
     function showError(msg) { errorContainer.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`; }
@@ -577,7 +671,6 @@
 
       const scores = computeScores(answers);
       
-      // update result page
       resultNameDisplay.textContent = name;
       resultPrimaryStyle.textContent = scores.primary;
       indexAutocratic.textContent = `${scores.autocratic}%`;
@@ -591,16 +684,18 @@
 
     submitBtn.addEventListener('click', handleSubmit);
 
-    backLink.addEventListener('click', function(e) {
-      e.preventDefault();
-      surveyContent.classList.remove('hidden');
-      resultPage.classList.remove('active');
-      clearErrors();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-
+    // Enter key on name field triggers submit if on page 2
     document.getElementById('respondentName').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') { e.preventDefault(); submitBtn.click(); }
+      if (e.key === 'Enter') {
+        // if on page 2, submit; else go to page 2
+        if (currentPage === 1) {
+          e.preventDefault();
+          submitBtn.click();
+        } else {
+          e.preventDefault();
+          showPage(1);
+        }
+      }
     });
 
     document.addEventListener('change', function(e) {
