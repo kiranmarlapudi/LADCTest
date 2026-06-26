@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leadership & Team Dynamics Survey</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-color: #a855f7;
+      --accent-hover: #c084fc;
+      --row-hover: rgba(168, 85, 247, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      line-height: 1.5;
+    }
+
+    .survey-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 2.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(to right, #f43f5e, #a855f7, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .required-note {
+      color: #f43f5e;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+
+    .survey-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+    }
+
+    .survey-table th {
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 1rem 0.5rem;
+      text-align: center;
+      border-bottom: 2px solid var(--card-border);
+    }
+
+    .survey-table th.statement-header {
+      text-align: left;
+      width: 45%;
+      padding-left: 1rem;
+    }
+
+    .survey-table td {
+      padding: 1.2rem 0.5rem;
+      border-bottom: 1px solid var(--card-border);
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .survey-table td.statement-cell {
+      text-align: left;
+      padding-left: 1rem;
+      color: #e2e8f0;
+    }
+
+    .survey-table tbody tr:hover {
+      background-color: var(--row-hover);
+    }
+
+    /* Style the radio buttons natively but clean */
+    input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--text-muted);
+      border-radius: 50%;
+      outline: none;
+      cursor: pointer;
+      vertical-align: middle;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    input[type="radio"]:checked {
+      border-color: var(--accent-color);
+      background: var(--accent-color);
+      box-shadow: 0 0 8px var(--accent-hover);
+    }
+
+    input[type="radio"]:checked::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ffffff;
+    }
+
+    input[type="radio"]:focus-visible {
+      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.4);
+    }
+
+    .submit-btn {
+      display: block;
+      width: 100%;
+      max-width: 250px;
+      margin: 2rem auto 0;
+      background: linear-gradient(135deg, var(--accent-color) 0%, #7c3aed 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 14px 0 rgba(124, 58, 237, 0.4);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px 0 rgba(124, 58, 237, 0.6);
+      background: linear-gradient(135deg, var(--accent-hover) 0%, #6d28d9 100%);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Responsive adjustments for smaller screens */
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem 0.5rem;
+      }
+      .survey-container {
+        padding: 1.25rem;
+      }
+      .survey-table thead {
+        display: none; /* Hide standard headers on mobile */
+      }
+      .survey-table tr {
+        display: block;
+        margin-bottom: 2rem;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--card-border);
+        border-radius: 8px;
+        padding: 1rem;
+      }
+      .survey-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border: none;
+        text-align: right;
+      }
+      .survey-table td.statement-cell {
+        display: block;
+        text-align: left;
+        padding: 0 0 1rem 0;
+        font-weight: 600;
+        border-bottom: 1px solid var(--card-border);
+        margin-bottom: 0.5rem;
+      }
+      /* Generate labels dynamically for mobile view */
+      .survey-table td::before {
+        content: attr(data-label);
+        float: left;
+        font-weight: 500;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        padding-right: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="survey-container">
+    <header>
+      <h1>Team Leadership Dynamics Survey</h1>
+      <p>Please read each statement carefully and select the value that best matches your opinion.</p>
+      <p class="required-note">* All statements are mandatory</p>
+    </header>
+
+    <!-- Replace 'YOUR_GOOGLE_FORM_ACTION_URL' with your form backend later -->
+    <form id="surveyForm" action="YOUR_GOOGLE_FORM_ACTION_URL" method="POST">
+      <table class="survey-table">
+        <thead>
+          <tr>
+            <th class="statement-header">Statements</th>
+            <th>Strongly Disagree</th>
+            <th>Disagree</th>
+            <th>Slightly Disagree</th>
+            <th>Neutral</th>
+            <th>Slightly Agree</th>
+            <th>Agree</th>
+            <th>Strongly Agree</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Item 1 -->
+          <tr>
+            <td class="statement-cell">1. I spend time coaching team members to achieve their potential.</td>
+            <td data-label="Strongly Disagree"><input type="radio" name="entry.XXXXXX_Q1" value="1" required></td>
+            <td data-label="Disagree"><input type="radio" name="entry.XXXXXX_Q1" value="2" required></td>
+            <td data-label="Slightly Disagree"><input type="radio" name="entry.XXXXXX_Q1" value="3" required></td>
+            <td data-label="Neutral"><input type="radio" name="entry.XXXXXX_Q1" value="4" required></td>
+            <td data-label="Slightly Agree"><input type="radio" name="entry.XXXXXX_Q1" value="5" required></td>
+            <td data-label="Agree"><input type="radio" name="entry.XXXXXX_Q1" value="6" required></td>
+            <td data-label="Strongly Agree"><input type="radio" name="entry.XXXXXX_Q1" value="7" required></td>
+          </tr>
+          <!-- Item 2 -->
+          <tr>
+            <td class="statement-cell">2. I monitor team performance closely to ensure compliance.</td>
+            <td data-label="Strongly Disagree"><input type="radio" name="entry.XXXXXX_Q2" value="1" required></td>
+            <td data-label="Disagree"><input type="radio" name="entry.XXXXXX_Q2" value="2" required></td>
+            <td data-label="Slightly Disagree"><input type="radio" name="entry.XXXXXX_Q2" value="3" required></td>
+            <td data-label="Neutral"><input type="radio" name="entry.XXXXXX_Q2" value="4" required></td>
+            <td data-label="Slightly Agree"><input type="radio" name="entry.XXXXXX_Q2" value="5" required></td>
+            <td data-label="Agree"><input type="radio" name="entry.XXXXXX_Q2" value="6" required></td>
+            <td data-label="Strongly Agree"><input type="radio" name="entry.XXXXXX_Q2" value="7" required></td>
+          </tr>
+          <!-- Item 3 -->
+          <tr>
+            <td class="statement-cell">3. I trust the team to manage their own deadlines.</td>
+            <td data-label="Strongly Disagree"><input type="radio" name="entry.XXXXXX_Q3" value="1" required></td>
+            <td data-label="Disagree"><input type="radio" name="entry.XXXXXX_Q3" value="2" required></td>
+            <td data-label="Slightly Disagree"><input type="radio" name="entry.XXXXXX_Q3" value="3" required></td>
+            <td data-label="Neutral"><input type="radio" name="entry.XXXXXX_Q3" value="4" required></td>
+            <td data-label="Slightly Agree"><input type="radio" name="entry.XXXXXX_Q3" value="5" required></td>
+            <td data-label="Agree"><input type="radio" name="entry.XXXXXX_Q3" value="6" required></td>
+            <td data-label="Strongly Agree"><input type="radio" name="entry.XXXXXX_Q3" value="7" required></td>
+          </tr>
+          <!-- Item 4 -->
+          <tr>
+            <td class="statement-cell">4. I encourage team members to vote on project strategies.</td>
+            <td data-label="Strongly Disagree"><input type="radio" name="entry.XXXXXX_Q4" value="1" required></td>
+            <td data-label="Disagree"><input type="radio" name="entry.XXXXXX_Q4" value="2" required></td>
+            <td data-label="Slightly Disagree"><input type="radio" name="entry.XXXXXX_Q4" value="3" required></td>
+            <td data-label="Neutral"><input type="radio" name="entry.XXXXXX_Q4" value="4" required></td>
+            <td data-label="Slightly Agree"><input type="radio" name="entry.XXXXXX_Q4" value="5" required></td>
