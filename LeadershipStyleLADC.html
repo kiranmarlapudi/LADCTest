@@ -43,7 +43,7 @@
       margin-bottom: 1.8rem;
     }
     .logo-container img {
-      max-width: 300px;
+      max-width: 350px;
       height: auto;
       border-radius: 12px;
       background: rgba(255,255,255,0.3);
@@ -56,8 +56,19 @@
       font-size: 2.6rem;
       letter-spacing: -0.02em;
       color: #0b1e33;
-      margin-bottom: 1.8rem;
+      margin-bottom: 0.8rem;
       text-align: center;
+    }
+
+    .survey-description {
+      text-align: center;
+      color: #1f3857;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto 2rem auto;
+      padding: 0 1rem;
+      font-weight: 450;
     }
 
     .field-name {
@@ -298,19 +309,19 @@
     }
 
     .result-greeting {
-      font-size: 2.4rem;
+      font-size: 1.6rem;
       font-weight: 600;
       color: #0b1e33;
-      margin-bottom: 0.5rem;
-      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+      letter-spacing: -0.01em;
     }
 
     .result-primary {
-      font-size: 2rem;
-      font-weight: 700;
+      font-size: 1.4rem;
+      font-weight: 600;
       color: #0b1e33;
-      margin: 1.2rem 0 2rem 0;
-      padding: 0.8rem 1.5rem;
+      margin: 0.8rem 0 1.5rem 0;
+      padding: 0.6rem 1.2rem;
       background: linear-gradient(145deg, #edf3fc, #dce8f8);
       display: inline-block;
       border-radius: 60px;
@@ -326,26 +337,26 @@
     }
 
     .result-sub {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       color: #1f3857;
       margin-bottom: 1.5rem;
-      font-weight: 500;
+      font-weight: 450;
     }
 
     .indices-list {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.8rem;
       margin: 1.5rem 0 1rem;
       background: rgba(255,255,255,0.3);
-      padding: 1.8rem 2.2rem;
+      padding: 1.5rem 2rem;
       border-radius: 2rem;
       backdrop-filter: blur(2px);
       border: 1px solid rgba(255,255,255,0.3);
     }
 
     .index-item {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       font-weight: 500;
       color: #0b1e33;
       display: flex;
@@ -362,7 +373,7 @@
 
     .index-item .value {
       font-weight: 700;
-      font-size: 1.5rem;
+      font-size: 1.3rem;
       color: #1a3f6e;
       background: rgba(255,255,255,0.4);
       padding: 0.1rem 1rem;
@@ -404,12 +415,13 @@
       .option-item input[type="radio"] { width: 18px; height: 18px; }
       .btn-submit { width: 100%; justify-content: center; }
       .nav-area { flex-wrap: wrap; justify-content: center; }
-      .result-greeting { font-size: 2rem; }
-      .result-primary { font-size: 1.6rem; }
+      .result-greeting { font-size: 1.3rem; }
+      .result-primary { font-size: 1.2rem; }
       .indices-list { padding: 1.2rem; }
-      .index-item { font-size: 1.1rem; }
-      .index-item .value { font-size: 1.2rem; }
-      .logo-container img { max-width: 200px; }
+      .index-item { font-size: 1rem; }
+      .index-item .value { font-size: 1.1rem; }
+      .logo-container img { max-width: 250px; }
+      .survey-description { font-size: 0.95rem; padding: 0 0.5rem; }
     }
 
     @media (max-width: 480px) {
@@ -418,8 +430,13 @@
       .option-item input[type="radio"] { width: 16px; height: 16px; }
       .q-text { font-size: 0.95rem; }
       h1 { font-size: 2rem; }
-      .logo-container img { max-width: 150px; }
+      .logo-container img { max-width: 200px; }
       .survey-wrapper { padding: 1.2rem 0.8rem; }
+      .survey-description { font-size: 0.85rem; }
+      .result-greeting { font-size: 1.1rem; }
+      .result-primary { font-size: 1rem; padding: 0.4rem 1rem; }
+      .index-item { font-size: 0.9rem; }
+      .index-item .value { font-size: 1rem; }
     }
   </style>
 </head>
@@ -434,6 +451,12 @@
   <!-- SURVEY CONTENT -->
   <div class="survey-content" id="surveyContent">
     <h1>Leadership Style</h1>
+    
+    <div class="survey-description">
+      This Leadership Style Assessment helps upcoming leaders understand their preferred leadership style. 
+      It provides four categories of leadership style (Authoritative, Democratic, Laissez faire, Transformational) 
+      which are determined by your cumulative score.
+    </div>
 
     <div class="field-name">
       <label for="respondentName">Your name <span class="mandatory-star">*</span></label>
@@ -469,15 +492,17 @@
 
   <!-- RESULT PAGE -->
   <div class="result-page" id="resultPage">
+    <!-- Logo will be displayed here too via the same container -->
+    <div class="logo-container">
+      <img src="https://github.com/kiranmarlapudi/LADCTest/blob/main/tapmi-bengaluru-2024-logo.png?raw=true" alt="Tapmi Bengaluru Logo">
+    </div>
+    
     <div class="result-greeting">Dear <span id="resultNameDisplay">—</span>,</div>
-    <div class="result-primary">Your Primary Leadership Archetype is: <span id="resultPrimaryStyle">Transformational</span>.</div>
+    <div class="result-primary" id="resultPrimaryDisplay">Your Primary Leadership Archetype is: <span id="resultPrimaryStyle">Transformational</span>.</div>
     <div class="result-sub" id="resultSubText"></div>
 
     <div class="indices-list" id="indicesList">
-      <div class="index-item" id="indexAutocraticItem"><span class="label">Autocratic/Authoritative:</span> <span class="value" id="indexAutocratic">0%</span></div>
-      <div class="index-item" id="indexDemocraticItem"><span class="label">Democratic:</span> <span class="value" id="indexDemocratic">0%</span></div>
-      <div class="index-item" id="indexTransformationalItem"><span class="label">Transformational:</span> <span class="value" id="indexTransformational">0%</span></div>
-      <div class="index-item" id="indexLaissezFaireItem"><span class="label">Laissez-Faire:</span> <span class="value" id="indexLaissezFaire">0%</span></div>
+      <!-- Will be populated dynamically -->
     </div>
   </div>
 </div>
@@ -590,7 +615,7 @@
       if (currentPage === 1) showPage(0);
     });
 
-    // ---------- IMPROVED SCORING WITH TIE-BREAKING ----------
+    // ---------- SCORING WITH IMPROVED LOGIC ----------
     function computeScores(answers) {
       const authIndices = [1,5,9,12,17,22];
       const demoIndices = [3,4,8,13,16,20];
@@ -612,67 +637,78 @@
 
       // Convert to percentage
       const toPct = (raw) => Math.round((raw / 7) * 100);
-      const authPct = toPct(authRaw);
-      const demoPct = toPct(demoRaw);
-      const laissezPct = toPct(laissezRaw);
-      const transPct = toPct(transRaw);
-
-      // Store raw scores for tie-breaking
-      const styles = [
-        { name: 'Transformational', pct: transPct, raw: transRaw },
-        { name: 'Democratic', pct: demoPct, raw: demoRaw },
-        { name: 'Laissez-Faire', pct: laissezPct, raw: laissezRaw },
-        { name: 'Autocratic/Authoritative', pct: authPct, raw: authRaw }
+      
+      // Create array of styles with their data
+      let styles = [
+        { name: 'Transformational', pct: toPct(transRaw), raw: transRaw },
+        { name: 'Democratic', pct: toPct(demoRaw), raw: demoRaw },
+        { name: 'Laissez-Faire', pct: toPct(laissezRaw), raw: laissezRaw },
+        { name: 'Autocratic/Authoritative', pct: toPct(authRaw), raw: authRaw }
       ];
 
-      // Sort by percentage (descending), then by raw score (descending) for tie-breaking
+      // Sort by percentage (descending), then alphabetically for ties
       styles.sort((a, b) => {
         if (b.pct !== a.pct) return b.pct - a.pct;
-        return b.raw - a.raw;
+        return a.name.localeCompare(b.name);
       });
 
-      // Check if there's a tie (within 2 percentage points)
-      const topTwo = styles.slice(0, 2);
-      const isTie = Math.abs(topTwo[0].pct - topTwo[1].pct) <= 2;
-
+      // Determine primary style and follow-up
       let primary = styles[0].name;
+      let primaryDisplay = '';
       let subText = '';
 
-      if (isTie && topTwo[0].pct === topTwo[1].pct) {
-        if (topTwo[0].raw === topTwo[1].raw) {
-          const topThree = styles.slice(0, 3);
-          if (topThree[0].pct === topThree[2].pct && topThree[0].raw === topThree[2].raw) {
-            primary = 'Mixed (Multiple Styles)';
-            subText = 'You show an equal balance across multiple leadership styles.';
+      // Check if top style is significantly higher than second (more than 3% difference)
+      const diff = styles[0].pct - styles[1].pct;
+      const isSignificant = diff > 3;
+
+      if (isSignificant) {
+        // Clear winner
+        primary = styles[0].name;
+        primaryDisplay = primary;
+        if (diff > 15) {
+          subText = `You have a strong, clear preference for ${primary} leadership.`;
+        } else {
+          subText = `You show a preference for ${primary} leadership with some ${styles[1].name} influence.`;
+        }
+      } else {
+        // Within 3% - need to check for ties or close scores
+        // Find all styles within 3% of the top
+        const closeStyles = styles.filter(s => (styles[0].pct - s.pct) <= 3);
+        
+        if (closeStyles.length === 1) {
+          // Only one style within 3% (shouldn't happen, but just in case)
+          primary = styles[0].name;
+          primaryDisplay = primary;
+          subText = `You show a preference for ${primary} leadership.`;
+        } else if (closeStyles.length === 2) {
+          // Two styles close
+          if (closeStyles[0].pct === closeStyles[1].pct) {
+            // Exact tie
+            primary = `${closeStyles[0].name} & ${closeStyles[1].name}`;
+            primaryDisplay = closeStyles[0].name;
+            subText = `You show a balanced blend of ${closeStyles[0].name} and ${closeStyles[1].name} leadership styles.`;
           } else {
-            primary = `${topTwo[0].name} & ${topTwo[1].name}`;
-            subText = `You show a balanced blend of ${topTwo[0].name} and ${topTwo[1].name} leadership styles.`;
+            // Close but not tied
+            primary = closeStyles[0].name;
+            primaryDisplay = `${primary}, followed by ${closeStyles[1].name}`;
+            subText = `Your leadership style is primarily ${primary} with strong ${closeStyles[1].name} influences.`;
           }
         } else {
-          primary = styles[0].name;
-          subText = `You show a slightly stronger tendency toward ${styles[0].name} over ${styles[1].name}.`;
-        }
-      } else if (isTie) {
-        primary = `${topTwo[0].name} (Primary)`;
-        subText = `You show strong ${topTwo[0].name} tendencies with notable ${topTwo[1].name} influence.`;
-      } else {
-        const diff = topTwo[0].pct - topTwo[1].pct;
-        if (diff > 15) {
-          subText = `You have a strong, clear preference for ${topTwo[0].name} leadership.`;
-        } else {
-          subText = `You show a preference for ${topTwo[0].name} leadership with some ${topTwo[1].name} influence.`;
+          // Three or more styles close
+          const styleNames = closeStyles.map(s => s.name);
+          const lastStyle = styleNames.pop();
+          primary = `${styleNames.join(', ')} & ${lastStyle}`;
+          primaryDisplay = styleNames[0] + ' (Mixed)';
+          subText = `You show a balanced approach across multiple leadership styles: ${styleNames.join(', ')} and ${lastStyle}.`;
         }
       }
 
       return {
-        autocratic: authPct,
-        democratic: demoPct,
-        transformational: transPct,
-        laissezFaire: laissezPct,
+        styles: styles,
         primary: primary,
+        primaryDisplay: primaryDisplay,
         subText: subText,
-        isTie: isTie,
-        rawScores: { authRaw, demoRaw, laissezRaw, transRaw }
+        closeStyles: styles.filter(s => (styles[0].pct - s.pct) <= 3)
       };
     }
 
@@ -683,15 +719,9 @@
     const resultPage = document.getElementById('resultPage');
     const resultNameDisplay = document.getElementById('resultNameDisplay');
     const resultPrimaryStyle = document.getElementById('resultPrimaryStyle');
+    const resultPrimaryDisplay = document.getElementById('resultPrimaryDisplay');
     const resultSubText = document.getElementById('resultSubText');
-    const indexAutocratic = document.getElementById('indexAutocratic');
-    const indexDemocratic = document.getElementById('indexDemocratic');
-    const indexTransformational = document.getElementById('indexTransformational');
-    const indexLaissezFaire = document.getElementById('indexLaissezFaire');
-    const indexAutocraticItem = document.getElementById('indexAutocraticItem');
-    const indexDemocraticItem = document.getElementById('indexDemocraticItem');
-    const indexTransformationalItem = document.getElementById('indexTransformationalItem');
-    const indexLaissezFaireItem = document.getElementById('indexLaissezFaireItem');
+    const indicesList = document.getElementById('indicesList');
 
     function clearErrors() { errorContainer.innerHTML = ''; }
     function showError(msg) { errorContainer.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`; }
@@ -726,37 +756,45 @@
       const answers = gatherAnswers();
       if (!answers) return;
 
-      const scores = computeScores(answers);
+      const result = computeScores(answers);
       
+      // Update result page
       resultNameDisplay.textContent = name;
-      resultPrimaryStyle.textContent = scores.primary;
-      resultSubText.textContent = scores.subText;
       
-      indexAutocratic.textContent = `${scores.autocratic}%`;
-      indexDemocratic.textContent = `${scores.democratic}%`;
-      indexTransformational.textContent = `${scores.transformational}%`;
-      indexLaissezFaire.textContent = `${scores.laissezFaire}%`;
-
-      // Highlight the primary style(s)
-      [indexAutocraticItem, indexDemocraticItem, indexTransformationalItem, indexLaissezFaireItem].forEach(el => {
-        el.classList.remove('highlight');
-      });
-      
-      const primaryLower = scores.primary.toLowerCase();
-      if (primaryLower.includes('autocratic')) indexAutocraticItem.classList.add('highlight');
-      if (primaryLower.includes('democratic')) indexDemocraticItem.classList.add('highlight');
-      if (primaryLower.includes('transformational')) indexTransformationalItem.classList.add('highlight');
-      if (primaryLower.includes('laissez')) indexLaissezFaireItem.classList.add('highlight');
-      
-      if (scores.primary.includes('&')) {
-        const styles = scores.primary.split('&').map(s => s.trim().toLowerCase());
-        styles.forEach(style => {
-          if (style.includes('autocratic')) indexAutocraticItem.classList.add('highlight');
-          if (style.includes('democratic')) indexDemocraticItem.classList.add('highlight');
-          if (style.includes('transformational')) indexTransformationalItem.classList.add('highlight');
-          if (style.includes('laissez')) indexLaissezFaireItem.classList.add('highlight');
-        });
+      // Update primary style display with "followed by" if applicable
+      if (result.primaryDisplay && result.primaryDisplay !== result.primary) {
+        resultPrimaryStyle.textContent = result.primaryDisplay;
+        // Update the full text
+        resultPrimaryDisplay.innerHTML = `Your Primary Leadership Archetype is: <span id="resultPrimaryStyle">${result.primaryDisplay}</span>.`;
+        // Re-get the reference
+        document.getElementById('resultPrimaryStyle').textContent = result.primaryDisplay;
+      } else {
+        resultPrimaryStyle.textContent = result.primary;
       }
+      
+      resultSubText.textContent = result.subText;
+
+      // Clear and rebuild indices list in sorted order
+      indicesList.innerHTML = '';
+      
+      result.styles.forEach((style, index) => {
+        const item = document.createElement('div');
+        item.className = 'index-item';
+        
+        // Check if this style is within 3% of the top (close)
+        const isClose = result.closeStyles.some(s => s.name === style.name);
+        if (isClose) {
+          item.classList.add('highlight');
+        }
+        
+        // Also highlight if it's the primary or mentioned in primary
+        if (result.primary.includes(style.name)) {
+          item.classList.add('highlight');
+        }
+        
+        item.innerHTML = `<span class="label">${style.name}:</span> <span class="value">${style.pct}%</span>`;
+        indicesList.appendChild(item);
+      });
 
       surveyContent.classList.add('hidden');
       resultPage.classList.add('active');
