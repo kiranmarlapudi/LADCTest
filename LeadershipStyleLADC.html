@@ -885,4 +885,127 @@
         styles: styles,
         primary: primary,
         primaryDisplay: primaryDisplay,
-        closeStyles: styles.filter(s => (styles[0].pct - s.pct
+        closeStyles: styles.filter(s => (styles[0].pct - s.pct) <= 3)
+      };
+    }
+
+    // ---------- SUBMIT ----------
+    const submitBtn = document.getElementById('submitBtn');
+    const errorContainer = document.getElementById('errorContainer');
+    const surveyContent = document.getElementById('surveyContent');
+    const resultPage = document.getElementById('resultPage');
+    const insightsPage = document.getElementById('insightsPage');
+    const resultNameDisplay = document.getElementById('resultNameDisplay');
+    const resultPrimaryStyle = document.getElementById('resultPrimaryStyle');
+    const resultPrimaryDisplay = document.getElementById('resultPrimaryDisplay');
+    const indicesList = document.getElementById('indicesList');
+
+    function clearErrors() { errorContainer.innerHTML = ''; }
+    function showError(msg) { errorContainer.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`; }
+
+    function gatherAnswers() {
+      const radios = document.querySelectorAll('.question-item input[type="radio"]');
+      const answerMap = new Map();
+      radios.forEach(r => { if (r.checked) answerMap.set(r.name, parseInt(r.value,10)); });
+
+      const missing = [];
+      for (let i = 0; i < 24; i++) {
+        const name = `q${i}`;
+        if (!answerMap.has(name)) missing.push(i+1);
+      }
+      if (missing.length > 0) {
+        const qList = missing.map(n => `#${n}`).join(', ');
+        showError(`Please answer all questions (missing: ${qList})`);
+        return null;
+      }
+
+      const answers = [];
+      for (let i = 0; i < 24; i++) answers.push(answerMap.get(`q${i}`));
+      return answers;
+    }
+
+    function handleSubmit() {
+      clearErrors();
+      const nameInput = document.getElementById('respondentName');
+      const name = nameInput.value.trim();
+      if (!name) { showError('Please enter your name.'); return; }
+
+      const answers = gatherAnswers();
+      if (!answers) return;
+
+      const result = computeScores(answers);
+      
+      // Update result page
+      resultNameDisplay.textContent = name;
+      
+      // Update primary style display with "followed by" if applicable
+      if (result.primaryDisplay && result.primaryDisplay !== result.primary) {
+        resultPrimaryStyle.textContent = result.primaryDisplay;
+        resultPrimaryDisplay.innerHTML = `Your Primary Leadership Archetype is: <span id="resultPrimaryStyle">${result.primaryDisplay}</span>.`;
+        document.getElementById('resultPrimaryStyle').textContent = result.primaryDisplay;
+      } else {
+        resultPrimaryStyle.textContent = result.primary;
+      }
+
+      // Clear and rebuild indices list in sorted order
+      indicesList.innerHTML = '';
+      
+      result.styles.forEach((style) => {
+        const item = document.createElement('div');
+        item.className = 'index-item';
+        
+        // Check if this style is within 3% of the top (close)
+        const isClose = result.closeStyles.some(s => s.name === style.name);
+        if (isClose) {
+          item.classList.add('highlight');
+        }
+        
+        // Also highlight if it's the primary or mentioned in primary
+        if (result.primary.includes(style.name)) {
+          item.classList.add('highlight');
+        }
+        
+        item.innerHTML = `<span class="label">${style.name}:</span> <span class="value">${style.pct}%</span>`;
+        indicesList.appendChild(item);
+      });
+
+      surveyContent.classList.add('hidden');
+      resultPage.classList.add('active');
+      insightsPage.classList.remove('active');
+    }
+
+    submitBtn.addEventListener('click', handleSubmit);
+
+    // ---------- INSIGHTS NAVIGATION ----------
+    document.getElementById('insightsBtn').addEventListener('click', function() {
+      resultPage.classList.remove('active');
+      insightsPage.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.getElementById('backToResultsBtn').addEventListener('click', function() {
+      insightsPage.classList.remove('active');
+      resultPage.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.getElementById('respondentName').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        if (currentPage === 1) {
+          e.preventDefault();
+          submitBtn.click();
+        } else {
+          e.preventDefault();
+          showPage(1);
+        }
+      }
+    });
+
+    document.addEventListener('change', function(e) {
+      if (e.target && e.target.type === 'radio') clearErrors();
+    });
+
+  })();
+</script>
+</body>
+</html>
