@@ -348,13 +348,6 @@
       background-clip: text;
     }
 
-    .result-sub {
-      font-size: 1.05rem;
-      color: #1f3857;
-      margin-bottom: 1.5rem;
-      font-weight: 450;
-    }
-
     .indices-list {
       display: flex;
       flex-direction: column;
@@ -472,17 +465,6 @@
       color: #1f3857;
       line-height: 1.6;
       font-weight: 450;
-    }
-
-    .insight-card .range-info {
-      font-size: 0.9rem;
-      color: #4a6582;
-      margin-top: 0.5rem;
-      font-weight: 400;
-      background: rgba(0,0,0,0.03);
-      padding: 0.3rem 0.8rem;
-      border-radius: 8px;
-      display: inline-block;
     }
 
     .reference {
@@ -630,11 +612,6 @@
 
   <!-- RESULT PAGE -->
   <div class="result-page" id="resultPage">
-    <div class="logo-container">
-      <img src="https://github.com/kiranmarlapudi/LADCTest/blob/main/tapmi-bengaluru-2024-logo.png?raw=true" alt="Tapmi Bengaluru Logo">
-    </div>
-    <div class="banner-title">Leadership Assessment and Development Center (LADC)</div>
-    
     <div class="result-greeting">Dear <span id="resultNameDisplay">—</span>,</div>
     <div class="result-primary" id="resultPrimaryDisplay">Your Primary Leadership Archetype is: <span id="resultPrimaryStyle">Transformational</span>.</div>
 
@@ -643,48 +620,32 @@
     </div>
 
     <div class="insights-btn-container">
-      <button class="btn-insights" id="insightsBtn">📖 Read about Leadership Styles</button>
+      <button class="btn-insights" id="insightsBtn">Read about Leadership Styles</button>
     </div>
   </div>
 
   <!-- INSIGHTS PAGE -->
   <div class="insights-page" id="insightsPage">
-    <div class="logo-container">
-      <img src="https://github.com/kiranmarlapudi/LADCTest/blob/main/tapmi-bengaluru-2024-logo.png?raw=true" alt="Tapmi Bengaluru Logo">
-    </div>
-    <div class="banner-title">Leadership Assessment and Development Center (LADC)</div>
-    
     <div class="insights-title">Understanding Leadership Styles</div>
 
     <div class="insight-card">
-      <h3> Authoritarian Leadership</h3>
-      <p>Leader needs to control members and what they do. They emphasize that they are in charge and exert influence and control over group members. Authoritarian leaders prefer communication be directed downwards.</p>
+      <h3>Authoritarian Leadership</h3>
+      <p>Leader needs to control members and what they do. They emphasize that they are in charge and exert influence and control over group members. Authoritarian leaders prefer communication be directed up.</p>
     </div>
 
     <div class="insight-card" style="border-left-color: #2ecc71;">
-      <h3> Democratic Leadership</h3>
+      <h3>Democratic Leadership</h3>
       <p>Leaders treat members as fully capable of doing work on their own. They work with group members, try hard to treat everyone fairly, and to not be above others. Their main goal is to help group members reach personal goals. Communication is interactional between leader and members.</p>
     </div>
 
     <div class="insight-card" style="border-left-color: #e67e22;">
-      <h3> Laissez-Faire Leadership</h3>
+      <h3>Laissez-Faire Leadership</h3>
       <p>Leaders do not try to control member and do not try to nurture and guide members either. Instead, this leader engages in minimal influence and has a "hands-off" approach.</p>
     </div>
 
     <div class="insight-card" style="border-left-color: #8e44ad;">
-      <h3> Transformational Leadership</h3>
+      <h3>Transformational Leadership</h3>
       <p>Leaders inspire and motivate followers to achieve extraordinary outcomes and develop their own leadership capacity. They focus on creating a vision, fostering innovation, and empowering team members to reach their full potential.</p>
-    </div>
-
-    <div style="background: rgba(255,255,255,0.4); border-radius: 16px; padding: 1.2rem 1.8rem; margin-top: 1.5rem;">
-      <p style="font-weight: 600; color: #0b1e33; margin-bottom: 0.5rem;">Score Ranges:</p>
-      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.95rem; color: #1f3857;">
-        <span style="background: rgba(46, 204, 113, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px;">26-30: Very High</span>
-        <span style="background: rgba(52, 152, 219, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px;">21-25: High</span>
-        <span style="background: rgba(241, 196, 15, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px;">16-20: Moderate</span>
-        <span style="background: rgba(230, 126, 34, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px;">11-15: Low</span>
-        <span style="background: rgba(231, 76, 60, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px;">6-10: Very Low</span>
-      </div>
     </div>
 
     <div class="reference">
