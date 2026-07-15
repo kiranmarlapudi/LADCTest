@@ -43,7 +43,7 @@
       margin-bottom: 1.8rem;
     }
     .logo-container img {
-      max-width: 350px;
+      max-width: 300px;
       height: auto;
       border-radius: 12px;
       background: rgba(255,255,255,0.3);
@@ -130,18 +130,15 @@
     .question-grid {
       display: flex;
       flex-direction: column;
-      gap: 1.2rem;
+      gap: 1.5rem;
       margin: 1.5rem 0 2rem;
     }
 
     .question-item {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
       background: rgba(255, 255, 255, 0.6);
       backdrop-filter: blur(2px);
-      padding: 0.9rem 1.5rem 0.9rem 1.8rem;
-      border-radius: 60px;
+      padding: 1.2rem 1.8rem;
+      border-radius: 20px;
       border: 1px solid rgba(255, 255, 255, 0.7);
       box-shadow: 0 2px 6px rgba(0,0,0,0.02);
       transition: 0.15s;
@@ -153,41 +150,45 @@
     }
 
     .q-text {
-      flex: 1 1 220px;
       font-weight: 600;
       color: #0b1e33;
       font-size: 1.05rem;
       letter-spacing: -0.01em;
-      padding-right: 0.8rem;
-      line-height: 1.4;
+      line-height: 1.5;
+      margin-bottom: 0.8rem;
     }
 
     .q-options {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.2rem 0.1rem;
-      justify-content: flex-end;
-      flex: 2 1 400px;
+      gap: 0.3rem;
+      justify-content: space-between;
+      padding: 0.5rem 0;
     }
 
     .option-item {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.2rem;
-      background: transparent;
-      padding: 0.2rem 0.5rem;
-      border-radius: 30px;
+      gap: 0.3rem;
+      flex: 1;
+      min-width: 55px;
+      max-width: 80px;
+      padding: 0.3rem 0.2rem;
+      border-radius: 12px;
       transition: 0.1s;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #1f3857;
+      cursor: pointer;
+    }
+
+    .option-item:hover {
+      background: rgba(26, 92, 255, 0.05);
     }
 
     .option-item input[type="radio"] {
       appearance: none;
-      width: 20px;
-      height: 20px;
-      border: 2px solid #b6c9e2;
+      width: 22px;
+      height: 22px;
+      border: 2.5px solid #b6c9e2;
       border-radius: 50%;
       margin: 0;
       background: white;
@@ -199,7 +200,7 @@
     .option-item input[type="radio"]:checked {
       border-color: #1a5cff;
       background: #1a5cff;
-      box-shadow: inset 0 0 0 4px white, 0 0 0 1px #1a5cff;
+      box-shadow: inset 0 0 0 5px white, 0 0 0 1px #1a5cff;
     }
 
     .option-item input[type="radio"]:focus-visible {
@@ -209,17 +210,17 @@
 
     .option-item label {
       cursor: pointer;
-      padding-right: 3px;
-      color: #1f3857;
+      text-align: center;
       font-weight: 500;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
+      color: #1f3857;
+      line-height: 1.2;
     }
 
-    .option-label {
-      font-size: 0.75rem;
-      font-weight: 400;
-      color: #4a6582;
-      margin-left: 2px;
+    .option-item .option-number {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #0b1e33;
     }
 
     .mandatory-star {
@@ -395,15 +396,11 @@
     /* responsive */
     @media (max-width: 820px) {
       .survey-wrapper { padding: 1.8rem 1.2rem; }
-      .question-item {
-        border-radius: 28px;
-        padding: 1rem 1.2rem;
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .q-text { flex: 1 1 auto; margin-bottom: 0.6rem; font-size: 1rem; }
-      .q-options { justify-content: center; gap: 0.2rem; }
-      .option-item { padding: 0.1rem 0.3rem; }
+      .question-item { padding: 1rem 1.2rem; }
+      .q-text { font-size: 1rem; }
+      .q-options { gap: 0.2rem; }
+      .option-item { min-width: 40px; max-width: 60px; }
+      .option-item label { font-size: 0.65rem; }
       .option-item input[type="radio"] { width: 18px; height: 18px; }
       .btn-submit { width: 100%; justify-content: center; }
       .nav-area { flex-wrap: wrap; justify-content: center; }
@@ -412,14 +409,17 @@
       .indices-list { padding: 1.2rem; }
       .index-item { font-size: 1.1rem; }
       .index-item .value { font-size: 1.2rem; }
-      .logo-container img { max-width: 160px; }
+      .logo-container img { max-width: 200px; }
     }
 
     @media (max-width: 480px) {
-      .option-item label { font-size: 0.75rem; }
-      .option-item { padding: 0.1rem 0.2rem; }
+      .option-item { min-width: 35px; max-width: 50px; }
+      .option-item label { font-size: 0.55rem; }
+      .option-item input[type="radio"] { width: 16px; height: 16px; }
       .q-text { font-size: 0.95rem; }
       h1 { font-size: 2rem; }
+      .logo-container img { max-width: 150px; }
+      .survey-wrapper { padding: 1.2rem 0.8rem; }
     }
   </style>
 </head>
@@ -517,13 +517,15 @@
     const page2Grid = document.getElementById('page2Grid');
 
     const optionValues = [1,2,3,4,5,6,7];
-    const shortLabels = ['1<br><span class="option-label">Strongly<br>Disagree</span>', 
-                         '2<br><span class="option-label">Disagree</span>',
-                         '3<br><span class="option-label">Slightly<br>Disagree</span>',
-                         '4<br><span class="option-label">Neutral</span>',
-                         '5<br><span class="option-label">Slightly<br>Agree</span>',
-                         '6<br><span class="option-label">Agree</span>',
-                         '7<br><span class="option-label">Strongly<br>Agree</span>'];
+    const optionLabels = [
+      'Strongly<br>Disagree',
+      'Disagree',
+      'Slightly<br>Disagree',
+      'Neutral',
+      'Slightly<br>Agree',
+      'Agree',
+      'Strongly<br>Agree'
+    ];
 
     function renderQuestions(startIdx, endIdx, container) {
       for (let idx = startIdx; idx < endIdx; idx++) {
@@ -552,7 +554,7 @@
 
           const label = document.createElement('label');
           label.htmlFor = `${nameAttr}_${val}`;
-          label.innerHTML = shortLabels[i];
+          label.innerHTML = `<span class="option-number">${val}</span><br>${optionLabels[i]}`;
 
           opt.appendChild(radio);
           opt.appendChild(label);
@@ -626,7 +628,7 @@
       // Sort by percentage (descending), then by raw score (descending) for tie-breaking
       styles.sort((a, b) => {
         if (b.pct !== a.pct) return b.pct - a.pct;
-        return b.raw - a.raw; // higher raw score wins ties
+        return b.raw - a.raw;
       });
 
       // Check if there's a tie (within 2 percentage points)
@@ -637,9 +639,7 @@
       let subText = '';
 
       if (isTie && topTwo[0].pct === topTwo[1].pct) {
-        // Exact tie - use raw score to break
         if (topTwo[0].raw === topTwo[1].raw) {
-          // Still tied - check third
           const topThree = styles.slice(0, 3);
           if (topThree[0].pct === topThree[2].pct && topThree[0].raw === topThree[2].raw) {
             primary = 'Mixed (Multiple Styles)';
@@ -649,16 +649,13 @@
             subText = `You show a balanced blend of ${topTwo[0].name} and ${topTwo[1].name} leadership styles.`;
           }
         } else {
-          // Raw score breaks the tie
           primary = styles[0].name;
           subText = `You show a slightly stronger tendency toward ${styles[0].name} over ${styles[1].name}.`;
         }
       } else if (isTie) {
-        // Close tie (within 2%)
         primary = `${topTwo[0].name} (Primary)`;
         subText = `You show strong ${topTwo[0].name} tendencies with notable ${topTwo[1].name} influence.`;
       } else {
-        // Clear winner
         const diff = topTwo[0].pct - topTwo[1].pct;
         if (diff > 15) {
           subText = `You have a strong, clear preference for ${topTwo[0].name} leadership.`;
@@ -751,7 +748,6 @@
       if (primaryLower.includes('transformational')) indexTransformationalItem.classList.add('highlight');
       if (primaryLower.includes('laissez')) indexLaissezFaireItem.classList.add('highlight');
       
-      // If multiple styles are mentioned (e.g., "Transformational & Democratic")
       if (scores.primary.includes('&')) {
         const styles = scores.primary.split('&').map(s => s.trim().toLowerCase());
         styles.forEach(style => {
@@ -768,7 +764,6 @@
 
     submitBtn.addEventListener('click', handleSubmit);
 
-    // Enter key on name field triggers submit if on page 2
     document.getElementById('respondentName').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         if (currentPage === 1) {
