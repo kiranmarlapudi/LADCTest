@@ -40,7 +40,7 @@
     /* Logo */
     .logo-container {
       text-align: center;
-      margin-bottom: 1.8rem;
+      margin-bottom: 0.5rem;
     }
     .logo-container img {
       max-width: 350px;
@@ -49,6 +49,17 @@
       background: rgba(255,255,255,0.3);
       padding: 6px 12px;
       backdrop-filter: blur(2px);
+    }
+
+    .banner-title {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #0b1e33;
+      letter-spacing: 0.5px;
+      margin-bottom: 1.8rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 2px solid rgba(26, 92, 255, 0.15);
     }
 
     h1 {
@@ -301,6 +312,7 @@
       border: 1px solid rgba(255,255,255,0.6);
       margin: 0.5rem 0;
       text-align: left;
+      position: relative;
     }
 
     .result-page.active {
@@ -320,7 +332,7 @@
       font-size: 1.4rem;
       font-weight: 600;
       color: #0b1e33;
-      margin: 0.8rem 0 1.5rem 0;
+      margin: 0.8rem 0 0.5rem 0;
       padding: 0.6rem 1.2rem;
       background: linear-gradient(145deg, #edf3fc, #dce8f8);
       display: inline-block;
@@ -387,6 +399,121 @@
       margin: 0 -0.8rem;
     }
 
+    /* Insights Button */
+    .insights-btn-container {
+      text-align: right;
+      margin-top: 1.5rem;
+    }
+
+    .btn-insights {
+      background: transparent;
+      border: 2px solid #1a5cff;
+      color: #1a5cff;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Inter', sans-serif;
+      background: rgba(255,255,255,0.6);
+      backdrop-filter: blur(2px);
+    }
+
+    .btn-insights:hover {
+      background: #1a5cff;
+      color: white;
+      transform: scale(1.02);
+      box-shadow: 0 4px 12px rgba(26, 92, 255, 0.25);
+    }
+
+    /* Insights Page (Debrief) */
+    .insights-page {
+      display: none;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(4px);
+      border-radius: 2rem;
+      padding: 2.5rem 2.5rem;
+      border: 1px solid rgba(255,255,255,0.6);
+      margin: 0.5rem 0;
+      text-align: left;
+    }
+
+    .insights-page.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .insights-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #0b1e33;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .insight-card {
+      background: rgba(255,255,255,0.6);
+      border-radius: 16px;
+      padding: 1.2rem 1.8rem;
+      margin-bottom: 1.2rem;
+      border-left: 5px solid #1a5cff;
+    }
+
+    .insight-card h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0b1e33;
+      margin-bottom: 0.4rem;
+    }
+
+    .insight-card p {
+      font-size: 1rem;
+      color: #1f3857;
+      line-height: 1.6;
+      font-weight: 450;
+    }
+
+    .insight-card .range-info {
+      font-size: 0.9rem;
+      color: #4a6582;
+      margin-top: 0.5rem;
+      font-weight: 400;
+      background: rgba(0,0,0,0.03);
+      padding: 0.3rem 0.8rem;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    .reference {
+      margin-top: 2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      font-size: 0.9rem;
+      color: #4a6582;
+      font-style: italic;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .btn-back-to-results {
+      background: #eef4fc;
+      border: 1px solid #d3e0f0;
+      padding: 0.6rem 2rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #0b1e33;
+      cursor: pointer;
+      transition: 0.15s;
+      font-family: 'Inter', sans-serif;
+      margin-top: 1.5rem;
+    }
+
+    .btn-back-to-results:hover {
+      background: #dce8f8;
+    }
+
     .error-msg {
       color: #b13e3e;
       background: #ffe9e9;
@@ -422,6 +549,11 @@
       .index-item .value { font-size: 1.1rem; }
       .logo-container img { max-width: 250px; }
       .survey-description { font-size: 0.95rem; padding: 0 0.5rem; }
+      .banner-title { font-size: 1.2rem; }
+      .insights-page { padding: 1.8rem 1.2rem; }
+      .insight-card { padding: 1rem 1.2rem; }
+      .insight-card h3 { font-size: 1.1rem; }
+      .insight-card p { font-size: 0.95rem; }
     }
 
     @media (max-width: 480px) {
@@ -437,16 +569,22 @@
       .result-primary { font-size: 1rem; padding: 0.4rem 1rem; }
       .index-item { font-size: 0.9rem; }
       .index-item .value { font-size: 1rem; }
+      .banner-title { font-size: 1rem; }
+      .insights-title { font-size: 1.4rem; }
+      .insight-card h3 { font-size: 1rem; }
+      .insight-card p { font-size: 0.85rem; }
+      .insights-page { padding: 1.2rem 0.8rem; }
     }
   </style>
 </head>
 <body>
 
 <div class="survey-wrapper" id="appContainer">
-  <!-- LOGO -->
+  <!-- LOGO & BANNER -->
   <div class="logo-container">
     <img src="https://github.com/kiranmarlapudi/LADCTest/blob/main/tapmi-bengaluru-2024-logo.png?raw=true" alt="Tapmi Bengaluru Logo">
   </div>
+  <div class="banner-title">Leadership Assessment and Development Center (LADC)</div>
 
   <!-- SURVEY CONTENT -->
   <div class="survey-content" id="surveyContent">
@@ -460,7 +598,7 @@
 
     <div class="field-name">
       <label for="respondentName">Your name <span class="mandatory-star">*</span></label>
-      <input type="text" id="respondentName" placeholder="e.g. Alex Rivera" autocomplete="name">
+      <input type="text" id="respondentName" placeholder="">
     </div>
 
     <!-- Page dots -->
@@ -492,17 +630,69 @@
 
   <!-- RESULT PAGE -->
   <div class="result-page" id="resultPage">
-    <!-- Logo will be displayed here too via the same container -->
     <div class="logo-container">
       <img src="https://github.com/kiranmarlapudi/LADCTest/blob/main/tapmi-bengaluru-2024-logo.png?raw=true" alt="Tapmi Bengaluru Logo">
     </div>
+    <div class="banner-title">Leadership Assessment and Development Center (LADC)</div>
     
     <div class="result-greeting">Dear <span id="resultNameDisplay">—</span>,</div>
     <div class="result-primary" id="resultPrimaryDisplay">Your Primary Leadership Archetype is: <span id="resultPrimaryStyle">Transformational</span>.</div>
-    <div class="result-sub" id="resultSubText"></div>
 
     <div class="indices-list" id="indicesList">
       <!-- Will be populated dynamically -->
+    </div>
+
+    <div class="insights-btn-container">
+      <button class="btn-insights" id="insightsBtn">📖 Read about Leadership Styles</button>
+    </div>
+  </div>
+
+  <!-- INSIGHTS PAGE -->
+  <div class="insights-page" id="insightsPage">
+    <div class="logo-container">
+      <img src="https://github.com/kiranmarlapudi/LADCTest/blob/main/tapmi-bengaluru-2024-logo.png?raw=true" alt="Tapmi Bengaluru Logo">
+    </div>
+    <div class="banner-title">Leadership Assessment and Development Center (LADC)</div>
+    
+    <div class="insights-title">Understanding Leadership Styles</div>
+
+    <div class="insight-card">
+      <h3> Authoritarian Leadership</h3>
+      <p>Leader needs to control members and what they do. They emphasize that they are in charge and exert influence and control over group members. Authoritarian leaders prefer communication be directed downwards.</p>
+    </div>
+
+    <div class="insight-card" style="border-left-color: #2ecc71;">
+      <h3> Democratic Leadership</h3>
+      <p>Leaders treat members as fully capable of doing work on their own. They work with group members, try hard to treat everyone fairly, and to not be above others. Their main goal is to help group members reach personal goals. Communication is interactional between leader and members.</p>
+    </div>
+
+    <div class="insight-card" style="border-left-color: #e67e22;">
+      <h3> Laissez-Faire Leadership</h3>
+      <p>Leaders do not try to control member and do not try to nurture and guide members either. Instead, this leader engages in minimal influence and has a "hands-off" approach.</p>
+    </div>
+
+    <div class="insight-card" style="border-left-color: #8e44ad;">
+      <h3> Transformational Leadership</h3>
+      <p>Leaders inspire and motivate followers to achieve extraordinary outcomes and develop their own leadership capacity. They focus on creating a vision, fostering innovation, and empowering team members to reach their full potential.</p>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.4); border-radius: 16px; padding: 1.2rem 1.8rem; margin-top: 1.5rem;">
+      <p style="font-weight: 600; color: #0b1e33; margin-bottom: 0.5rem;">Score Ranges:</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.95rem; color: #1f3857;">
+        <span style="background: rgba(46, 204, 113, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px;">26-30: Very High</span>
+        <span style="background: rgba(52, 152, 219, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px;">21-25: High</span>
+        <span style="background: rgba(241, 196, 15, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px;">16-20: Moderate</span>
+        <span style="background: rgba(230, 126, 34, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px;">11-15: Low</span>
+        <span style="background: rgba(231, 76, 60, 0.15); padding: 0.2rem 0.8rem; border-radius: 20px;">6-10: Very Low</span>
+      </div>
+    </div>
+
+    <div class="reference">
+      Adapted from <em>Introduction to Leadership: Concepts and Practice</em> by Peter G. Northouse (2009). Thousand Oaks, CA: SAGE
+    </div>
+
+    <div style="text-align: center; margin-top: 1.5rem;">
+      <button class="btn-back-to-results" id="backToResultsBtn">← Back to Results</button>
     </div>
   </div>
 </div>
@@ -655,7 +845,6 @@
       // Determine primary style and follow-up
       let primary = styles[0].name;
       let primaryDisplay = '';
-      let subText = '';
 
       // Check if top style is significantly higher than second (more than 3% difference)
       const diff = styles[0].pct - styles[1].pct;
@@ -665,41 +854,30 @@
         // Clear winner
         primary = styles[0].name;
         primaryDisplay = primary;
-        if (diff > 15) {
-          subText = `You have a strong, clear preference for ${primary} leadership.`;
-        } else {
-          subText = `You show a preference for ${primary} leadership with some ${styles[1].name} influence.`;
-        }
       } else {
-        // Within 3% - need to check for ties or close scores
-        // Find all styles within 3% of the top
+        // Within 3% - check for ties or close scores
         const closeStyles = styles.filter(s => (styles[0].pct - s.pct) <= 3);
         
-        if (closeStyles.length === 1) {
-          // Only one style within 3% (shouldn't happen, but just in case)
-          primary = styles[0].name;
-          primaryDisplay = primary;
-          subText = `You show a preference for ${primary} leadership.`;
-        } else if (closeStyles.length === 2) {
+        if (closeStyles.length === 2) {
           // Two styles close
           if (closeStyles[0].pct === closeStyles[1].pct) {
             // Exact tie
             primary = `${closeStyles[0].name} & ${closeStyles[1].name}`;
-            primaryDisplay = closeStyles[0].name;
-            subText = `You show a balanced blend of ${closeStyles[0].name} and ${closeStyles[1].name} leadership styles.`;
+            primaryDisplay = primary;
           } else {
             // Close but not tied
             primary = closeStyles[0].name;
             primaryDisplay = `${primary}, followed by ${closeStyles[1].name}`;
-            subText = `Your leadership style is primarily ${primary} with strong ${closeStyles[1].name} influences.`;
           }
-        } else {
+        } else if (closeStyles.length > 2) {
           // Three or more styles close
           const styleNames = closeStyles.map(s => s.name);
           const lastStyle = styleNames.pop();
           primary = `${styleNames.join(', ')} & ${lastStyle}`;
-          primaryDisplay = styleNames[0] + ' (Mixed)';
-          subText = `You show a balanced approach across multiple leadership styles: ${styleNames.join(', ')} and ${lastStyle}.`;
+          primaryDisplay = primary;
+        } else {
+          primary = styles[0].name;
+          primaryDisplay = primary;
         }
       }
 
@@ -707,118 +885,4 @@
         styles: styles,
         primary: primary,
         primaryDisplay: primaryDisplay,
-        subText: subText,
-        closeStyles: styles.filter(s => (styles[0].pct - s.pct) <= 3)
-      };
-    }
-
-    // ---------- SUBMIT ----------
-    const submitBtn = document.getElementById('submitBtn');
-    const errorContainer = document.getElementById('errorContainer');
-    const surveyContent = document.getElementById('surveyContent');
-    const resultPage = document.getElementById('resultPage');
-    const resultNameDisplay = document.getElementById('resultNameDisplay');
-    const resultPrimaryStyle = document.getElementById('resultPrimaryStyle');
-    const resultPrimaryDisplay = document.getElementById('resultPrimaryDisplay');
-    const resultSubText = document.getElementById('resultSubText');
-    const indicesList = document.getElementById('indicesList');
-
-    function clearErrors() { errorContainer.innerHTML = ''; }
-    function showError(msg) { errorContainer.innerHTML = `<div class="error-msg">⚠️ ${msg}</div>`; }
-
-    function gatherAnswers() {
-      const radios = document.querySelectorAll('.question-item input[type="radio"]');
-      const answerMap = new Map();
-      radios.forEach(r => { if (r.checked) answerMap.set(r.name, parseInt(r.value,10)); });
-
-      const missing = [];
-      for (let i = 0; i < 24; i++) {
-        const name = `q${i}`;
-        if (!answerMap.has(name)) missing.push(i+1);
-      }
-      if (missing.length > 0) {
-        const qList = missing.map(n => `#${n}`).join(', ');
-        showError(`Please answer all questions (missing: ${qList})`);
-        return null;
-      }
-
-      const answers = [];
-      for (let i = 0; i < 24; i++) answers.push(answerMap.get(`q${i}`));
-      return answers;
-    }
-
-    function handleSubmit() {
-      clearErrors();
-      const nameInput = document.getElementById('respondentName');
-      const name = nameInput.value.trim();
-      if (!name) { showError('Please enter your name.'); return; }
-
-      const answers = gatherAnswers();
-      if (!answers) return;
-
-      const result = computeScores(answers);
-      
-      // Update result page
-      resultNameDisplay.textContent = name;
-      
-      // Update primary style display with "followed by" if applicable
-      if (result.primaryDisplay && result.primaryDisplay !== result.primary) {
-        resultPrimaryStyle.textContent = result.primaryDisplay;
-        // Update the full text
-        resultPrimaryDisplay.innerHTML = `Your Primary Leadership Archetype is: <span id="resultPrimaryStyle">${result.primaryDisplay}</span>.`;
-        // Re-get the reference
-        document.getElementById('resultPrimaryStyle').textContent = result.primaryDisplay;
-      } else {
-        resultPrimaryStyle.textContent = result.primary;
-      }
-      
-      resultSubText.textContent = result.subText;
-
-      // Clear and rebuild indices list in sorted order
-      indicesList.innerHTML = '';
-      
-      result.styles.forEach((style, index) => {
-        const item = document.createElement('div');
-        item.className = 'index-item';
-        
-        // Check if this style is within 3% of the top (close)
-        const isClose = result.closeStyles.some(s => s.name === style.name);
-        if (isClose) {
-          item.classList.add('highlight');
-        }
-        
-        // Also highlight if it's the primary or mentioned in primary
-        if (result.primary.includes(style.name)) {
-          item.classList.add('highlight');
-        }
-        
-        item.innerHTML = `<span class="label">${style.name}:</span> <span class="value">${style.pct}%</span>`;
-        indicesList.appendChild(item);
-      });
-
-      surveyContent.classList.add('hidden');
-      resultPage.classList.add('active');
-    }
-
-    submitBtn.addEventListener('click', handleSubmit);
-
-    document.getElementById('respondentName').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        if (currentPage === 1) {
-          e.preventDefault();
-          submitBtn.click();
-        } else {
-          e.preventDefault();
-          showPage(1);
-        }
-      }
-    });
-
-    document.addEventListener('change', function(e) {
-      if (e.target && e.target.type === 'radio') clearErrors();
-    });
-
-  })();
-</script>
-</body>
-</html>
+        closeStyles: styles.filter(s => (styles[0].pct - s.pct
