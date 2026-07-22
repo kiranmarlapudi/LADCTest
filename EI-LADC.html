@@ -3,15 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visual Assessment · Fixed</title>
+  <title>LADC · Assessment 6</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Segoe UI", system-ui, sans-serif; background: #FAF9F8; color: #323130; font-size: 14px; line-height: 1.5; min-height: 100vh; }
     .topbar { height: 6px; background: #6264A7; }
-    .header { background: #fff; border-bottom: 1px solid #EDEBE9; padding: 13px 24px; display: flex; gap: 12px; align-items: center; }
-    .logo { font-weight: 700; color: #6264A7; font-size: 15px; }
-    .sep { width: 1px; height: 20px; background: #C8C6C4; }
-    .header-title { color: #605E5C; font-size: 13px; }
+    .header { background: #fff; border-bottom: 1px solid #EDEBE9; padding: 13px 24px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .logo-img { height: 38px; width: auto; display: block; }
+    .logo-text { font-weight: 700; color: #6264A7; font-size: 18px; letter-spacing: 0.3px; }
+    .sep { width: 1px; height: 28px; background: #C8C6C4; }
+    .header-title { color: #605E5C; font-size: 14px; }
     .progress { background: #fff; border-bottom: 1px solid #EDEBE9; padding: 8px 24px; display: flex; gap: 12px; align-items: center; }
     .progress-bar { height: 4px; flex: 1; background: #EDEBE9; border-radius: 99px; overflow: hidden; }
     .progress-fill { height: 100%; background: #0078D4; transition: width 0.3s ease; }
@@ -40,7 +41,6 @@
     .btn:hover:not(:disabled) { background: #106EBE; }
     .btn:disabled { background: #EDEBE9; border-color: #EDEBE9; color: #A19F9D; cursor: not-allowed; }
     .error { display: none; color: #D13438; font-size: 12px; margin-top: 5px; }
-    .input-error { border-color: #D13438!important; }
     .image-frame { width: 100%; aspect-ratio: 16/10; background: #1b1b1b; display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 16px 0; }
     .image-frame img { width: 100%; height: 100%; object-fit: contain; }
     .placeholder { color: rgba(255,255,255,0.5); text-align: center; padding: 20px; }
@@ -51,7 +51,9 @@
     .choice { display: flex; align-items: center; gap: 10px; padding: 13px; border: 1px solid #C8C6C4; border-radius: 3px; cursor: pointer; }
     .choice:hover { background: #EFF6FC; border-color: #C7E0F4; }
     .choice input { width: 18px; height: 18px; accent-color: #0078D4; }
-    .question-number { font-size: 18px; color: #605E5C; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+    .question-number { display: none; }
+    .select-prompt { font-size: 15px; font-weight: 600; color: #323130; }
+    .qtext { font-size: 18px; font-weight: 500; margin-top: 4px; }
     .submit-area { margin-top: 20px; text-align: center; }
     .thankyou { text-align: center; padding: 42px 32px; }
     .success { font-size: 48px; margin-bottom: 10px; }
@@ -59,16 +61,17 @@
     .overlay.active { display: flex; }
     .spinner { width: 36px; height: 36px; border: 3px solid #EDEBE9; border-top-color: #0078D4; border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    /* custom: question text 18px, "Please select" 15px */
-    .qtext { font-size: 18px; font-weight: 500; margin-top: 4px; }
-    .select-prompt { font-size: 15px; font-weight: 600; color: #323130; }
-    .question-number { display: none; } /* hide "Question X of 16" */
   </style>
 </head>
 <body>
 <div class="overlay" id="overlay"><div class="spinner"></div><div>Submitting…</div></div>
 <div class="topbar"></div>
-<div class="header"><div class="logo">VISUAL ASSESSMENT</div><div class="sep"></div><div class="header-title">Research Assessment</div></div>
+<div class="header">
+  <img class="logo-img" src="https://github.com/kiranmarlapudi/LADCTest/blob/main/tapmi-bengaluru-2024-logo.png?raw=true" alt="Tapmi Bengaluru Logo">
+  <span class="logo-text">LADC - Assessment 6</span>
+  <div class="sep"></div>
+  <div class="header-title">Research Assessment</div>
+</div>
 <div class="progress"><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div class="progress-text" id="progressText"></div></div>
 
 <!-- PAGE 1: DEMOGRAPHICS + CONSENT -->
@@ -92,7 +95,7 @@
 <!-- DYNAMIC PAGES -->
 <div id="dynamicPages"></div>
 
-<!-- SUBMIT -->
+<!-- SUBMIT (final) -->
 <section class="page" id="page-submit">
   <div class="card"><div class="card-accent"></div><div class="thankyou"><div class="success">✓</div><div class="title">Assessment Complete</div><div class="subtitle">Review and submit your response.</div><div class="submit-area"><button class="btn" id="submitBtn" onclick="submitResponse()">Submit Response</button></div></div></div>
 </section>
@@ -106,15 +109,15 @@
 
 <script>
 /* =========================================================
-   CONFIGURATION
+   CONFIG
    ========================================================= */
 const IMAGE_URLS = [
-  "https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPOSITORY/main/image1.png",
-  "https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPOSITORY/main/image2.png"
+  "https://github.com/kiranmarlapudi/LADCTest/blob/main/image2.png?raw=true",
+  "https://github.com/kiranmarlapudi/LADCTest/blob/main/image3.png?raw=true"
 ];
 
-// TIMERS: image1=20s, image1 repeat=25s, image2=20s, image2 repeat=25s
-const IMAGE_TIMERS = [20, 25, 20, 25]; // per round index
+// timers per round: image1=20s, image1 repeat=25s, image2=20s, image2 repeat=25s
+const IMAGE_TIMERS = [20, 25, 20, 25];
 
 const QUESTIONS = [
   "Question 1: Enter your question here.",
@@ -134,24 +137,7 @@ const QUESTIONS = [
   "Question 15: Enter your question here.",
   "Question 16: Enter your question here."
 ];
-const OPTIONS = [
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"],
-  ["Option 1", "Option 2", "Option 3", "Option 4"]
-];
+const OPTIONS = Array.from({ length: 16 }, () => ["Option 1", "Option 2", "Option 3", "Option 4"]);
 
 const FORM_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse";
 const FORM_FIELDS = {
@@ -173,13 +159,11 @@ let imageTimer = null;
 let sessionId = (crypto.randomUUID ? crypto.randomUUID() : "session-" + Date.now() + "-" + Math.random().toString(36).slice(2));
 
 /* =========================================================
-   BUILD PAGES — strict order:
-   Image1(20s) → Q1,Q2,Q3,Q4 → Image1-repeat(25s) → Q5,Q6,Q7,Q8
-   → Image2(20s) → Q9,Q10,Q11,Q12 → Image2-repeat(25s) → Q13,Q14,Q15,Q16 → Submit
+   BUILD PAGES
+   rounds: [imageIndex, timerIndex, firstQuestion]
    ========================================================= */
 function buildAssessmentPages() {
   const container = document.getElementById("dynamicPages");
-  // rounds: [imageIndex, timerIndex, firstQuestion]
   const rounds = [
     { imgIdx: 0, timerIdx: 0, startQ: 0 },   // image1 20s
     { imgIdx: 0, timerIdx: 1, startQ: 4 },   // image1 repeat 25s
@@ -215,7 +199,13 @@ function buildAssessmentPages() {
       const opts = OPTIONS[qIdx].map(o => `
         <label class="choice"><input type="radio" name="q${qIdx}" value="${escapeHtml(o)}" onchange="selectAnswer(${qIdx}, '${escapeJs(o)}')"><span>${escapeHtml(o)}</span></label>
       `).join("");
-      // question-number hidden via CSS; "Please select one answer" 15px; question text 18px
+      
+      // For Q16 (index 15) show "Submit" instead of "Next"
+      const isLast = (qIdx === 15);
+      const buttonHtml = isLast
+        ? `<button class="btn" id="next-btn-${qIdx}" disabled onclick="submitFromLastQuestion()">Submit Response</button>`
+        : `<button class="btn" id="next-btn-${qIdx}" disabled onclick="nextQuestion(${qIdx})">Next ›</button>`;
+
       page.innerHTML = `
         <div class="card"><div class="card-accent"></div><div class="card-body">
           <div class="question-number" style="display:none">Question ${qIdx+1} of 16</div>
@@ -224,9 +214,7 @@ function buildAssessmentPages() {
         </div></div>
         <div class="question">
           <div class="choices">${opts}</div>
-          <div class="submit-area">
-            <button class="btn" id="next-btn-${qIdx}" disabled onclick="nextQuestion(${qIdx})">Next ›</button>
-          </div>
+          <div class="submit-area">${buttonHtml}</div>
         </div>`;
       container.appendChild(page);
     }
@@ -275,14 +263,13 @@ function startAssessment() {
   }
   document.getElementById("startError").style.display = "none";
   respondentData = { name, email, age, gender, identifier, answers: Array(16).fill("") };
-  // ensure all radio buttons are unchecked
   document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
   showPage("image-page-0", 1);
   startImageTimer(0);
 }
 
 /* =========================================================
-   IMAGE TIMER (dynamic per round)
+   IMAGE TIMER
    ========================================================= */
 function startImageTimer(roundIndex) {
   clearInterval(imageTimer);
@@ -294,7 +281,6 @@ function startImageTimer(roundIndex) {
     if (el) el.textContent = remaining;
     if (remaining <= 0) {
       clearInterval(imageTimer);
-      // after image, go to first question of that round
       const startQ = [0, 4, 8, 12][roundIndex];
       showPage(`question-page-${startQ}`, 2 + roundIndex * 2);
     }
@@ -312,36 +298,33 @@ function selectAnswer(qIdx, ans) {
 
 function nextQuestion(qIdx) {
   if (!respondentData.answers[qIdx]) return;
-
-  // determine next page based on strict sequence
-  // qIdx 0-3 → image1-repeat (round1)
-  // qIdx 4-7 → image2 (round2)
-  // qIdx 8-11 → image2-repeat (round3)
-  // qIdx 12-15 → submit
   if (qIdx < 3) {
     showPage(`question-page-${qIdx+1}`, 2 + qIdx);
   } else if (qIdx === 3) {
-    // after Q4 → image1-repeat (round index 1)
     showPage("image-page-1", 6);
     startImageTimer(1);
   } else if (qIdx < 7) {
     showPage(`question-page-${qIdx+1}`, 7 + (qIdx-4));
   } else if (qIdx === 7) {
-    // after Q8 → image2 (round index 2)
     showPage("image-page-2", 10);
     startImageTimer(2);
   } else if (qIdx < 11) {
     showPage(`question-page-${qIdx+1}`, 11 + (qIdx-8));
   } else if (qIdx === 11) {
-    // after Q12 → image2-repeat (round index 3)
     showPage("image-page-3", 14);
     startImageTimer(3);
   } else if (qIdx < 15) {
     showPage(`question-page-${qIdx+1}`, 15 + (qIdx-12));
   } else if (qIdx === 15) {
-    // after Q16 → submit
-    showPage("page-submit", 19);
+    // Q16: submit directly (handled by submitFromLastQuestion)
+    submitFromLastQuestion();
   }
+}
+
+/* special handler for Q16 submit button */
+function submitFromLastQuestion() {
+  if (!respondentData.answers[15]) return;
+  showPage("page-submit", 19);
 }
 
 /* =========================================================
