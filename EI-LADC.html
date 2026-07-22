@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visual Assessment</title>
+<style>
+:root{
+  --blue:#0078D4;--blue-dark:#106EBE;--purple:#6264A7;
+  --bg:#FAF9F8;--surface:#fff;--border:#EDEBE9;--border-dark:#C8C6C4;
+  --text:#323130;--subtle:#605E5C;--success:#107C10;--danger:#D13438;
+  --shadow:0 1.6px 3.6px rgba(0,0,0,.132),0 .3px .9px rgba(0,0,0,.108);
+  --font:"Segoe UI",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh}
+.topbar{height:6px;background:var(--purple)}
+.header{background:#fff;border-bottom:1px solid var(--border);padding:13px 24px;display:flex;gap:12px;align-items:center}
+.logo{font-weight:700;color:var(--purple);font-size:15px}
+.sep{width:1px;height:20px;background:var(--border-dark)}
+.header-title{color:var(--subtle);font-size:13px}
+.progress{background:#fff;border-bottom:1px solid var(--border);padding:8px 24px;display:flex;gap:12px;align-items:center}
+.progress-bar{height:4px;flex:1;background:var(--border);border-radius:99px;overflow:hidden}
+.progress-fill{height:100%;background:var(--blue);transition:width .3s ease}
+.progress-text{font-size:12px;color:var(--subtle);white-space:nowrap}
+.page{display:none;max-width:680px;margin:32px auto;padding:0 16px 80px}
+.page.active{display:block;animation:slide .25s ease}
+@keyframes slide{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card,.question,.instructions{background:var(--surface);border-radius:4px;box-shadow:var(--shadow);margin-bottom:16px}
+.card-accent{height:5px;background:var(--purple)}
+.card-body{padding:28px 32px 32px}
+.title{font-size:24px;font-weight:700;line-height:1.25;margin-bottom:7px}
+.subtitle{color:var(--subtle);line-height:1.6}
+.question{padding:20px 24px}
+.label{font-weight:600;margin-bottom:9px}
+.required{color:var(--danger);font-size:12px}
+input,select{width:100%;padding:9px 10px;font:inherit;border:1px solid var(--border-dark);border-radius:2px;background:#fff}
+input:focus,select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px #0078D4}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.two-col{grid-template-columns:1fr}}
+.instructions{padding:26px 32px;border-left:5px solid var(--purple)}
+.instructions h3{font-size:18px;margin-bottom:10px}
+.instructions ol{padding-left:20px;color:var(--subtle);line-height:1.8}
+.consent{display:flex;gap:10px;margin-top:18px;padding:14px;background:#EFF6FC;border:1px solid #C7E0F4;border-radius:4px}
+.consent input{width:18px;height:18px;flex-shrink:0}
+.btn{background:var(--blue);border:1px solid var(--blue);color:#fff;padding:9px 22px;border-radius:2px;font:inherit;font-weight:600;cursor:pointer}
+.btn:hover:not(:disabled){background:var(--blue-dark)}
+.btn:disabled{background:var(--border-dark);border-color:var(--border-dark);color:#A19F9D;cursor:not-allowed}
+.error{display:none;color:var(--danger);font-size:12px;margin-top:5px}
+.input-error{border-color:var(--danger)!important}
+.image-frame{width:100%;aspect-ratio:16/10;background:#1b1b1b;display:flex;align-items:center;justify-content:center;overflow:hidden;margin:16px 0}
+.image-frame img{width:100%;height:100%;object-fit:contain}
+.placeholder{color:rgba(255,255,255,.5);text-align:center;padding:20px}
+.countdown{text-align:center;margin:16px 0}
+.countdown-number{font-size:28px;font-weight:700;color:var(--blue)}
+.countdown-note{font-size:12px;color:var(--subtle)}
+.choices{display:flex;flex-direction:column;gap:8px}
+.choice{display:flex;align-items:center;gap:10px;padding:13px;border:1px solid var(--border-dark);border-radius:3px;cursor:pointer}
+.choice:hover{background:#EFF6FC;border-color:#C7E0F4}
+.choice input{width:18px;height:18px;accent-color:var(--blue)}
+.question-number{font-size:18px;color:var(--subtle);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px}
+.submit-area{margin-top:20px;text-align:center}
+.thankyou{text-align:center;padding:42px 32px}
+.success{font-size:48px;margin-bottom:10px}
+.overlay{position:fixed;inset:0;background:rgba(255,255,255,.9);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;z-index:20}
+.overlay.active{display:flex}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="overlay" id="overlay">
+  <div class="spinner"></div>
+  <div>Submitting your response…</div>
+</div>
+
+<div class="topbar"></div>
+<div class="header">
+  <div class="logo">VISUAL ASSESSMENT</div>
+  <div class="sep"></div>
+  <div class="header-title">Research Assessment</div>
+</div>
+<div class="progress">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-text" id="progressText"></div>
+</div>
+
+<!-- PAGE 1: DEMOGRAPHICS + CONSENT -->
+<section class="page active" id="page-1">
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="card-body">
+      <div class="title">Visual Assessment</div>
+      <div class="subtitle">
+        Please complete the demographic information below and provide consent before beginning the assessment.
+      </div>
+    </div>
+  </div>
+
+  <div class="question">
+    <div style="background:#FFF4CE;border:1px solid #FFD335;padding:10px 12px;border-radius:2px">
+      <strong>Informed Consent:</strong> By participating, you agree that your responses may be used for academic and research purposes.
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="question">
+      <div class="label">Full Name <span class="required">*</span></div>
+      <input id="name" type="text">
+      <div class="error" id="nameError">Please enter your name.</div>
+    </div>
+    <div class="question">
+      <div class="label">Email <span class="required">*</span></div>
+      <input id="email" type="email">
+      <div class="error" id="emailError">Please enter a valid email address.</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="question">
+      <div class="label">Age <span class="required">*</span></div>
+      <input id="age" type="number" min="18" max="99">
+      <div class="error" id="ageError">Please enter a valid age.</div>
+    </div>
+    <div class="question">
+      <div class="label">Gender <span class="required">*</span></div>
+      <select id="gender">
+        <option value="">Select an option</option>
+        <option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option>
+      </select>
+      <div class="error" id="genderError">Please select an option.</div>
+    </div>
+  </div>
+
+  <div class="question">
+    <div class="label">Additional Identifier / Roll Number</div>
+    <input id="identifier" type="text">
+  </div>
+
+  <div class="instructions">
+    <h3>Instructions</h3>
+    <ol>
+      <li>You will be shown four images, one at a time.</li>
+      <li>Each image will remain on the screen for approximately 20 seconds.</li>
+      <li>After each image, one multiple-choice question with four options will appear.</li>
+      <li>Select one option. The assessment will automatically move to the next question.</li>
+      <li>You cannot go back to a previous image or question.</li>
+      <li>After all four images and questions are completed, click Submit.</li>
+    </ol>
+    <div class="consent">
+      <input type="checkbox" id="consent">
+      <label for="consent">I have read the information above and voluntarily consent to participate.</label>
+    </div>
+  </div>
+
+  <div class="error" id="startError" style="margin-bottom:12px">
+    Please complete all required fields and provide consent.
+  </div>
+  <button class="btn" id="startBtn" onclick="startAssessment()">Begin Assessment ›</button>
+</section>
+
+<!-- DYNAMIC ASSESSMENT PAGES -->
+<div id="dynamicPages"></div>
+
+<!-- FINAL SUBMIT PAGE -->
+<section class="page" id="page-submit">
+  <div class="card">
+    <div class="card-accent"></div>
+    <div class="thankyou">
+      <div class="success">✓</div>
+      <div class="title">Assessment Complete</div>
+      <div class="subtitle">
+        You have completed all four image-question rounds. Please review the completion message and submit your response.
+      </div>
+      <div class="submit-area">
+        <button class="btn" id="submitBtn" onclick="submitResponse()">Submit Response</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- THANK YOU PAGE -->
+<section class="page" id="page-thankyou">
+  <div class="card">
+    <div class="card-accent" style="background:var(--success)"></div>
+    <div class="thankyou">
+      <div class="success">✓</div>
+      <div class="title">Thank You</div>
+      <div class="subtitle">Your response has been recorded successfully.</div>
+      <div id="responseId" style="font-size:12px;color:var(--subtle);margin-top:14px"></div>
+    </div>
+  </div>
+</section>
+
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none"></iframe>
+
+<script>
+/* =========================================================
+   1. CONFIGURATION
+   ========================================================= */
+
+/* Replace these image URLs with your actual image URLs.
+   The same image can be repeated by using the same URL. */
+const IMAGE_URLS = [
+  "https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPOSITORY/main/image1.png",
+  "https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPOSITORY/main/image1.png",
+  "https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPOSITORY/main/image2.png",
+  "https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPOSITORY/main/image2.png"
+];
+
+const IMAGE_TIME_SECONDS = 20;
+
+/* Four questions, one after each image.
+   Replace the text and options with your actual questions. */
+const QUESTIONS = [
+  { text: "Question 1: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 2: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 3: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 4: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 5: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 6: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 7: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 8: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 9: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 10: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 11: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 12: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 13: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 14: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 15: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] },
+  { text: "Question 16: Enter your question here.", options: ["Option 1", "Option 2", "Option 3", "Option 4"] }
+];
+
+/* Google Form endpoint.
+   Replace with your own Google Form formResponse URL. */
+const FORM_URL =
+"https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse";
+
+/* Replace the entry IDs with the entry IDs from your Google Form. */
+const FORM_FIELDS = {
+  name: "entry.NAME_ENTRY_ID",
+  email: "entry.EMAIL_ENTRY_ID",
+  age: "entry.AGE_ENTRY_ID",
+  gender: "entry.GENDER_ENTRY_ID",
+  identifier: "entry.IDENTIFIER_ENTRY_ID",
+  q1: "entry.QUESTION_1_ENTRY_ID",
+  q2: "entry.QUESTION_2_ENTRY_ID",
+  q3: "entry.QUESTION_3_ENTRY_ID",
+  q4: "entry.QUESTION_4_ENTRY_ID",
+  q5: "entry.QUESTION_5_ENTRY_ID",
+  q6: "entry.QUESTION_6_ENTRY_ID",
+  q7: "entry.QUESTION_7_ENTRY_ID",
+  q8: "entry.QUESTION_8_ENTRY_ID",
+  q9: "entry.QUESTION_9_ENTRY_ID",
+  q10: "entry.QUESTION_10_ENTRY_ID",
+  q11: "entry.QUESTION_11_ENTRY_ID",
+  q12: "entry.QUESTION_12_ENTRY_ID",
+  q13: "entry.QUESTION_13_ENTRY_ID",
+  q14: "entry.QUESTION_14_ENTRY_ID",
+  q15: "entry.QUESTION_15_ENTRY_ID",
+  q16: "entry.QUESTION_16_ENTRY_ID"
+};
+
+/* =========================================================
+   2. STATE
+   ========================================================= */
+
+let currentRound = 0;
+let imageTimer = null;
+let respondentData = {
+  name: "",
+  email: "",
+  age: "",
+  gender: "",
+  identifier: "",
+  answers: Array(16).fill("")
+};
+
+const sessionId =
+  (crypto.randomUUID ? crypto.randomUUID() :
+  "session-" + Date.now() + "-" + Math.random().toString(36).slice(2));
+
+/* =========================================================
+   3. BUILD FOUR IMAGE + QUESTION PAGES
+   ========================================================= */
+
+function buildAssessmentPages() {
+  const container = document.getElementById("dynamicPages");
+
+  // Order: Image 1 → Q1-Q4 → Image 1 repeat → Q5-Q8 → Image 2 → Q9-Q12 → Image 2 repeat → Q13-Q16
+  const imageRounds = [
+    { imageIndex: 0, firstQuestion: 0,  label: "Image 1" },
+    { imageIndex: 0, firstQuestion: 4,  label: "Image 1 — Repeat" },
+    { imageIndex: 1, firstQuestion: 8,  label: "Image 2" },
+    { imageIndex: 1, firstQuestion: 12, label: "Image 2 — Repeat" }
+  ];
+
+  imageRounds.forEach((round, roundIndex) => {
+    const imagePage = document.createElement("section");
+    imagePage.className = "page";
+    imagePage.id = `image-page-${roundIndex}`;
+    imagePage.innerHTML = `
+      <div class="card"><div class="card-accent"></div><div class="card-body">
+        
+        <div class="title" style="font-size:20px">Please observe the image carefully</div>
+        <div class="subtitle">Remember the names of people in the picture and their expression</div>
+      </div></div>
+      <div class="question">
+        <div class="image-frame">
+          <img src="${IMAGE_URLS[round.imageIndex]}" alt="${round.label}" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+          <div class="placeholder" style="display:none">Image could not be loaded. Please check the image URL.</div>
+        </div>
+        <div class="countdown"><div class="countdown-number" id="countdown-${roundIndex}">${IMAGE_TIME_SECONDS}</div><div class="countdown-note">The next question will appear automatically.</div></div>
+      </div>`;
+    container.appendChild(imagePage);
+
+    for (let q = 0; q < 4; q++) {
+      const questionIndex = round.firstQuestion + q;
+      const questionPage = document.createElement("section");
+      questionPage.className = "page";
+      questionPage.id = `question-page-${questionIndex}`;
+      const optionsHtml = QUESTIONS[questionIndex].options.map(option => `
+        <label class="choice"><input type="radio" name="q${questionIndex}" value="${escapeHtml(option)}" onchange="selectAnswer(${questionIndex}, '${escapeJs(option)}')"><span>${escapeHtml(option)}</span></label>`).join("");
+      questionPage.innerHTML = `
+        <div class="card"><div class="card-accent"></div><div class="card-body">
+          <div class="question-number">Question ${questionIndex + 1} of 16</div>
+          <div class="title" style="font-size:15px">Please select one answer</div>
+          <div class="subtitle">${escapeHtml(QUESTIONS[questionIndex].text)}</div>
+        </div></div>
+        <div class="question">
+          <div class="choices">${optionsHtml}</div>
+          <div class="submit-area">
+            <button class="btn" id="next-btn-${questionIndex}" disabled onclick="nextQuestion(${questionIndex})">Next ›</button>
+          </div>
+        </div>`;
+      container.appendChild(questionPage);
+    }
+  });
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  }[c]));
+}
+
+function escapeJs(value) {
+  return String(value).replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+}
+
+/* =========================================================
+   4. NAVIGATION
+   ========================================================= */
+
+function showPage(pageId, progressStep) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(pageId).classList.add("active");
+
+  const totalSteps = 19;
+  const percent = Math.min(100, (progressStep / totalSteps) * 100);
+  document.getElementById("progressFill").style.width = percent + "%";
+
+  if (pageId === "page-1") {
+    document.getElementById("progressText").textContent = "Getting Started";
+  } else if (pageId === "page-thankyou") {
+    document.getElementById("progressText").textContent = "Complete";
+  } else if (pageId === "page-submit") {
+    document.getElementById("progressText").textContent = "Assessment Complete";
+  } else {
+    document.getElementById("progressText").textContent =
+      `Assessment Progress`;
+  }
+
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* =========================================================
+   5. DEMOGRAPHICS + CONSENT
+   ========================================================= */
+
+function startAssessment() {
+  const name = document.getElementById("name").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const age = document.getElementById("age").value.trim();
+  const gender = document.getElementById("gender").value;
+  const identifier = document.getElementById("identifier").value.trim();
+  const consent = document.getElementById("consent").checked;
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const ageValid = age && Number(age) >= 18 && Number(age) <= 99;
+
+  document.getElementById("nameError").style.display = name ? "none" : "block";
+  document.getElementById("emailError").style.display = emailValid ? "none" : "block";
+  document.getElementById("ageError").style.display = ageValid ? "none" : "block";
+  document.getElementById("genderError").style.display = gender ? "none" : "block";
+
+  const valid = name && emailValid && ageValid && gender && consent;
+
+  if (!valid) {
+    document.getElementById("startError").style.display = "block";
+    return;
+  }
+
+  document.getElementById("startError").style.display = "none";
+
+  respondentData.name = name;
+  respondentData.email = email;
+  respondentData.age = age;
+  respondentData.gender = gender;
+  respondentData.identifier = identifier;
+  respondentData.answers = Array(16).fill("");
+
+  // Explicitly clear every radio button before the assessment begins.
+  document.querySelectorAll('input[type="radio"]').forEach(radio => {
+    radio.checked = false;
+  });
+
+  currentRound = 0;
+  showPage("image-page-0", 1);
+  startImageTimer(0);
+}
+
+/* =========================================================
+   6. IMAGE TIMER
+   ========================================================= */
+
+function startImageTimer(round) {
+  clearInterval(imageTimer);
+
+  let remaining = IMAGE_TIME_SECONDS;
+  const countdown = document.getElementById(`countdown-${round}`);
+  countdown.textContent = remaining;
+
+  imageTimer = setInterval(() => {
+    remaining--;
+    countdown.textContent = remaining;
+
+    if (remaining <= 0) {
+      clearInterval(imageTimer);
+      showPage(`question-page-${round}`, 2 + round * 2);
+    }
+  }, 1000);
+}
+
+/* =========================================================
+   7. MCQ AUTO-NAVIGATION
+   ========================================================= */
+
+function selectAnswer(questionIndex, answer) {
+  respondentData.answers[questionIndex] = answer;
+  const nextButton = document.getElementById(`next-btn-${questionIndex}`);
+  if (nextButton) nextButton.disabled = false;
+}
+
+function nextQuestion(questionIndex) {
+  if (!respondentData.answers[questionIndex]) return;
+
+  if (questionIndex < 3) {
+    showPage(`question-page-${questionIndex + 1}`, 2 + questionIndex);
+  } else if (questionIndex === 3) {
+    currentRound = 1; showPage("image-page-1", 6); startImageTimer(1);
+  } else if (questionIndex < 7) {
+    showPage(`question-page-${questionIndex + 1}`, 7 + (questionIndex - 4));
+  } else if (questionIndex === 7) {
+    currentRound = 2; showPage("image-page-2", 10); startImageTimer(2);
+  } else if (questionIndex < 11) {
+    showPage(`question-page-${questionIndex + 1}`, 11 + (questionIndex - 8));
+  } else if (questionIndex === 11) {
+    currentRound = 3; showPage("image-page-3", 14); startImageTimer(3);
+  } else if (questionIndex < 15) {
+    showPage(`question-page-${questionIndex + 1}`, 15 + (questionIndex - 12));
+  } else {
+    showPage("page-submit", 19);
+  }
+}
+
+/* =========================================================
+   8. GOOGLE FORM SUBMISSION
+   ========================================================= */
+
+function submitResponse() {
+  const flatData = {
+    name: respondentData.name,
+    email: respondentData.email,
+    age: respondentData.age,
+    gender: respondentData.gender,
+    identifier: respondentData.identifier,
+    q1: respondentData.answers[0] || "",
+    q2: respondentData.answers[1] || "",
+    q3: respondentData.answers[2] || "",
+    q4: respondentData.answers[3] || "",
+    q5: respondentData.answers[4] || "",
+    q6: respondentData.answers[5] || "",
+    q7: respondentData.answers[6] || "",
+    q8: respondentData.answers[7] || "",
+    q9: respondentData.answers[8] || "",
+    q10: respondentData.answers[9] || "",
+    q11: respondentData.answers[10] || "",
+    q12: respondentData.answers[11] || "",
+    q13: respondentData.answers[12] || "",
+    q14: respondentData.answers[13] || "",
+    q15: respondentData.answers[14] || "",
+    q16: respondentData.answers[15] || ""
+  };
+
+  document.getElementById("overlay").classList.add("active");
+
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = FORM_URL;
+  form.target = "hidden_iframe";
+  form.style.display = "none";
+
+  Object.entries(FORM_FIELDS).forEach(([key, entryId]) => {
+    if (!entryId || !flatData.hasOwnProperty(key)) return;
+
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = entryId;
+    input.value = flatData[key];
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+
+  setTimeout(() => {
+    if (document.body.contains(form)) form.remove();
+    document.getElementById("overlay").classList.remove("active");
+    document.getElementById("responseId").textContent =
+      "Response ID: " + sessionId;
+    showPage("page-thankyou", 10);
+  }, 1800);
+}
+
+/* =========================================================
+   9. INITIALISE
+   ========================================================= */
+
+buildAssessmentPages();
+showPage("page-1", 0);
+</script>
+</body>
+</html>
