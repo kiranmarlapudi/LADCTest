@@ -54,6 +54,7 @@
         .question-number { display: none; }
         .select-prompt { font-size: 15px; font-weight: 600; color: #323130; }
         .qtext { font-size: 18px; font-weight: 500; margin-top: 4px; white-space: pre-wrap; }
+        .qtext-small { font-size: 14px; font-weight: 400; color: #605E5C; margin-top: 6px; font-style: italic; }
         .submit-area { margin-top: 20px; text-align: center; }
         .thankyou { text-align: center; padding: 42px 32px; }
         .success { font-size: 48px; margin-bottom: 10px; }
@@ -127,7 +128,7 @@ Select "I don't know" if you don't know what the correct option is).
             <span>F. Cannot determine/none of the above</span>
             <span>G. Don't know</span>
         </div>
-        <div style="margin-top:8px; font-size:14px;">Some questions have choices up to H</div>
+        <div style="margin-top:8px; color:#605E5C; font-size:14px; font-style:italic;">Some questions have choices up to H</div>
     </div>
     <div class="submit-area">
         <button class="btn" onclick="goToImagePage(0)">Continue ›</button>
@@ -162,69 +163,84 @@ const IMAGE_URLS = [
 // TIMERS: image1=15s, image1 repeat=20s, image2=15s, image2 repeat=20s
 const IMAGE_TIMERS = [15, 20, 15, 20];
 
-// 16 Questions with full options (as provided)
+// 15 Questions with full options
 const QUESTIONS = [
     {
-    text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>1. What do you think Ellen was most likely feeling at the moment this picture was taken?`,
-    options: ["A. Bored", "B. Hopeful", "C. Stressed", "D. Terrified", "E. Shocked", "F. Cannot determine/none of the above", "G. Don't know"]
-},
+        text: `1. What do you think Ellen was most likely feeling at the moment this picture was taken?`,
+        note: `(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).`,
+        options: ["A. Bored", "B. Hopeful", "C. Stressed", "D. Terrified", "E. Shocked", "F. Cannot determine/none of the above", "G. Don't know"]
+    },
     {
-        text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>2. What do you think Stacy was most likely feeling at the moment this picture was taken?`,
+        text: `2. What do you think Stacy was most likely feeling at the moment this picture was taken?`,
+        note: `(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).`,
         options: ["A. Disgusted", "B. Excited", "C. Sad", "D. Frustrated", "E. Enraged", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
-        text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>3. What do you think Steve was most likely feeling at the moment this picture was taken?`,
+        text: `3. What do you think Steve was most likely feeling at the moment this picture was taken?`,
+        note: `(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).`,
         options: ["A. Neutral", "B. Grateful", "C. Amused", "D. Curious", "E. Joyful", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
         text: `4. You asked some people about this later and heard that Ellen was returning from a visit with her boyfriend, who has unexpectedly broken up with her. She had just finished talking with Stacy when others just joined them. Now that you know the context a little more, what do you think she was feeling?`,
+        note: ``,
         options: ["A. Miserable", "B. Confused", "C. Neutral", "D. Sad", "E. Suspicious", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
         text: `5. You also realized that Stacy was telling this story to her friend in green. What do you think the lady in green top was feeling?`,
+        note: ``,
         options: ["A. Bored", "B. Disinterested", "C. Neutral", "D. Surprised", "E. Cannot determine/none of the above", "F. Don't know"]
     },
     {
         text: `6. In relation to the feeling you decided about what you think Stacy was feeling.`,
+        note: ``,
         options: ["A. Frustrated", "B. Embarrassed", "C. Offended", "D. Neutral", "E. Surprised", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
         text: `7. You also learnt that Steve had just joined them when you saw the group. He had been having a little crush on Ellen; but had not seen her for long. Knowing this and seeing his expression, what do you think Steve was feeling?`,
+        note: ``,
         options: ["A. Nervous", "B. Jealous", "C. Thrilled", "D. Pleased", "E. Calm", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
-      text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>8. What do you think that Aisha was feeling when this picture was taken?`,
+        text: `8. What do you think that Aisha was feeling when this picture was taken?`,
+        note: `(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).`,
         options: ["A. Impatient", "B. Bored", "C. Sad", "D. Excited", "E. Relaxed", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
-         text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>9. What do you think that Claudet was feeling when this picture was taken?`,
+        text: `9. What do you think that Claudet was feeling when this picture was taken?`,
+        note: `(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).`,
         options: ["A. Content", "B. Worried", "C. Neutral", "D. Excited", "E. Worried", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
-         text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>10. What do you think that Serena was feeling when this picture was taken?`,
+        text: `10. What do you think that Serena was feeling when this picture was taken?`,
+        note: `(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).`,
         options: ["A. Angry", "B. Excited", "C. Neutral", "D. Curious", "E. Confused", "F. Content", "G. Cannot determine/none of the above", "H. Don't know"]
     },
     {
-        text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>11. What do you think that Erika was feeling when this picture was taken?`,
+        text: `11. What do you think that Erika was feeling when this picture was taken?`,
+        note: `(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).`,
         options: ["A. Happy, sad combination", "B. Satisfied, indifferent combination", "C. Joyful, solemn combination", "D. Excited, frustrated combination", "E. Content, restless combination", "F. I cannot determine/none of the above.", "G. Don't know"]
     },
     {
         text: `12. This picture was taken when the ladies were waiting for their bus. Aisha, Serena and Erika are friends and were having a little argument among them when Aisha joined them; but the both Serena and Erika were busy in their own little argument. If this was the situation, what do you think Aisha was feeling?`,
+        note: ``,
         options: ["A. Lonely", "B. Bitter", "C. Worried", "D. Furious", "E. Surprised", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
         text: `13. Claudette was already sitting when waiting for the bus when Serena and Erika came arguing and sat near her. They don't know each other. Keeping this input, what do you think Claudette was feeling?`,
+        note: ``,
         options: ["A. Jealous", "B. Ambivalent", "C. Confused", "D. Amused", "E. Cannot determine/none of the above", "F. Don't know"]
     },
     {
         text: `14. Aisha, Serena and Erika had walked down arguing and sat in the bus stop together. The argument went on and Serena and Erika were together on one side of the argument while Aisha on the other end. Keeping this input in mind, what do you think Aisha was feeling?`,
+        note: ``,
         options: ["A. Frustrated", "B. Lonely", "C. Isolated", "D. Furious", "E. Cannot determine/none of the above", "F. Don't know"]
     },
     {
         text: `15. Claudette and Aisha were once friends, but not so. Keeping this in mind and the incident of argument between Aisha, Serena and Erika and Serena and Erika taking one side of the argument and Aisha the other side, what do you think Claudette is feeling?`,
+        note: ``,
         options: ["A. Amused", "B. Pleased", "C. Happy", "D. Vindicated", "E. Cannot determine/none of the above", "F. Don't know"]
-    },
-   ];
+    }
+];
 
 const FORM_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse";
 const FORM_FIELDS = {
@@ -240,7 +256,7 @@ const FORM_FIELDS = {
 /* =========================================================
    STATE
    ========================================================= */
-let respondentData = { name: "", email: "", age: "", gender: "", identifier: "", answers: Array(16).fill("") };
+let respondentData = { name: "", email: "", age: "", gender: "", identifier: "", answers: Array(15).fill("") };
 let imageTimer = null;
 let sessionId = (crypto.randomUUID ? crypto.randomUUID() : "session-" + Date.now() + "-" + Math.random().toString(36).slice(2));
 
@@ -251,10 +267,10 @@ let sessionId = (crypto.randomUUID ? crypto.randomUUID() : "session-" + Date.now
 function buildAssessmentPages() {
     const container = document.getElementById("dynamicPages");
     const rounds = [
-        { imgIdx: 0, timerIdx: 0, startQ: 0 },   // image1 15s → Q1-Q4
-        { imgIdx: 0, timerIdx: 1, startQ: 4 },   // image1 repeat 20s → Q5-Q7
-        { imgIdx: 1, timerIdx: 2, startQ: 7 },   // image2 15s → Q8-Q11
-        { imgIdx: 1, timerIdx: 3, startQ: 11 }   // image2 repeat 20s → Q12-Q15
+        { imgIdx: 0, timerIdx: 0, startQ: 0, numQs: 4 },   // image1 15s → Q1-Q4
+        { imgIdx: 0, timerIdx: 1, startQ: 4, numQs: 3 },   // image1 repeat 20s → Q5-Q7
+        { imgIdx: 1, timerIdx: 2, startQ: 7, numQs: 4 },   // image2 15s → Q8-Q11
+        { imgIdx: 1, timerIdx: 3, startQ: 11, numQs: 4 }   // image2 repeat 20s → Q12-Q15
     ];
 
     rounds.forEach((round, rIdx) => {
@@ -277,10 +293,9 @@ function buildAssessmentPages() {
         container.appendChild(imgPage);
 
         // ---- QUESTION PAGES for this round ----
-        const numQs = (rIdx === 0) ? 4 : (rIdx === 1) ? 3 : (rIdx === 2) ? 4 : 4;
-        for (let i = 0; i < numQs; i++) {
+        for (let i = 0; i < round.numQs; i++) {
             const qIdx = round.startQ + i;
-            if (qIdx >= 16) break;
+            if (qIdx >= 15) break;
             const page = document.createElement("section");
             page.className = "page";
             page.id = `question-page-${qIdx}`;
@@ -288,16 +303,22 @@ function buildAssessmentPages() {
                 <label class="choice"><input type="radio" name="q${qIdx}" value="${escapeHtml(o)}" onchange="selectAnswer(${qIdx}, '${escapeJs(o)}')" /><span>${escapeHtml(o)}</span></label>
             `).join("");
             
-const isLast = (qIdx === 14);
-const buttonHtml = isLast
-    ? `<button class="btn" id="next-btn-${qIdx}" disabled onclick="submitFromLastQuestion()">Submit Response</button>`
-    : `<button class="btn" id="next-btn-${qIdx}" disabled onclick="nextQuestion(${qIdx})">Next ›</button>`;
+            const isLast = (qIdx === 14); // Q15 is the last question
+            const buttonHtml = isLast
+                ? `<button class="btn" id="next-btn-${qIdx}" disabled onclick="submitFromLastQuestion()">Submit Response</button>`
+                : `<button class="btn" id="next-btn-${qIdx}" disabled onclick="nextQuestion(${qIdx})">Next ›</button>`;
+
+            // Build question text with note if present
+            let questionHtml = escapeHtml(QUESTIONS[qIdx].text);
+            if (QUESTIONS[qIdx].note) {
+                questionHtml += `<div class="qtext-small">${escapeHtml(QUESTIONS[qIdx].note)}</div>`;
+            }
 
             page.innerHTML = `
                 <div class="card"><div class="card-accent"></div><div class="card-body">
-                    <div class="question-number" style="display:none">Question ${qIdx+1} of 16</div>
+                    <div class="question-number" style="display:none">Question ${qIdx+1} of 15</div>
                     <div class="select-prompt">Please select one answer</div>
-                    <div class="qtext">${escapeHtml(QUESTIONS[qIdx].text)}</div>
+                    <div class="qtext">${questionHtml}</div>
                 </div></div>
                 <div class="question">
                     <div class="choices">${opts}</div>
@@ -318,7 +339,7 @@ function showPage(pageId, step) {
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     const el = document.getElementById(pageId);
     if (el) el.classList.add("active");
-    const total = 19;
+    const total = 18;
     const pct = Math.min(100, (step / total) * 100);
     document.getElementById("progressFill").style.width = pct + "%";
     if (pageId === "page-1") document.getElementById("progressText").textContent = "Getting Started";
@@ -348,9 +369,8 @@ function startAssessment() {
         return;
     }
     document.getElementById("startError").style.display = "none";
-    respondentData = { name, email, age, gender, identifier, answers: Array(16).fill("") };
+    respondentData = { name, email, age, gender, identifier, answers: Array(15).fill("") };
     document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
-    // Show example page first
     showPage("page-example", 1);
 }
 
@@ -408,13 +428,14 @@ function nextQuestion(qIdx) {
     } else if (qIdx < 14) {
         showPage(`question-page-${qIdx+1}`, 15 + (qIdx-11));
     } else if (qIdx === 14) {
-        // Q15 is the last question - submit directly
-        submitResponse();
+        // Q15 (index 14) - this is the last question, but the submit button handles it
+        // This shouldn't be called directly as Q15 has its own submit button
     }
 }
 
+/* special handler for Q15 submit button */
 function submitFromLastQuestion() {
-    if (!respondentData.answers[15]) return;
+    if (!respondentData.answers[14]) return;
     submitResponse();
 }
 
@@ -424,7 +445,7 @@ function submitFromLastQuestion() {
 function submitResponse() {
     const data = respondentData;
     const flat = { name: data.name, email: data.email, age: data.age, gender: data.gender, identifier: data.identifier };
-    for (let i = 0; i < 16; i++) flat[`q${i+1}`] = data.answers[i] || "";
+    for (let i = 0; i < 15; i++) flat[`q${i+1}`] = data.answers[i] || "";
 
     document.getElementById("overlay").classList.add("active");
     const form = document.createElement("form");
@@ -440,21 +461,4 @@ function submitResponse() {
         inp.value = flat[key];
         form.appendChild(inp);
     });
-    document.body.appendChild(form);
-    form.submit();
-    setTimeout(() => {
-        if (document.body.contains(form)) form.remove();
-        document.getElementById("overlay").classList.remove("active");
-        document.getElementById("responseId").textContent = "Response ID: " + sessionId;
-        showPage("page-thankyou", 20);
-    }, 1800);
-}
-
-/* =========================================================
-   INIT
-   ========================================================= */
-buildAssessmentPages();
-showPage("page-1", 0);
-</script>
-</body>
-</html>
+    document.body
