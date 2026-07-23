@@ -276,7 +276,7 @@ function buildAssessmentPages() {
                     <img src="${IMAGE_URLS[round.imgIdx]}" alt="Image ${rIdx+1}" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" />
                     <div class="placeholder" style="display:none">Image could not be loaded.</div>
                 </div>
-                <div class="countdown"><div class="countdown-number" id="countdown-${rIdx}">${IMAGE_TIMERS[round.timerIdx]}</div><div class="countdown-note">The next question will appear automatically.</div></div>
+                <div class="countdown"><div class="countdown-number" id="countdown-${rIdx}">${IMAGE_TIMERS[round.timerIdx]}</div><div class="countdown-note">The questions will appear automatically after the timer.</div></div>
             </div>`;
         container.appendChild(imgPage);
 
