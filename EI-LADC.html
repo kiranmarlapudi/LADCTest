@@ -461,4 +461,21 @@ function submitResponse() {
         inp.value = flat[key];
         form.appendChild(inp);
     });
-    document.body
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => {
+        if (document.body.contains(form)) form.remove();
+        document.getElementById("overlay").classList.remove("active");
+        document.getElementById("responseId").textContent = "Response ID: " + sessionId;
+        showPage("page-thankyou", 19);
+    }, 1800);
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+buildAssessmentPages();
+showPage("page-1", 0);
+</script>
+</body>
+</html>
