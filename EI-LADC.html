@@ -1,5 +1,3 @@
-Here is the complete HTML code with all the requested updates: new images, guidelines, example question, updated timers, and a proper success message after submission.
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,37 +73,29 @@ Here is the complete HTML code with all the requested updates: new images, guide
     <img class="logo-img" src="https://github.com/kiranmarlapudi/LADCTest/blob/main/tapmi-bengaluru-2024-logo.png?raw=true" alt="Tapmi Bengaluru Logo" />
     <span class="logo-text">LADC - Assessment 6</span>
     <div class="sep"></div>
-    <div class="header-title">Research Assessment</div>
-</div>
+   </div>
 <div class="progress"><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div><div class="progress-text" id="progressText"></div></div>
 
 <!-- PAGE 1: DEMOGRAPHICS + CONSENT + GUIDELINES -->
 <section class="page active" id="page-1">
-    <div class="card"><div class="card-accent"></div><div class="card-body"><div class="title">Visual Assessment</div><div class="subtitle">Please complete the demographic information below and provide consent before beginning the assessment.</div></div></div>
+    <div class="card"><div class="card-accent"></div><div class="card-body"><div class="title">LADC Assessment</div><div class="subtitle">Please complete the demographic information below and provide consent before beginning the assessment.</div></div></div>
     
-    <!-- Guidelines -->
-    <div class="instructions">
-        <h3>📋 Guidelines</h3>
-        <p style="margin-bottom: 6px; color: #323130;">You will be shown two pictures. One picture at a time.</p>
-        <p style="margin-bottom: 6px; color: #323130;">First the <strong>Picture 1</strong> will be shown for <strong>15 seconds</strong>.</p>
-        <p style="color: #323130;">Watch carefully the people in the picture, their names and their emotions.</p>
-    </div>
-
     <div class="question"><div style="background:#FFF4CE;border:1px solid #FFD335;padding:10px 12px;border-radius:2px"><strong>Informed Consent:</strong> By participating, you agree that your responses may be used for academic and research purposes.</div></div>
     <div class="two-col">
         <div class="question"><div class="label">Full Name <span class="required">*</span></div><input id="name" type="text" /><div class="error" id="nameError">Please enter your name.</div></div>
-        <div class="question"><div class="label">Email <span class="required">*</span></div><input id="email" type="email" /><div class="error" id="emailError">Please enter a valid email address.</div></div>
+        <div class="question"><div class="label">Manipal Email <span class="required">*</span></div><input id="email" type="email" /><div class="error" id="emailError">Please enter a valid email address.</div></div>
     </div>
     <div class="two-col">
         <div class="question"><div class="label">Age <span class="required">*</span></div><input id="age" type="number" min="18" max="99" /><div class="error" id="ageError">Please enter a valid age.</div></div>
         <div class="question"><div class="label">Gender <span class="required">*</span></div><select id="gender"><option value="">Select an option</option><option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option></select><div class="error" id="genderError">Please select an option.</div></div>
     </div>
-    <div class="question"><div class="label">Additional Identifier / Roll Number</div><input id="identifier" type="text" /></div>
-    <div class="instructions">
-        <h3>Instructions</h3>
+    <div class="question"><div class="label">Full Enrollment Number of MAHE/TAPMI</div><input id="identifier" type="text" /></div>
+    <div class="Guidelines">
+        <h3>Guidelines</h3>
         <ol>
-            <li>You will be shown images, each with a timer.</li>
-            <li>After each image, multiple-choice questions appear.</li>
+            <li>You will be shown two pictures. One picture at a time.</li>
+            <li>First the Picture 1 will be shown for 10 to 15 seconds.</li>
+            <li>Watch carefully the people in the picture, their names and their emotions.</li>
             <li>Select one option and click Next.</li>
             <li>You cannot go back.</li>
         </ol>
@@ -122,7 +112,7 @@ Here is the complete HTML code with all the requested updates: new images, guide
         <div class="subtitle">Please review this example before you begin.</div>
     </div></div>
     <div class="example-box">
-        <h4>📌 Example</h4>
+        <h4>Example</h4>
         <div class="qtext" style="font-size:16px; font-weight:400; margin-top:6px;">
             What do you think XYZ in the picture was most likely feeling at the moment this picture was taken? 
             (Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. 
