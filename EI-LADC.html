@@ -234,8 +234,7 @@ const FORM_FIELDS = {
     q4: "entry.QUESTION_4_ENTRY_ID", q5: "entry.QUESTION_5_ENTRY_ID", q6: "entry.QUESTION_6_ENTRY_ID",
     q7: "entry.QUESTION_7_ENTRY_ID", q8: "entry.QUESTION_8_ENTRY_ID", q9: "entry.QUESTION_9_ENTRY_ID",
     q10: "entry.QUESTION_10_ENTRY_ID", q11: "entry.QUESTION_11_ENTRY_ID", q12: "entry.QUESTION_12_ENTRY_ID",
-    q13: "entry.QUESTION_13_ENTRY_ID", q14: "entry.QUESTION_14_ENTRY_ID", q15: "entry.QUESTION_15_ENTRY_ID",
-    q16: "entry.QUESTION_16_ENTRY_ID"
+    q13: "entry.QUESTION_13_ENTRY_ID", q14: "entry.QUESTION_14_ENTRY_ID", q15: "entry.QUESTION_15_ENTRY_ID"
 };
 
 /* =========================================================
@@ -289,10 +288,10 @@ function buildAssessmentPages() {
                 <label class="choice"><input type="radio" name="q${qIdx}" value="${escapeHtml(o)}" onchange="selectAnswer(${qIdx}, '${escapeJs(o)}')" /><span>${escapeHtml(o)}</span></label>
             `).join("");
             
-            const isLast = (qIdx === 14);
-            const buttonHtml = isLast
-                ? `<button class="btn" id="next-btn-${qIdx}" disabled onclick="submitFromLastQuestion()">Submit Response</button>`
-                : `<button class="btn" id="next-btn-${qIdx}" disabled onclick="nextQuestion(${qIdx})">Next ›</button>`;
+const isLast = (qIdx === 14);
+const buttonHtml = isLast
+    ? `<button class="btn" id="next-btn-${qIdx}" disabled onclick="submitFromLastQuestion()">Submit Response</button>`
+    : `<button class="btn" id="next-btn-${qIdx}" disabled onclick="nextQuestion(${qIdx})">Next ›</button>`;
 
             page.innerHTML = `
                 <div class="card"><div class="card-accent"></div><div class="card-body">
@@ -414,7 +413,6 @@ function nextQuestion(qIdx) {
     }
 }
 
-/* special handler for Q16 submit button */
 function submitFromLastQuestion() {
     if (!respondentData.answers[15]) return;
     submitResponse();
