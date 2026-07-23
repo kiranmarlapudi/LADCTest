@@ -165,24 +165,15 @@ const IMAGE_TIMERS = [15, 20, 15, 20];
 // 16 Questions with full options (as provided)
 const QUESTIONS = [
     {
-        text: `1. What do you think Ellen was most likely feeling at the moment this picture was taken?
-        
-    (Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. 
-    Select "I don't know" if you don't know what the correct option is).`,
-        options: ["A. Bored", "B. Hopeful", "C. Stressed", "D. Terrified", "E. Shocked", "F. Cannot determine/none of the above", "G. Don't know"]
-    },
+    text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>1. What do you think Ellen was most likely feeling at the moment this picture was taken?`,
+    options: ["A. Bored", "B. Hopeful", "C. Stressed", "D. Terrified", "E. Shocked", "F. Cannot determine/none of the above", "G. Don't know"]
+},
     {
-        text: `2. What do you think Stacy was most likely feeling at the moment this picture was taken? 
-        
-        (Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. 
-        Select "I don't know" if you don't know what the correct option is).`,
+        text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>2. What do you think Stacy was most likely feeling at the moment this picture was taken?`,
         options: ["A. Disgusted", "B. Excited", "C. Sad", "D. Frustrated", "E. Enraged", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
-        text: `3. What do you think Steve was most likely feeling at the moment this picture was taken? 
-        
-        (Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. 
-        Select "I don't know" if you don't know what the correct option is).`,
+        text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>3. What do you think Steve was most likely feeling at the moment this picture was taken?`,
         options: ["A. Neutral", "B. Grateful", "C. Amused", "D. Curious", "E. Joyful", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
@@ -202,31 +193,19 @@ const QUESTIONS = [
         options: ["A. Nervous", "B. Jealous", "C. Thrilled", "D. Pleased", "E. Calm", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
-        text: `8. What do you think that Aisha was feeling when this picture was taken? 
-        
-        (Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. 
-        Select "I don't know" if you don't know what the correct option is).`,
+      text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>8. What do you think that Aisha was feeling when this picture was taken?`,
         options: ["A. Impatient", "B. Bored", "C. Sad", "D. Excited", "E. Relaxed", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
-        text: `9. What do you think that Claudet was feeling when this picture was taken? 
-        
-        (Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. 
-        Select "I don't know" if you don't know what the correct option is).`,
+         text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>9. What do you think that Claudet was feeling when this picture was taken?`,
         options: ["A. Content", "B. Worried", "C. Neutral", "D. Excited", "E. Worried", "F. Cannot determine/none of the above", "G. Don't know"]
     },
     {
-        text: `10. What do you think that Serena was feeling when this picture was taken? 
-        
-        (Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. 
-        Select "I don't know" if you don't know what the correct option is).`,
+         text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>10. What do you think that Serena was feeling when this picture was taken?`,
         options: ["A. Angry", "B. Excited", "C. Neutral", "D. Curious", "E. Confused", "F. Content", "G. Cannot determine/none of the above", "H. Don't know"]
     },
     {
-        text: `11. What do you think that Erika was feeling when this picture was taken? 
-        
-        (Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. 
-        Select "I don't know" if you don't know what the correct option is).`,
+        text: `<span class="helper-text">(Please select "Cannot be determined..." if you think that what the person is feeling is not obvious. Select "I don't know" if you don't know what the correct option is).</span>11. What do you think that Erika was feeling when this picture was taken?`,
         options: ["A. Happy, sad combination", "B. Satisfied, indifferent combination", "C. Joyful, solemn combination", "D. Excited, frustrated combination", "E. Content, restless combination", "F. I cannot determine/none of the above.", "G. Don't know"]
     },
     {
@@ -245,11 +224,7 @@ const QUESTIONS = [
         text: `15. Claudette and Aisha were once friends, but not so. Keeping this in mind and the incident of argument between Aisha, Serena and Erika and Serena and Erika taking one side of the argument and Aisha the other side, what do you think Claudette is feeling?`,
         options: ["A. Amused", "B. Pleased", "C. Happy", "D. Vindicated", "E. Cannot determine/none of the above", "F. Don't know"]
     },
-    {
-        text: `16. (Final Question) Please confirm your responses are complete.`,
-        options: ["Yes, I have completed all questions.", "No, I want to review."]
-    }
-];
+   ];
 
 const FORM_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse";
 const FORM_FIELDS = {
@@ -314,7 +289,7 @@ function buildAssessmentPages() {
                 <label class="choice"><input type="radio" name="q${qIdx}" value="${escapeHtml(o)}" onchange="selectAnswer(${qIdx}, '${escapeJs(o)}')" /><span>${escapeHtml(o)}</span></label>
             `).join("");
             
-            const isLast = (qIdx === 15);
+            const isLast = (qIdx === 14);
             const buttonHtml = isLast
                 ? `<button class="btn" id="next-btn-${qIdx}" disabled onclick="submitFromLastQuestion()">Submit Response</button>`
                 : `<button class="btn" id="next-btn-${qIdx}" disabled onclick="nextQuestion(${qIdx})">Next ›</button>`;
@@ -434,9 +409,8 @@ function nextQuestion(qIdx) {
     } else if (qIdx < 14) {
         showPage(`question-page-${qIdx+1}`, 15 + (qIdx-11));
     } else if (qIdx === 14) {
-        showPage(`question-page-${15}`, 19);
-    } else if (qIdx === 15) {
-        submitFromLastQuestion();
+        // Q15 is the last question - submit directly
+        submitResponse();
     }
 }
 
