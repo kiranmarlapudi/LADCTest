@@ -53,7 +53,6 @@
     .badge { background: #dcebf5; padding: 2px 12px; border-radius: 30px; font-size: 0.8rem; color: #003153; }
     .empty-state { text-align: center; color: #5d7e94; padding: 40px 10px; }
     .footer-note { margin-top: 22px; font-size: 0.8rem; color: #4d6f86; border-top: 1px solid #dde9f2; padding-top: 16px; text-align: right; }
-    /* Password overlay */
     #passwordOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; }
     #passwordBox { background: white; padding: 40px 50px; border-radius: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); text-align: center; max-width: 400px; width: 90%; }
     #passwordBox h2 { color: #003153; margin-bottom: 20px; }
@@ -109,19 +108,23 @@
     const PASSWORD = '2026';
 
     // ============================================================
-    // CONFIGURATION — YOUR GOOGLE SHEETS API URL
+    // CONFIGURATION — USING PUBLISHED GOOGLE SHEET
     // ============================================================
     const CONFIG = {
-      SHEETS_API_URL: 'https://script.google.com/macros/s/AKfycbwugpfGcBYVvOGgf3Q83bIrZ6LzUNfykqK-c_28etL2gMArhYSoigJbXrfIZe_00uGo/exec'
+      // Published Google Sheet URL (HTML format)
+      PUBLISHED_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQbrLo-Nb6HhhC0kaqyBEr2r6SNa0l2jLfVIdfkX8wlQKCP-MUVJ1z5hN56h1ypXuZZwcy-jvLGWGOj/pubhtml',
+      // Alternative: Use CSV export (more reliable for parsing)
+      CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQbrLo-Nb6HhhC0kaqyBEr2r6SNa0l2jLfVIdfkX8wlQKCP-MUVJ1z5hN56h1ypXuZZwcy-jvLGWGOj/pub?output=csv',
+      // Fallback: Use Apps Script (if needed)
+      APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwugpfGcBYVvOGgf3Q83bIrZ6LzUNfykqK-c_28etL2gMArhYSoigJbXrfIZe_00uGo/exec'
     };
 
     // ============================================================
     // STATE
     // ============================================================
     let allEmployees = [];
-    let currentManagerId = null; // will be set dynamically
+    let currentManagerId = null;
     let currentEmployeeIndex = 0;
-    let isLoading = false;
     let managers = [];
 
     // DOM refs
@@ -156,155 +159,143 @@
     });
 
     // ============================================================
-    // FETCH DATA FROM GOOGLE SHEETS
+    // FETCH DATA FROM PUBLISHED GOOGLE SHEET (CSV Method)
     // ============================================================
     async function fetchDataFromSheets() {
       try {
         isLoading = true;
         showLoadingState('Fetching data from Google Sheets...');
-        const response = await fetch(CONFIG.SHEETS_API_URL);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
         
-        let rawData = [];
-        if (Array.isArray(data)) rawData = data;
-        else if (data.data && Array.isArray(data.data)) rawData = data.data;
-        else if (data.table && data.table.rows) {
-          const rows = data.table.rows;
-          const cols = data.table.cols;
-          rawData = rows.map(row => {
-            const obj = {};
-            row.c.forEach((cell, idx) => {
-              const colName = cols[idx]?.label || `col${idx}`;
-              obj[colName] = cell?.v || '';
-            });
-            return obj;
-          });
-        } else throw new Error('Unexpected data format');
-
-        // Map to employee objects
-        allEmployees = rawData.map((row, idx) => {
-          const get = (key) => {
-            const keys = Object.keys(row);
-            const exact = keys.find(k => k === key);
-            if (exact) return row[exact];
-            const lower = keys.find(k => k.toLowerCase() === key.toLowerCase());
-            return lower ? row[lower] : '';
-          };
-          const toInt = (v) => parseInt(v) || 0;
-          const toStr = (v) => String(v || '').trim();
-
-          return {
-            sl: toInt(get('Sl. No')) || idx + 1,
-            roll: toStr(get('Roll Number')),
-            name: toStr(get('User full name')),
-            section: toStr(get('Section')),
-            email: toStr(get('student Email Address')),
-            // Core scores
-            op: toInt(get('Op')), opGrd: toStr(get('Op Grd')),
-            cst: toInt(get('Cst')), cstGrd: toStr(get('Cst Grd')),
-            ext: toInt(get('Ext')), extGrd: toStr(get('Ext Grd')),
-            // Self-Personality
-            agr: toInt(get('Agr')), agrGrd: toStr(get('Agr Grd')),
-            stb: toInt(get('Stb')), stbGrd: toStr(get('Stb Grd')),
-            aown: toInt(get('Aown')), aownGrd: toStr(get('Aown Grd')),
-            cont: toInt(get('Cont')), contGrd: toStr(get('Cont Grd')),
-            adpt: toInt(get('Adpt')), adptGrd: toStr(get('Adpt Grd')),
-            post: toInt(get('Post')), postGrd: toStr(get('Post Grd')),
-            empth: toInt(get('Empth')), empthGrd: toStr(get('Empth Grd')),
-            conf: toInt(get('Conf')), confGrd: toStr(get('Conf Grd')),
-            aother: toInt(get('Aother')), aotherGrd: toStr(get('Aother Grd')),
-            eqTot: toInt(get('EqTot')), eqTotGrd: toStr(get('EqTot Grd')),
-            se: toInt(get('SE')), seGrd: toStr(get('SEGR1')),
-            loc: toInt(get('LOC')), locGrd: toStr(get('LOCGR1')),
-            // Full Range Leadership
-            iia: toInt(get('II-A')), iiaGrd: toStr(get('II-A Grd')),
-            iib: toInt(get('II-B')), iibGrd: toStr(get('II-B Grd')),
-            im: toInt(get('IM')), imGrd: toStr(get('IM Grd')),
-            is: toInt(get('IS')), isGrd: toStr(get('IS Grd')),
-            ic: toInt(get('IC')), icGrd: toStr(get('IC Grd')),
-            tflTot: toInt(get('TFL Tot')), tflGrd: toStr(get('TFL Grd')),
-            crew: toInt(get('CRew')), crewGrd: toStr(get('Crew Grd')),
-            mba: toInt(get('MBA')), mbaGrd: toStr(get('MBA Grd')),
-            mbp: toInt(get('MBP')), mbpGrd: toStr(get('MBP Grd')),
-            lf: toInt(get('LF')), lfGrd: toStr(get('LF Grd')),
-            effect: toInt(get('Effect')), effectGrd: toStr(get('Effect Grd')),
-            eefrt: toInt(get('EEfrt')), eefrtGrd: toStr(get('Eefrt Grd')),
-            satis: toInt(get('Satis')), satisGrd: toStr(get('Satis Grd')),
-            // FIRO
-            ei: toInt(get('EI')), eiGrd: toStr(get('EI Grd')),
-            wi: toInt(get('WI')), wiGrd: toStr(get('WI Grd')),
-            ec: toInt(get('EC')), ecGrd: toStr(get('EC Grd')),
-            wc: toInt(get('WC')), wcGrd: toStr(get('WC Grd')),
-            ea: toInt(get('EA')), eaGrd: toStr(get('EA Grd')),
-            wa: toInt(get('WA')), waGrd: toStr(get('WA Grd')),
-            incTot: toInt(get('Inc Tot')), incGrd: toStr(get('Inc Grd')),
-            contTot: toInt(get('Cont Tot')), contGrd: toStr(get('Cont Grd')),
-            affTot: toInt(get('Aff Tot')), affGrd: toStr(get('Aff Grd')),
-            expTot: toInt(get('Exp Tot')), expGrd: toStr(get('Exp Grd')),
-            wantTot: toInt(get('Want Tot')), wantGrd: toStr(get('Want Grd')),
-            firoTot: toInt(get('FIRO Tot')), firoGrd: toStr(get('FIRO Grd')),
-            // PPT
-            nPowInc: toInt(get('nPow Inc')), nPowPct: toStr(get('nPow%')), nPowInterp: toStr(get('nPow Interp')),
-            nAchInc: toInt(get('nAch Inc')), nAchPct: toStr(get('nAch%')), nAchInterp: toStr(get('nAch Interp')),
-            nAffInc: toInt(get('nAff Inc')), nAffPct: toStr(get('nAff%')), nAffInterp: toStr(get('nAff Interp')),
-            // Faculty (column CQ = 79th column, index 78)
-            facultyName: toStr(get('Faculty Name')),
-            facultyEmail: toStr(get('Faculty Email'))
-          };
-        });
-
-        allEmployees = allEmployees.filter(emp => emp.name && emp.name !== '');
-        
-        // Build managers dynamically from unique faculty names (column CQ)
-        const facultyMap = new Map();
-        allEmployees.forEach(emp => {
-          if (emp.facultyName) {
-            const key = emp.facultyName.trim();
-            if (!facultyMap.has(key)) {
-              facultyMap.set(key, { name: key, email: emp.facultyEmail, sections: new Set() });
-            }
-            facultyMap.get(key).sections.add(emp.section);
-          }
-        });
-        // Also add fallback managers by section if no faculty data
-        if (facultyMap.size === 0) {
-          const sections = [...new Set(allEmployees.map(e => e.section))];
-          sections.forEach(sec => {
-            facultyMap.set(`Manager ${sec}`, { name: `Manager ${sec}`, email: '', sections: new Set([sec]) });
-          });
+        // Method 1: Try CSV export (most reliable for published sheets)
+        let csvData = '';
+        try {
+          const response = await fetch(CONFIG.CSV_URL);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          csvData = await response.text();
+        } catch (csvError) {
+          console.warn('CSV fetch failed, trying Apps Script:', csvError);
+          // Fallback to Apps Script
+          const response = await fetch(CONFIG.APPS_SCRIPT_URL);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const jsonData = await response.json();
+          processSheetData(jsonData);
+          return;
         }
-        managers = Array.from(facultyMap.entries()).map(([id, info]) => ({
-          id: id.replace(/\s+/g, '_'),
-          label: info.name,
-          email: info.email,
-          sections: Array.from(info.sections)
-        }));
-        // Sort managers
-        managers.sort((a,b) => a.label.localeCompare(b.label));
-        // Add "All" manager
-        managers.unshift({ id: 'mgrAll', label: 'All (dev)', sections: ['A','D','E'] });
-
-        isLoading = false;
-        return true;
+        
+        // Parse CSV
+        const rows = csvData.split('\n').filter(row => row.trim() !== '');
+        if (rows.length < 2) throw new Error('CSV has no data rows');
+        
+        // Get headers (first row)
+        const headers = rows[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+        
+        // Parse data rows
+        const data = [];
+        for (let i = 1; i < rows.length; i++) {
+          const values = rows[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+          const row = {};
+          headers.forEach((header, idx) => {
+            row[header] = values[idx] || '';
+          });
+          data.push(row);
+        }
+        
+        processSheetData(data);
+        
       } catch (error) {
         console.error('Fetch error:', error);
         isLoading = false;
-        showErrorState('Failed to load data. Using sample data.');
+        showErrorState('Failed to load data from Google Sheets. Using sample data. Error: ' + error.message);
         loadSampleData();
-        return false;
+        buildManagersFromData();
+        renderAll();
       }
     }
 
     // ============================================================
-    // SAMPLE DATA (FALLBACK)
+    // PROCESS SHEET DATA
     // ============================================================
-    function loadSampleData() {
-      allEmployees = [
-        { sl:1, roll:'246213010', name:'Name1', section:'D', email:'n1@k.com', op:77, opGrd:'S', cst:82, cstGrd:'S', ext:60, extGrd:'R', agr:70, agrGrd:'S', stb:65, stbGrd:'R', aown:72, aownGrd:'S', cont:68, contGrd:'R', adpt:74, adptGrd:'S', post:66, postGrd:'R', empth:69, empthGrd:'S', conf:71, confGrd:'S', aother:63, aotherGrd:'R', eqTot:68, eqTotGrd:'S', se:75, seGrd:'S', loc:70, locGrd:'R', iia:22, iiaGrd:'S', iib:19, iibGrd:'R', im:17, imGrd:'S', is:24, isGrd:'S', ic:21, icGrd:'R', tflTot:103, tflGrd:'S', crew:12, crewGrd:'R', mba:9, mbaGrd:'R', mbp:8, mbpGrd:'R', lf:14, lfGrd:'S', effect:18, effectGrd:'S', eefrt:16, eefrtGrd:'R', satis:20, satisGrd:'S', ei:23, eiGrd:'S', wi:19, wiGrd:'R', ec:16, ecGrd:'S', wc:21, wcGrd:'R', ea:14, eaGrd:'S', wa:18, waGrd:'R', incTot:42, incGrd:'S', contTot:37, contGrd:'R', affTot:32, affGrd:'S', expTot:53, expGrd:'R', wantTot:58, wantGrd:'S', firoTot:111, firoGrd:'S', nPowInc:4, nPowPct:'36%', nPowInterp:'MOD', nAchInc:3, nAchPct:'27%', nAchInterp:'DOM', nAffInc:2, nAffPct:'18%', nAffInterp:'MIN', facultyName:'Dr. Smith', facultyEmail:'smith@k.com' },
-        { sl:2, roll:'246213060', name:'Name2', section:'D', email:'n2@k.com', op:63, opGrd:'R', cst:56, cstGrd:'R', ext:53, extGrd:'R', agr:60, agrGrd:'R', stb:58, stbGrd:'R', aown:55, aownGrd:'R', cont:62, contGrd:'R', adpt:59, adptGrd:'R', post:57, postGrd:'R', empth:61, empthGrd:'R', conf:64, confGrd:'R', aother:52, aotherGrd:'R', eqTot:58, eqTotGrd:'R', se:60, seGrd:'R', loc:55, locGrd:'R', iia:18, iiaGrd:'R', iib:16, iibGrd:'R', im:14, imGrd:'R', is:19, isGrd:'R', ic:17, icGrd:'R', tflTot:84, tflGrd:'R', crew:10, crewGrd:'R', mba:7, mbaGrd:'R', mbp:6, mbpGrd:'R', lf:11, lfGrd:'R', effect:14, effectGrd:'R', eefrt:12, eefrtGrd:'R', satis:15, satisGrd:'R', ei:18, eiGrd:'R', wi:15, wiGrd:'R', ec:13, ecGrd:'R', wc:17, wcGrd:'R', ea:11, eaGrd:'R', wa:14, waGrd:'R', incTot:33, incGrd:'R', contTot:30, contGrd:'R', affTot:25, affGrd:'R', expTot:42, expGrd:'R', wantTot:46, wantGrd:'R', firoTot:88, firoGrd:'R', nPowInc:2, nPowPct:'18%', nPowInterp:'MIN', nAchInc:4, nAchPct:'36%', nAchInterp:'DOM', nAffInc:1, nAffPct:'9%', nAffInterp:'INS', facultyName:'Dr. Jones', facultyEmail:'jones@k.com' }
-      ];
-      // Build managers from sample
+    function processSheetData(data) {
+      // Map to employee objects
+      allEmployees = data.map((row, idx) => {
+        const get = (key) => {
+          const keys = Object.keys(row);
+          const exact = keys.find(k => k === key);
+          if (exact) return row[exact];
+          const lower = keys.find(k => k.toLowerCase() === key.toLowerCase());
+          return lower ? row[lower] : '';
+        };
+        const toInt = (v) => parseInt(String(v).replace(/,/g, '')) || 0;
+        const toStr = (v) => String(v || '').trim();
+
+        return {
+          sl: toInt(get('Sl. No')) || idx + 1,
+          roll: toStr(get('Roll Number')),
+          name: toStr(get('User full name')),
+          section: toStr(get('Section')),
+          email: toStr(get('student Email Address')),
+          op: toInt(get('Op')), opGrd: toStr(get('Op Grd')),
+          cst: toInt(get('Cst')), cstGrd: toStr(get('Cst Grd')),
+          ext: toInt(get('Ext')), extGrd: toStr(get('Ext Grd')),
+          agr: toInt(get('Agr')), agrGrd: toStr(get('Agr Grd')),
+          stb: toInt(get('Stb')), stbGrd: toStr(get('Stb Grd')),
+          aown: toInt(get('Aown')), aownGrd: toStr(get('Aown Grd')),
+          cont: toInt(get('Cont')), contGrd: toStr(get('Cont Grd')),
+          adpt: toInt(get('Adpt')), adptGrd: toStr(get('Adpt Grd')),
+          post: toInt(get('Post')), postGrd: toStr(get('Post Grd')),
+          empth: toInt(get('Empth')), empthGrd: toStr(get('Empth Grd')),
+          conf: toInt(get('Conf')), confGrd: toStr(get('Conf Grd')),
+          aother: toInt(get('Aother')), aotherGrd: toStr(get('Aother Grd')),
+          eqTot: toInt(get('EqTot')), eqTotGrd: toStr(get('EqTot Grd')),
+          se: toInt(get('SE')), seGrd: toStr(get('SEGR1')),
+          loc: toInt(get('LOC')), locGrd: toStr(get('LOCGR1')),
+          iia: toInt(get('II-A')), iiaGrd: toStr(get('II-A Grd')),
+          iib: toInt(get('II-B')), iibGrd: toStr(get('II-B Grd')),
+          im: toInt(get('IM')), imGrd: toStr(get('IM Grd')),
+          is: toInt(get('IS')), isGrd: toStr(get('IS Grd')),
+          ic: toInt(get('IC')), icGrd: toStr(get('IC Grd')),
+          tflTot: toInt(get('TFL Tot')), tflGrd: toStr(get('TFL Grd')),
+          crew: toInt(get('CRew')), crewGrd: toStr(get('Crew Grd')),
+          mba: toInt(get('MBA')), mbaGrd: toStr(get('MBA Grd')),
+          mbp: toInt(get('MBP')), mbpGrd: toStr(get('MBP Grd')),
+          lf: toInt(get('LF')), lfGrd: toStr(get('LF Grd')),
+          effect: toInt(get('Effect')), effectGrd: toStr(get('Effect Grd')),
+          eefrt: toInt(get('EEfrt')), eefrtGrd: toStr(get('Eefrt Grd')),
+          satis: toInt(get('Satis')), satisGrd: toStr(get('Satis Grd')),
+          ei: toInt(get('EI')), eiGrd: toStr(get('EI Grd')),
+          wi: toInt(get('WI')), wiGrd: toStr(get('WI Grd')),
+          ec: toInt(get('EC')), ecGrd: toStr(get('EC Grd')),
+          wc: toInt(get('WC')), wcGrd: toStr(get('WC Grd')),
+          ea: toInt(get('EA')), eaGrd: toStr(get('EA Grd')),
+          wa: toInt(get('WA')), waGrd: toStr(get('WA Grd')),
+          incTot: toInt(get('Inc Tot')), incGrd: toStr(get('Inc Grd')),
+          contTot: toInt(get('Cont Tot')), contGrd: toStr(get('Cont Grd')),
+          affTot: toInt(get('Aff Tot')), affGrd: toStr(get('Aff Grd')),
+          expTot: toInt(get('Exp Tot')), expGrd: toStr(get('Exp Grd')),
+          wantTot: toInt(get('Want Tot')), wantGrd: toStr(get('Want Grd')),
+          firoTot: toInt(get('FIRO Tot')), firoGrd: toStr(get('FIRO Grd')),
+          nPowInc: toInt(get('nPow Inc')), nPowPct: toStr(get('nPow%')), nPowInterp: toStr(get('nPow Interp')),
+          nAchInc: toInt(get('nAch Inc')), nAchPct: toStr(get('nAch%')), nAchInterp: toStr(get('nAch Interp')),
+          nAffInc: toInt(get('nAff Inc')), nAffPct: toStr(get('nAff%')), nAffInterp: toStr(get('nAff Interp')),
+          facultyName: toStr(get('Faculty Name')),
+          facultyEmail: toStr(get('Faculty Email'))
+        };
+      });
+
+      allEmployees = allEmployees.filter(emp => emp.name && emp.name !== '');
+      
+      buildManagersFromData();
+      isLoading = false;
+      console.log('Successfully loaded', allEmployees.length, 'employees');
+      
+      // Render everything
+      renderAll();
+    }
+
+    // ============================================================
+    // BUILD MANAGERS FROM DATA
+    // ============================================================
+    function buildManagersFromData() {
       const facultyMap = new Map();
       allEmployees.forEach(emp => {
         if (emp.facultyName) {
@@ -315,6 +306,14 @@
           facultyMap.get(key).sections.add(emp.section);
         }
       });
+      
+      if (facultyMap.size === 0) {
+        const sections = [...new Set(allEmployees.map(e => e.section))];
+        sections.forEach(sec => {
+          facultyMap.set(`Manager ${sec}`, { name: `Manager ${sec}`, email: '', sections: new Set([sec]) });
+        });
+      }
+      
       managers = Array.from(facultyMap.entries()).map(([id, info]) => ({
         id: id.replace(/\s+/g, '_'),
         label: info.name,
@@ -323,6 +322,16 @@
       }));
       managers.sort((a,b) => a.label.localeCompare(b.label));
       managers.unshift({ id: 'mgrAll', label: 'All (dev)', sections: ['A','D','E'] });
+    }
+
+    // ============================================================
+    // SAMPLE DATA (FALLBACK)
+    // ============================================================
+    function loadSampleData() {
+      allEmployees = [
+        { sl:1, roll:'246213010', name:'Name1', section:'D', email:'n1@k.com', op:77, opGrd:'S', cst:82, cstGrd:'S', ext:60, extGrd:'R', agr:70, agrGrd:'S', stb:65, stbGrd:'R', aown:72, aownGrd:'S', cont:68, contGrd:'R', adpt:74, adptGrd:'S', post:66, postGrd:'R', empth:69, empthGrd:'S', conf:71, confGrd:'S', aother:63, aotherGrd:'R', eqTot:68, eqTotGrd:'S', se:75, seGrd:'S', loc:70, locGrd:'R', iia:22, iiaGrd:'S', iib:19, iibGrd:'R', im:17, imGrd:'S', is:24, isGrd:'S', ic:21, icGrd:'R', tflTot:103, tflGrd:'S', crew:12, crewGrd:'R', mba:9, mbaGrd:'R', mbp:8, mbpGrd:'R', lf:14, lfGrd:'S', effect:18, effectGrd:'S', eefrt:16, eefrtGrd:'R', satis:20, satisGrd:'S', ei:23, eiGrd:'S', wi:19, wiGrd:'R', ec:16, ecGrd:'S', wc:21, wcGrd:'R', ea:14, eaGrd:'S', wa:18, waGrd:'R', incTot:42, incGrd:'S', contTot:37, contGrd:'R', affTot:32, affGrd:'S', expTot:53, expGrd:'R', wantTot:58, wantGrd:'S', firoTot:111, firoGrd:'S', nPowInc:4, nPowPct:'36%', nPowInterp:'MOD', nAchInc:3, nAchPct:'27%', nAchInterp:'DOM', nAffInc:2, nAffPct:'18%', nAffInterp:'MIN', facultyName:'Dr. Smith', facultyEmail:'smith@k.com' },
+        { sl:2, roll:'246213060', name:'Name2', section:'D', email:'n2@k.com', op:63, opGrd:'R', cst:56, cstGrd:'R', ext:53, extGrd:'R', agr:60, agrGrd:'R', stb:58, stbGrd:'R', aown:55, aownGrd:'R', cont:62, contGrd:'R', adpt:59, adptGrd:'R', post:57, postGrd:'R', empth:61, empthGrd:'R', conf:64, confGrd:'R', aother:52, aotherGrd:'R', eqTot:58, eqTotGrd:'R', se:60, seGrd:'R', loc:55, locGrd:'R', iia:18, iiaGrd:'R', iib:16, iibGrd:'R', im:14, imGrd:'R', is:19, isGrd:'R', ic:17, icGrd:'R', tflTot:84, tflGrd:'R', crew:10, crewGrd:'R', mba:7, mbaGrd:'R', mbp:6, mbpGrd:'R', lf:11, lfGrd:'R', effect:14, effectGrd:'R', eefrt:12, eefrtGrd:'R', satis:15, satisGrd:'R', ei:18, eiGrd:'R', wi:15, wiGrd:'R', ec:13, ecGrd:'R', wc:17, wcGrd:'R', ea:11, eaGrd:'R', wa:14, waGrd:'R', incTot:33, incGrd:'R', contTot:30, contGrd:'R', affTot:25, affGrd:'R', expTot:42, expGrd:'R', wantTot:46, wantGrd:'R', firoTot:88, firoGrd:'R', nPowInc:2, nPowPct:'18%', nPowInterp:'MIN', nAchInc:4, nAchPct:'36%', nAchInterp:'DOM', nAffInc:1, nAffPct:'9%', nAffInterp:'INS', facultyName:'Dr. Jones', facultyEmail:'jones@k.com' }
+      ];
     }
 
     // ============================================================
@@ -390,9 +399,6 @@
       if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
 
-    // ============================================================
-    // RENDER FULL REPORT (exact template from image)
-    // ============================================================
     function renderReport(emp) {
       if (!emp) { showEmptyReport('No employee selected'); return; }
       reportTitle.innerText = `${emp.name} · ${emp.roll}`;
@@ -406,7 +412,7 @@
           <span class="badge">${emp.section} · ${emp.roll}</span>
         </div>
 
-        <!-- Self-Personality, Self-Efficacy and Locus of Control -->
+        <!-- Self-Personality -->
         <div class="section-title">Self-Personality, Self-Efficacy and Locus of Control</div>
         <table>
           <tr><th>O</th><th>C</th><th>E</th><th>A</th><th>S</th></tr>
@@ -437,7 +443,7 @@
           <tr><td colspan="2">${fmt(emp.firoTot, emp.firoGrd)}</td><td colspan="4"></td></tr>
         </table>
 
-        <!-- Full Range Leadership Scores -->
+        <!-- Full Range Leadership -->
         <div class="section-title">Full Range Leadership Scores</div>
         <table>
           <tr><th colspan="6">Transformational (TFL)</th><th colspan="3">Transactional (TXL)</th></tr>
@@ -465,7 +471,25 @@
     }
 
     // ============================================================
-    // PDF DOWNLOAD (using html2canvas + jsPDF)
+    // RENDER ALL
+    // ============================================================
+    function renderAll() {
+      if (managers.length === 0) return;
+      currentManagerId = currentManagerId || managers[0]?.id || 'mgrAll';
+      renderManagers();
+      const filtered = getEmployeesForManager(currentManagerId);
+      if (filtered.length > 0) {
+        currentEmployeeIndex = Math.min(currentEmployeeIndex, filtered.length - 1);
+        renderEmployeeList(filtered);
+        renderReport(filtered[currentEmployeeIndex]);
+      } else {
+        showEmptyReport('No employees found');
+        renderEmployeeList([]);
+      }
+    }
+
+    // ============================================================
+    // PDF DOWNLOAD
     // ============================================================
     async function downloadPDF() {
       const content = document.getElementById('reportContent');
@@ -511,30 +535,11 @@
     // REFRESH & INIT
     // ============================================================
     async function refreshData() {
-      const success = await fetchDataFromSheets();
-      if (success) {
-        const filtered = getEmployeesForManager(currentManagerId || managers[0]?.id);
-        if (filtered && filtered.length > 0) {
-          currentEmployeeIndex = Math.min(currentEmployeeIndex, filtered.length - 1);
-          renderEmployeeList(filtered);
-          renderReport(filtered[currentEmployeeIndex]);
-        } else { showEmptyReport('No employees found'); renderEmployeeList([]); }
-        renderManagers();
-      }
+      await fetchDataFromSheets();
     }
 
     async function init() {
       await fetchDataFromSheets();
-      if (managers.length > 0) {
-        currentManagerId = managers[0]?.id || 'mgrAll';
-        renderManagers();
-        const filtered = getEmployeesForManager(currentManagerId);
-        if (filtered.length > 0) {
-          currentEmployeeIndex = 0;
-          renderEmployeeList(filtered);
-          renderReport(filtered[0]);
-        } else { showEmptyReport('No employees found'); renderEmployeeList([]); }
-      }
       document.getElementById('pdfBtn').addEventListener('click', downloadPDF);
       document.getElementById('printBtn').addEventListener('click', printReport);
       refreshBtn.addEventListener('click', refreshData);
