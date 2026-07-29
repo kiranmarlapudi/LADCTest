@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CLI · Full Dashboard</title>
-  <!-- Font Awesome -->
+  <title>CLI · Manager Dashboard</title>
+  <!-- Font Awesome & jsPDF -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
     body { background: #f4f7fc; min-height: 100vh; display: flex; justify-content: center; padding: 20px; }
@@ -38,26 +40,43 @@
     .action-btn:hover { background: #dce8f2; border-color: #b8cfdf; }
     .action-btn.print-btn { background: #1d4b64; color: white; }
     .action-btn.print-btn:hover { background: #0f364b; }
+    .action-btn.pdf-btn { background: #c0392b; color: white; }
+    .action-btn.pdf-btn:hover { background: #922b21; }
     .template-report { font-size: 0.95rem; line-height: 1.6; color: #1e2f3d; }
     .template-report .title-cli { font-weight: 600; font-size: 1.3rem; letter-spacing: 0.5px; color: #003153; border-bottom: 2px solid #b0ccdd; padding-bottom: 8px; margin-bottom: 18px; display: flex; justify-content: space-between; flex-wrap: wrap; }
-    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 20px; background: #f2f8fe; padding: 12px 16px; border-radius: 20px; margin: 12px 0 18px; font-weight: 500; }
-    .grid-4 span { color: #0b3347; }
-    .section-title { font-weight: 600; color: #15485f; margin: 18px 0 6px; border-left: 5px solid #4582a3; padding-left: 14px; }
-    .data-row { display: flex; flex-wrap: wrap; padding: 6px 0 6px 16px; background: #fafdff; border-radius: 14px; margin: 6px 0; }
-    .data-row .label { min-width: 180px; font-weight: 500; color: #1b4b64; }
-    .data-row .value { font-weight: 500; color: #003153; background: #eef4fa; padding: 0 14px; border-radius: 30px; }
-    .mini-table { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; background: #f6faff; padding: 12px 14px; border-radius: 20px; margin: 6px 0 12px; font-weight: 500; }
-    .mini-table .head { color: #1e5777; font-weight: 600; }
+    .template-report table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 0.9rem; }
+    .template-report td, .template-report th { border: 1px solid #cbdae6; padding: 6px 10px; text-align: center; }
+    .template-report th { background: #eef4fa; font-weight: 600; color: #15485f; }
+    .template-report .section-title { font-weight: 600; color: #15485f; margin: 18px 0 6px; border-left: 5px solid #4582a3; padding-left: 14px; }
+    .template-report .note { font-size: 0.85rem; color: #4d6f86; margin: 4px 0 8px; }
     .ppt-block { background: #f0f6fc; border-radius: 20px; padding: 14px 18px; margin-top: 16px; }
-    .ppt-block .row-ppt { display: flex; flex-wrap: wrap; gap: 18px 30px; }
     .badge { background: #dcebf5; padding: 2px 12px; border-radius: 30px; font-size: 0.8rem; color: #003153; }
     .empty-state { text-align: center; color: #5d7e94; padding: 40px 10px; }
     .footer-note { margin-top: 22px; font-size: 0.8rem; color: #4d6f86; border-top: 1px solid #dde9f2; padding-top: 16px; text-align: right; }
+    /* Password overlay */
+    #passwordOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+    #passwordBox { background: white; padding: 40px 50px; border-radius: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.3); text-align: center; max-width: 400px; width: 90%; }
+    #passwordBox h2 { color: #003153; margin-bottom: 20px; }
+    #passwordBox input { width: 100%; padding: 12px 16px; border: 2px solid #d5e2ec; border-radius: 40px; font-size: 1rem; margin-bottom: 16px; outline: none; }
+    #passwordBox input:focus { border-color: #2a6f8f; }
+    #passwordBox button { background: #1d4b64; color: white; border: none; padding: 12px 30px; border-radius: 40px; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+    #passwordBox button:hover { background: #0f364b; }
+    #passwordError { color: #c0392b; font-size: 0.9rem; margin-top: 10px; display: none; }
     @media print { body { background: white; padding: 0.2in; } .app { box-shadow: none; border: none; padding: 10px; } .manager-grid, .employee-list, .action-buttons, .no-print { display: none !important; } .report-container { border: none; box-shadow: none; padding: 0; } .report-header h2 { font-size: 1.8rem; } }
   </style>
 </head>
 <body>
-<div class="app" id="app">
+<!-- Password Overlay -->
+<div id="passwordOverlay">
+  <div id="passwordBox">
+    <h2><i class="fas fa-lock" style="color:#2a6f8f;"></i> Enter Password</h2>
+    <input type="password" id="passwordInput" placeholder="Enter access code" autofocus>
+    <button id="passwordSubmit">Unlock Dashboard</button>
+    <div id="passwordError">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<div class="app" id="app" style="display:none;">
   <h1><i class="fas fa-chart-pie"></i> CLI · Manager Dashboard
     <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
   </h1>
@@ -71,7 +90,7 @@
       <div class="report-header">
         <h2 id="reportTitle">Individual report <small id="reportSub">select employee</small></h2>
         <div class="action-buttons no-print">
-          <button class="action-btn" id="downloadBtn"><i class="fas fa-download"></i> Download</button>
+          <button class="action-btn pdf-btn" id="pdfBtn"><i class="fas fa-file-pdf"></i> PDF</button>
           <button class="action-btn print-btn" id="printBtn"><i class="fas fa-print"></i> Print</button>
         </div>
       </div>
@@ -81,8 +100,14 @@
     </div>
   </div>
 </div>
+
 <script>
   (function() {
+    // ============================================================
+    // PASSWORD
+    // ============================================================
+    const PASSWORD = '2026';
+
     // ============================================================
     // CONFIGURATION — YOUR GOOGLE SHEETS API URL
     // ============================================================
@@ -94,17 +119,10 @@
     // STATE
     // ============================================================
     let allEmployees = [];
-    let currentManagerId = 'mgrD';
+    let currentManagerId = null; // will be set dynamically
     let currentEmployeeIndex = 0;
     let isLoading = false;
-
-    // Managers (based on Section column)
-    const managers = [
-      { id: 'mgrA', label: 'Manager A', sections: ['A'] },
-      { id: 'mgrD', label: 'Manager D', sections: ['D'] },
-      { id: 'mgrE', label: 'Manager E', sections: ['E'] },
-      { id: 'mgrAll', label: 'All (dev)', sections: ['A','D','E'] }
-    ];
+    let managers = [];
 
     // DOM refs
     const managerListEl = document.getElementById('managerList');
@@ -113,6 +131,29 @@
     const reportTitle = document.getElementById('reportTitle');
     const reportSub = document.getElementById('reportSub');
     const refreshBtn = document.getElementById('refreshBtn');
+    const appEl = document.getElementById('app');
+
+    // ============================================================
+    // PASSWORD HANDLING
+    // ============================================================
+    function handlePassword() {
+      const input = document.getElementById('passwordInput');
+      const error = document.getElementById('passwordError');
+      const overlay = document.getElementById('passwordOverlay');
+      if (input.value === PASSWORD) {
+        overlay.style.display = 'none';
+        appEl.style.display = 'block';
+        init();
+      } else {
+        error.style.display = 'block';
+        input.value = '';
+        input.focus();
+      }
+    }
+    document.getElementById('passwordSubmit').addEventListener('click', handlePassword);
+    document.getElementById('passwordInput').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handlePassword();
+    });
 
     // ============================================================
     // FETCH DATA FROM GOOGLE SHEETS
@@ -125,7 +166,6 @@
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
         
-        // Parse different possible formats
         let rawData = [];
         if (Array.isArray(data)) rawData = data;
         else if (data.data && Array.isArray(data.data)) rawData = data.data;
@@ -142,7 +182,7 @@
           });
         } else throw new Error('Unexpected data format');
 
-        // Map to employee objects with all 70+ fields
+        // Map to employee objects
         allEmployees = rawData.map((row, idx) => {
           const get = (key) => {
             const keys = Object.keys(row);
@@ -155,16 +195,16 @@
           const toStr = (v) => String(v || '').trim();
 
           return {
-            // Core fields
             sl: toInt(get('Sl. No')) || idx + 1,
             roll: toStr(get('Roll Number')),
             name: toStr(get('User full name')),
             section: toStr(get('Section')),
             email: toStr(get('student Email Address')),
+            // Core scores
             op: toInt(get('Op')), opGrd: toStr(get('Op Grd')),
             cst: toInt(get('Cst')), cstGrd: toStr(get('Cst Grd')),
             ext: toInt(get('Ext')), extGrd: toStr(get('Ext Grd')),
-            // Additional fields
+            // Self-Personality
             agr: toInt(get('Agr')), agrGrd: toStr(get('Agr Grd')),
             stb: toInt(get('Stb')), stbGrd: toStr(get('Stb Grd')),
             aown: toInt(get('Aown')), aownGrd: toStr(get('Aown Grd')),
@@ -208,13 +248,43 @@
             nPowInc: toInt(get('nPow Inc')), nPowPct: toStr(get('nPow%')), nPowInterp: toStr(get('nPow Interp')),
             nAchInc: toInt(get('nAch Inc')), nAchPct: toStr(get('nAch%')), nAchInterp: toStr(get('nAch Interp')),
             nAffInc: toInt(get('nAff Inc')), nAffPct: toStr(get('nAff%')), nAffInterp: toStr(get('nAff Interp')),
-            // Faculty
+            // Faculty (column CQ = 79th column, index 78)
             facultyName: toStr(get('Faculty Name')),
             facultyEmail: toStr(get('Faculty Email'))
           };
         });
 
         allEmployees = allEmployees.filter(emp => emp.name && emp.name !== '');
+        
+        // Build managers dynamically from unique faculty names (column CQ)
+        const facultyMap = new Map();
+        allEmployees.forEach(emp => {
+          if (emp.facultyName) {
+            const key = emp.facultyName.trim();
+            if (!facultyMap.has(key)) {
+              facultyMap.set(key, { name: key, email: emp.facultyEmail, sections: new Set() });
+            }
+            facultyMap.get(key).sections.add(emp.section);
+          }
+        });
+        // Also add fallback managers by section if no faculty data
+        if (facultyMap.size === 0) {
+          const sections = [...new Set(allEmployees.map(e => e.section))];
+          sections.forEach(sec => {
+            facultyMap.set(`Manager ${sec}`, { name: `Manager ${sec}`, email: '', sections: new Set([sec]) });
+          });
+        }
+        managers = Array.from(facultyMap.entries()).map(([id, info]) => ({
+          id: id.replace(/\s+/g, '_'),
+          label: info.name,
+          email: info.email,
+          sections: Array.from(info.sections)
+        }));
+        // Sort managers
+        managers.sort((a,b) => a.label.localeCompare(b.label));
+        // Add "All" manager
+        managers.unshift({ id: 'mgrAll', label: 'All (dev)', sections: ['A','D','E'] });
+
         isLoading = false;
         return true;
       } catch (error) {
@@ -231,9 +301,28 @@
     // ============================================================
     function loadSampleData() {
       allEmployees = [
-        { sl:1, roll:'246213010', name:'Name1', section:'D', email:'Name1@email.kom', op:77, opGrd:'S', cst:82, cstGrd:'S', ext:60, extGrd:'R', agr:70, agrGrd:'S', stb:65, stbGrd:'R', aown:72, aownGrd:'S', cont:68, contGrd:'R', adpt:74, adptGrd:'S', post:66, postGrd:'R', empth:69, empthGrd:'S', conf:71, confGrd:'S', aother:63, aotherGrd:'R', eqTot:68, eqTotGrd:'S', se:75, seGrd:'S', loc:70, locGrd:'R', iia:22, iiaGrd:'S', iib:19, iibGrd:'R', im:17, imGrd:'S', is:24, isGrd:'S', ic:21, icGrd:'R', tflTot:103, tflGrd:'S', crew:12, crewGrd:'R', mba:9, mbaGrd:'R', mbp:8, mbpGrd:'R', lf:14, lfGrd:'S', effect:18, effectGrd:'S', eefrt:16, eefrtGrd:'R', satis:20, satisGrd:'S', ei:23, eiGrd:'S', wi:19, wiGrd:'R', ec:16, ecGrd:'S', wc:21, wcGrd:'R', ea:14, eaGrd:'S', wa:18, waGrd:'R', incTot:42, incGrd:'S', contTot:37, contGrd:'R', affTot:32, affGrd:'S', expTot:53, expGrd:'R', wantTot:58, wantGrd:'S', firoTot:111, firoGrd:'S', nPowInc:4, nPowPct:'36%', nPowInterp:'MOD', nAchInc:3, nAchPct:'27%', nAchInterp:'DOM', nAffInc:2, nAffPct:'18%', nAffInterp:'MIN', facultyName:'Dr. Smith', facultyEmail:'smith@email.kom' },
-        { sl:2, roll:'246213060', name:'Name2', section:'D', email:'Name2@email.kom', op:63, opGrd:'R', cst:56, cstGrd:'R', ext:53, extGrd:'R', agr:60, agrGrd:'R', stb:58, stbGrd:'R', aown:55, aownGrd:'R', cont:62, contGrd:'R', adpt:59, adptGrd:'R', post:57, postGrd:'R', empth:61, empthGrd:'R', conf:64, confGrd:'R', aother:52, aotherGrd:'R', eqTot:58, eqTotGrd:'R', se:60, seGrd:'R', loc:55, locGrd:'R', iia:18, iiaGrd:'R', iib:16, iibGrd:'R', im:14, imGrd:'R', is:19, isGrd:'R', ic:17, icGrd:'R', tflTot:84, tflGrd:'R', crew:10, crewGrd:'R', mba:7, mbaGrd:'R', mbp:6, mbpGrd:'R', lf:11, lfGrd:'R', effect:14, effectGrd:'R', eefrt:12, eefrtGrd:'R', satis:15, satisGrd:'R', ei:18, eiGrd:'R', wi:15, wiGrd:'R', ec:13, ecGrd:'R', wc:17, wcGrd:'R', ea:11, eaGrd:'R', wa:14, waGrd:'R', incTot:33, incGrd:'R', contTot:30, contGrd:'R', affTot:25, affGrd:'R', expTot:42, expGrd:'R', wantTot:46, wantGrd:'R', firoTot:88, firoGrd:'R', nPowInc:2, nPowPct:'18%', nPowInterp:'MIN', nAchInc:4, nAchPct:'36%', nAchInterp:'DOM', nAffInc:1, nAffPct:'9%', nAffInterp:'INS', facultyName:'Dr. Jones', facultyEmail:'jones@email.kom' }
+        { sl:1, roll:'246213010', name:'Name1', section:'D', email:'n1@k.com', op:77, opGrd:'S', cst:82, cstGrd:'S', ext:60, extGrd:'R', agr:70, agrGrd:'S', stb:65, stbGrd:'R', aown:72, aownGrd:'S', cont:68, contGrd:'R', adpt:74, adptGrd:'S', post:66, postGrd:'R', empth:69, empthGrd:'S', conf:71, confGrd:'S', aother:63, aotherGrd:'R', eqTot:68, eqTotGrd:'S', se:75, seGrd:'S', loc:70, locGrd:'R', iia:22, iiaGrd:'S', iib:19, iibGrd:'R', im:17, imGrd:'S', is:24, isGrd:'S', ic:21, icGrd:'R', tflTot:103, tflGrd:'S', crew:12, crewGrd:'R', mba:9, mbaGrd:'R', mbp:8, mbpGrd:'R', lf:14, lfGrd:'S', effect:18, effectGrd:'S', eefrt:16, eefrtGrd:'R', satis:20, satisGrd:'S', ei:23, eiGrd:'S', wi:19, wiGrd:'R', ec:16, ecGrd:'S', wc:21, wcGrd:'R', ea:14, eaGrd:'S', wa:18, waGrd:'R', incTot:42, incGrd:'S', contTot:37, contGrd:'R', affTot:32, affGrd:'S', expTot:53, expGrd:'R', wantTot:58, wantGrd:'S', firoTot:111, firoGrd:'S', nPowInc:4, nPowPct:'36%', nPowInterp:'MOD', nAchInc:3, nAchPct:'27%', nAchInterp:'DOM', nAffInc:2, nAffPct:'18%', nAffInterp:'MIN', facultyName:'Dr. Smith', facultyEmail:'smith@k.com' },
+        { sl:2, roll:'246213060', name:'Name2', section:'D', email:'n2@k.com', op:63, opGrd:'R', cst:56, cstGrd:'R', ext:53, extGrd:'R', agr:60, agrGrd:'R', stb:58, stbGrd:'R', aown:55, aownGrd:'R', cont:62, contGrd:'R', adpt:59, adptGrd:'R', post:57, postGrd:'R', empth:61, empthGrd:'R', conf:64, confGrd:'R', aother:52, aotherGrd:'R', eqTot:58, eqTotGrd:'R', se:60, seGrd:'R', loc:55, locGrd:'R', iia:18, iiaGrd:'R', iib:16, iibGrd:'R', im:14, imGrd:'R', is:19, isGrd:'R', ic:17, icGrd:'R', tflTot:84, tflGrd:'R', crew:10, crewGrd:'R', mba:7, mbaGrd:'R', mbp:6, mbpGrd:'R', lf:11, lfGrd:'R', effect:14, effectGrd:'R', eefrt:12, eefrtGrd:'R', satis:15, satisGrd:'R', ei:18, eiGrd:'R', wi:15, wiGrd:'R', ec:13, ecGrd:'R', wc:17, wcGrd:'R', ea:11, eaGrd:'R', wa:14, waGrd:'R', incTot:33, incGrd:'R', contTot:30, contGrd:'R', affTot:25, affGrd:'R', expTot:42, expGrd:'R', wantTot:46, wantGrd:'R', firoTot:88, firoGrd:'R', nPowInc:2, nPowPct:'18%', nPowInterp:'MIN', nAchInc:4, nAchPct:'36%', nAchInterp:'DOM', nAffInc:1, nAffPct:'9%', nAffInterp:'INS', facultyName:'Dr. Jones', facultyEmail:'jones@k.com' }
       ];
+      // Build managers from sample
+      const facultyMap = new Map();
+      allEmployees.forEach(emp => {
+        if (emp.facultyName) {
+          const key = emp.facultyName.trim();
+          if (!facultyMap.has(key)) {
+            facultyMap.set(key, { name: key, email: emp.facultyEmail, sections: new Set() });
+          }
+          facultyMap.get(key).sections.add(emp.section);
+        }
+      });
+      managers = Array.from(facultyMap.entries()).map(([id, info]) => ({
+        id: id.replace(/\s+/g, '_'),
+        label: info.name,
+        email: info.email,
+        sections: Array.from(info.sections)
+      }));
+      managers.sort((a,b) => a.label.localeCompare(b.label));
+      managers.unshift({ id: 'mgrAll', label: 'All (dev)', sections: ['A','D','E'] });
     }
 
     // ============================================================
@@ -253,6 +342,7 @@
     function getEmployeesForManager(managerId) {
       const mgr = managers.find(m => m.id === managerId);
       if (!mgr) return [];
+      if (managerId === 'mgrAll') return allEmployees;
       return allEmployees.filter(p => mgr.sections.includes(p.section));
     }
 
@@ -301,14 +391,13 @@
     }
 
     // ============================================================
-    // RENDER FULL REPORT (with all new fields)
+    // RENDER FULL REPORT (exact template from image)
     // ============================================================
     function renderReport(emp) {
       if (!emp) { showEmptyReport('No employee selected'); return; }
       reportTitle.innerText = `${emp.name} · ${emp.roll}`;
       reportSub.innerText = `Section ${emp.section} · ${emp.facultyName || 'Faculty'}`;
 
-      // Helper: format score + grade
       const fmt = (score, grade) => (score || score === 0) ? `${score}-${grade || '—'}` : '—';
 
       const html = `
@@ -316,74 +405,106 @@
           <span>Consolidated Leadership Indicators (CLI) Template</span>
           <span class="badge">${emp.section} · ${emp.roll}</span>
         </div>
-        <div class="grid-4">
-          <span>G: ${emp.opGrd || '—'}</span>
-          <span>S: ${emp.cstGrd || '—'}</span>
-          <span>R: ${emp.extGrd || '—'}</span>
-          <span>I: ${emp.opGrd?.includes('I') ? 'I' : '—'}</span>
-        </div>
 
-        <!-- Self-Personality, Self-Efficacy & Locus of Control -->
-        <div class="section-title">Self-Personality, Self-Efficacy & Locus of Control</div>
-        <div class="data-row"><span class="label">O · C · E · A · S</span><span class="value">${fmt(emp.op, emp.opGrd)} · ${fmt(emp.cst, emp.cstGrd)} · ${fmt(emp.ext, emp.extGrd)} · ${fmt(emp.aown, emp.aownGrd)} · ${fmt(emp.stb, emp.stbGrd)}</span></div>
-        <div class="data-row"><span class="label">Agr · Adpt · Post · Empth · Conf</span><span class="value">${fmt(emp.agr, emp.agrGrd)} · ${fmt(emp.adpt, emp.adptGrd)} · ${fmt(emp.post, emp.postGrd)} · ${fmt(emp.empth, emp.empthGrd)} · ${fmt(emp.conf, emp.confGrd)}</span></div>
-        <div class="data-row"><span class="label">Aother · EqTot · SE · LOC</span><span class="value">${fmt(emp.aother, emp.aotherGrd)} · ${fmt(emp.eqTot, emp.eqTotGrd)} · ${fmt(emp.se, emp.seGrd)} · ${fmt(emp.loc, emp.locGrd)}</span></div>
+        <!-- Self-Personality, Self-Efficacy and Locus of Control -->
+        <div class="section-title">Self-Personality, Self-Efficacy and Locus of Control</div>
+        <table>
+          <tr><th>O</th><th>C</th><th>E</th><th>A</th><th>S</th></tr>
+          <tr><td>${fmt(emp.op, emp.opGrd)}</td><td>${fmt(emp.cst, emp.cstGrd)}</td><td>${fmt(emp.ext, emp.extGrd)}</td><td>${fmt(emp.aown, emp.aownGrd)}</td><td>${fmt(emp.stb, emp.stbGrd)}</td></tr>
+          <tr><th colspan="2">SE</th><th colspan="2">LOC</th><th></th></tr>
+          <tr><td colspan="2">${fmt(emp.se, emp.seGrd)}</td><td colspan="2">${fmt(emp.loc, emp.locGrd)}</td><td></td></tr>
+        </table>
+        <div class="note">Note: While writing scores, use actual score followed by grade e.g. 58-R; 69-R/S; 73-S/R etc.</div>
+        <table>
+          <tr><th>Aware</th><th>Positive</th><th>Control</th></tr>
+          <tr><td>${fmt(emp.aown, emp.aownGrd)}</td><td>${fmt(emp.post, emp.postGrd)}</td><td>${fmt(emp.cont, emp.contGrd)}</td></tr>
+          <tr><th>Aware Others</th><th>Empathy</th><th>Adapt</th></tr>
+          <tr><td>${fmt(emp.aother, emp.aotherGrd)}</td><td>${fmt(emp.empth, emp.empthGrd)}</td><td>${fmt(emp.adpt, emp.adptGrd)}</td></tr>
+          <tr><th>Conflict Handling</th><th colspan="2">Overall</th></tr>
+          <tr><td>${fmt(emp.conf, emp.confGrd)}</td><td colspan="2">${fmt(emp.eqTot, emp.eqTotGrd)}</td></tr>
+        </table>
 
-        <!-- Full Range Leadership -->
+        <!-- Interpersonal -->
+        <div class="section-title">Interpersonal</div>
+        <table>
+          <tr><th>Exp_Incl</th><th>Want_Incl</th><th>Exp_Cont</th><th>Want_Cont</th><th>Exp_Aff</th><th>Want_Aff</th></tr>
+          <tr><td>${fmt(emp.ei, emp.eiGrd)}</td><td>${fmt(emp.wi, emp.wiGrd)}</td><td>${fmt(emp.ec, emp.ecGrd)}</td><td>${fmt(emp.wc, emp.wcGrd)}</td><td>${fmt(emp.ea, emp.eaGrd)}</td><td>${fmt(emp.wa, emp.waGrd)}</td></tr>
+          <tr><th>Incl_Tot</th><th>Cont_Tot</th><th></th><th></th><th>Aff_Tot</th><th></th></tr>
+          <tr><td>${fmt(emp.incTot, emp.incGrd)}</td><td>${fmt(emp.contTot, emp.contGrd)}</td><td></td><td></td><td>${fmt(emp.affTot, emp.affGrd)}</td><td></td></tr>
+          <tr><th>Exp_Tot</th><th>Want_Tot</th><th></th><th></th><th></th><th></th></tr>
+          <tr><td>${fmt(emp.expTot, emp.expGrd)}</td><td>${fmt(emp.wantTot, emp.wantGrd)}</td><td></td><td></td><td></td><td></td></tr>
+          <tr><th colspan="2">G_Total</th><th colspan="4"></th></tr>
+          <tr><td colspan="2">${fmt(emp.firoTot, emp.firoGrd)}</td><td colspan="4"></td></tr>
+        </table>
+
+        <!-- Full Range Leadership Scores -->
         <div class="section-title">Full Range Leadership Scores</div>
-        <div class="data-row"><span class="label">II-A · II-B · IM · IS · IC</span><span class="value">${fmt(emp.iia, emp.iiaGrd)} · ${fmt(emp.iib, emp.iibGrd)} · ${fmt(emp.im, emp.imGrd)} · ${fmt(emp.is, emp.isGrd)} · ${fmt(emp.ic, emp.icGrd)}</span></div>
-        <div class="data-row"><span class="label">TFL Tot · CRew · MBA · MBP</span><span class="value">${fmt(emp.tflTot, emp.tflGrd)} · ${fmt(emp.crew, emp.crewGrd)} · ${fmt(emp.mba, emp.mbaGrd)} · ${fmt(emp.mbp, emp.mbpGrd)}</span></div>
-        <div class="data-row"><span class="label">LF · Effect · EEfrt · Satis</span><span class="value">${fmt(emp.lf, emp.lfGrd)} · ${fmt(emp.effect, emp.effectGrd)} · ${fmt(emp.eefrt, emp.eefrtGrd)} · ${fmt(emp.satis, emp.satisGrd)}</span></div>
-
-        <!-- Interpersonal / FIRO -->
-        <div class="section-title">Interpersonal (FIRO)</div>
-        <div class="mini-table">
-          <span class="head">EI</span><span>${fmt(emp.ei, emp.eiGrd)}</span>
-          <span class="head">WI</span><span>${fmt(emp.wi, emp.wiGrd)}</span>
-          <span class="head">EC</span><span>${fmt(emp.ec, emp.ecGrd)}</span>
-          <span class="head">WC</span><span>${fmt(emp.wc, emp.wcGrd)}</span>
-          <span class="head">EA</span><span>${fmt(emp.ea, emp.eaGrd)}</span>
-          <span class="head">WA</span><span>${fmt(emp.wa, emp.waGrd)}</span>
-        </div>
-        <div class="data-row"><span class="label">Inc Tot · Cont Tot · Aff Tot · Exp Tot · Want Tot · FIRO Tot</span><span class="value">${fmt(emp.incTot, emp.incGrd)} · ${fmt(emp.contTot, emp.contGrd)} · ${fmt(emp.affTot, emp.affGrd)} · ${fmt(emp.expTot, emp.expGrd)} · ${fmt(emp.wantTot, emp.wantGrd)} · ${fmt(emp.firoTot, emp.firoGrd)}</span></div>
+        <table>
+          <tr><th colspan="6">Transformational (TFL)</th><th colspan="3">Transactional (TXL)</th></tr>
+          <tr><th>II-A</th><th>II-B</th><th>IM</th><th>IS</th><th>IC</th><th>TOT TFL</th><th>CR</th><th>MBE(A)</th><th>MBE(P)</th></tr>
+          <tr><td>${fmt(emp.iia, emp.iiaGrd)}</td><td>${fmt(emp.iib, emp.iibGrd)}</td><td>${fmt(emp.im, emp.imGrd)}</td><td>${fmt(emp.is, emp.isGrd)}</td><td>${fmt(emp.ic, emp.icGrd)}</td><td>${fmt(emp.tflTot, emp.tflGrd)}</td><td>${fmt(emp.crew, emp.crewGrd)}</td><td>${fmt(emp.mba, emp.mbaGrd)}</td><td>${fmt(emp.mbp, emp.mbpGrd)}</td></tr>
+          <tr><th>LF</th><th>Effectiveness</th><th>Extra Effort</th><th>Satisfaction</th><th></th><th></th><th></th><th></th><th></th></tr>
+          <tr><td>${fmt(emp.lf, emp.lfGrd)}</td><td>${fmt(emp.effect, emp.effectGrd)}</td><td>${fmt(emp.eefrt, emp.eefrtGrd)}</td><td>${fmt(emp.satis, emp.satisGrd)}</td><td></td><td></td><td></td><td></td><td></td></tr>
+        </table>
 
         <!-- PPT -->
-        <div class="section-title">SELF - Picture Perception Test (PPT)</div>
+        <div class="section-title">SELF - Picture Perception Test or PPT</div>
+        <div class="note">(to be used to decide 'guard against' in the deliverables)</div>
         <div class="ppt-block">
-          <div class="row-ppt">
-            <span><strong>nPow</strong> Inc: ${emp.nPowInc || 0}  %: ${emp.nPowPct || '—'}  Interp: ${emp.nPowInterp || '—'}</span>
-            <span><strong>nAch</strong> Inc: ${emp.nAchInc || 0}  %: ${emp.nAchPct || '—'}  Interp: ${emp.nAchInterp || '—'}</span>
-            <span><strong>nAff</strong> Inc: ${emp.nAffInc || 0}  %: ${emp.nAffPct || '—'}  Interp: ${emp.nAffInterp || '—'}</span>
-          </div>
-          <div style="margin-top:8px;font-size:0.9rem;">DOM=Dominant; MOD=Moderate; MIN=Minor; INS=Insignificant; ABS=Absent</div>
+          <table>
+            <tr><th colspan="3">nPow</th><th colspan="3">nAch</th><th colspan="3">nAff</th></tr>
+            <tr><th>Inc</th><th>%</th><th>Interp</th><th>Inc</th><th>%</th><th>Interp</th><th>Inc</th><th>%</th><th>Interp</th></tr>
+            <tr><td>${emp.nPowInc || 0}</td><td>${emp.nPowPct || '—'}</td><td>${emp.nPowInterp || '—'}</td><td>${emp.nAchInc || 0}</td><td>${emp.nAchPct || '—'}</td><td>${emp.nAchInterp || '—'}</td><td>${emp.nAffInc || 0}</td><td>${emp.nAffPct || '—'}</td><td>${emp.nAffInterp || '—'}</td></tr>
+          </table>
+          <div style="margin-top:8px;font-size:0.85rem;">Use: DOM=Dominant; MOD=Moderate; MIN=Minor; INS=Insignificant; ABS=Absent</div>
         </div>
 
-        <!-- Faculty -->
-        <div class="data-row" style="margin-top:12px;"><span class="label">Faculty</span><span class="value">${emp.facultyName || '—'} (${emp.facultyEmail || '—'})</span></div>
-
-        <div class="footer-note">CLI · data from Google Sheets · ${emp.name}</div>
+        <div class="footer-note">CLI · data from Google Sheets · ${emp.name} · Faculty: ${emp.facultyName || '—'}</div>
       `;
       reportContent.innerHTML = html;
     }
 
     // ============================================================
-    // DOWNLOAD & PRINT
+    // PDF DOWNLOAD (using html2canvas + jsPDF)
     // ============================================================
-    function downloadReport() {
-      const content = document.getElementById('reportContent').innerHTML;
-      if (!content || content.includes('empty-state')) { alert('Please select an employee first.'); return; }
-      const title = document.getElementById('reportTitle').innerText || 'report';
-      const style = document.querySelector('style').innerHTML;
-      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CLI Report</title><style>${style}</style></head>
-        <body style="background:white;padding:20px;"><div class="app" style="max-width:1000px;margin:auto;">${document.querySelector('.report-container').outerHTML}</div></body></html>`;
-      const blob = new Blob([html], { type: 'text/html' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `CLI_${title.replace(/\s/g,'_')}.html`;
-      a.click();
-      URL.revokeObjectURL(a.href);
+    async function downloadPDF() {
+      const content = document.getElementById('reportContent');
+      if (!content || content.innerHTML.includes('empty-state')) {
+        alert('Please select an employee first.');
+        return;
+      }
+      try {
+        const canvas = await html2canvas(content, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        let heightLeft = pdfHeight;
+        let position = 0;
+        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+        heightLeft -= pdf.internal.pageSize.getHeight();
+        while (heightLeft > 0) {
+          position = heightLeft - pdfHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+          heightLeft -= pdf.internal.pageSize.getHeight();
+        }
+        pdf.save(`CLI_${document.getElementById('reportTitle').innerText.replace(/\s/g,'_')}.pdf`);
+      } catch (error) {
+        console.error('PDF error:', error);
+        alert('Could not generate PDF. Please use Print instead.');
+      }
     }
 
+    // ============================================================
+    // PRINT
+    // ============================================================
     function printReport() { window.print(); }
 
     // ============================================================
@@ -392,31 +513,34 @@
     async function refreshData() {
       const success = await fetchDataFromSheets();
       if (success) {
-        const filtered = getEmployeesForManager(currentManagerId);
-        if (filtered.length > 0) {
+        const filtered = getEmployeesForManager(currentManagerId || managers[0]?.id);
+        if (filtered && filtered.length > 0) {
           currentEmployeeIndex = Math.min(currentEmployeeIndex, filtered.length - 1);
           renderEmployeeList(filtered);
           renderReport(filtered[currentEmployeeIndex]);
-        } else { showEmptyReport('No employees under this manager'); renderEmployeeList([]); }
+        } else { showEmptyReport('No employees found'); renderEmployeeList([]); }
         renderManagers();
       }
     }
 
     async function init() {
       await fetchDataFromSheets();
-      renderManagers();
-      const filtered = getEmployeesForManager('mgrD');
-      if (filtered.length > 0) {
-        currentEmployeeIndex = 0;
-        renderEmployeeList(filtered);
-        renderReport(filtered[0]);
-      } else { showEmptyReport('No employees in section D'); renderEmployeeList([]); }
-      document.getElementById('downloadBtn').addEventListener('click', downloadReport);
+      if (managers.length > 0) {
+        currentManagerId = managers[0]?.id || 'mgrAll';
+        renderManagers();
+        const filtered = getEmployeesForManager(currentManagerId);
+        if (filtered.length > 0) {
+          currentEmployeeIndex = 0;
+          renderEmployeeList(filtered);
+          renderReport(filtered[0]);
+        } else { showEmptyReport('No employees found'); renderEmployeeList([]); }
+      }
+      document.getElementById('pdfBtn').addEventListener('click', downloadPDF);
       document.getElementById('printBtn').addEventListener('click', printReport);
       refreshBtn.addEventListener('click', refreshData);
     }
 
-    init();
+    // If data loads before password, init will be called after unlock.
   })();
 </script>
 </body>
