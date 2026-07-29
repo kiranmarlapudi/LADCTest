@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLI · Full Dashboard</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, system-ui, sans-serif; }
+    body { background: #f4f7fc; min-height: 100vh; display: flex; justify-content: center; padding: 20px; }
+    .app { max-width: 1400px; width: 100%; background: white; border-radius: 32px; box-shadow: 0 20px 40px -12px rgba(0,20,30,0.25); padding: 28px 30px 40px; }
+    h1 { font-weight: 500; font-size: 1.9rem; color: #0b2b3d; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #e7edf4; padding-bottom: 18px; margin-bottom: 28px; }
+    h1 i { color: #2a6f8f; }
+    .refresh-btn { background: #e8f0f8; border: none; padding: 6px 18px; border-radius: 30px; cursor: pointer; font-size: 0.85rem; color: #1d4b64; margin-left: auto; transition: 0.2s; }
+    .refresh-btn:hover { background: #d0e2f0; }
+    .loading { text-align: center; padding: 30px; color: #2a6f8f; }
+    .manager-grid { display: flex; flex-wrap: wrap; gap: 14px 18px; margin-bottom: 30px; background: #f0f5fa; padding: 18px 22px; border-radius: 60px; }
+    .manager-btn { background: white; border: none; padding: 10px 28px; border-radius: 40px; font-weight: 500; color: #1d3b4f; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s; cursor: pointer; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; }
+    .manager-btn i { color: #3d7b9b; }
+    .manager-btn:hover { background: #e3edf5; border-color: #b3cfdf; transform: translateY(-2px); }
+    .manager-btn.active { background: #1d4b64; color: white; border-color: #1d4b64; box-shadow: 0 8px 14px rgba(26,80,110,0.25); }
+    .manager-btn.active i { color: white; }
+    .panel { display: flex; flex-direction: row; flex-wrap: wrap; gap: 28px; margin-top: 8px; }
+    .employee-list { flex: 1 1 260px; background: #f8fafd; border-radius: 24px; padding: 18px 0 18px 18px; max-height: 600px; overflow-y: auto; border: 1px solid #e2ecf3; }
+    .employee-list h3 { font-weight: 500; color: #1d3b4f; padding-bottom: 12px; border-bottom: 1px solid #d5e2ec; margin-right: 18px; display: flex; align-items: center; gap: 8px; }
+    .employee-list h3 i { color: #2f789b; }
+    .employee-item { display: block; width: calc(100% - 18px); text-align: left; background: transparent; border: none; padding: 12px 16px; margin: 4px 0; border-radius: 40px 0 0 40px; font-weight: 500; color: #1c3a4b; transition: 0.15s; cursor: pointer; border-left: 3px solid transparent; }
+    .employee-item i { margin-right: 12px; color: #487a98; width: 18px; }
+    .employee-item:hover { background: #e3eef7; border-left-color: #5492b3; }
+    .employee-item.active { background: #d2e6f2; border-left-color: #1d6d94; font-weight: 600; color: #0c3143; }
+    .report-container { flex: 3 1 720px; background: white; border-radius: 28px; padding: 18px 22px 28px; border: 1px solid #dfecf3; box-shadow: 0 6px 14px rgba(0,20,30,0.04); }
+    .report-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 18px; border-bottom: 1px dashed #cbdae6; padding-bottom: 14px; }
+    .report-header h2 { font-weight: 500; color: #003153; font-size: 1.6rem; }
+    .report-header h2 small { font-weight: 400; font-size: 1rem; color: #4d6f86; margin-left: 12px; }
+    .action-buttons { display: flex; gap: 12px; }
+    .action-btn { background: #f0f6fc; border: none; padding: 8px 18px; border-radius: 40px; font-weight: 500; color: #1d4b64; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; border: 1px solid transparent; }
+    .action-btn:hover { background: #dce8f2; border-color: #b8cfdf; }
+    .action-btn.print-btn { background: #1d4b64; color: white; }
+    .action-btn.print-btn:hover { background: #0f364b; }
+    .template-report { font-size: 0.95rem; line-height: 1.6; color: #1e2f3d; }
+    .template-report .title-cli { font-weight: 600; font-size: 1.3rem; letter-spacing: 0.5px; color: #003153; border-bottom: 2px solid #b0ccdd; padding-bottom: 8px; margin-bottom: 18px; display: flex; justify-content: space-between; flex-wrap: wrap; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px 20px; background: #f2f8fe; padding: 12px 16px; border-radius: 20px; margin: 12px 0 18px; font-weight: 500; }
+    .grid-4 span { color: #0b3347; }
+    .section-title { font-weight: 600; color: #15485f; margin: 18px 0 6px; border-left: 5px solid #4582a3; padding-left: 14px; }
+    .data-row { display: flex; flex-wrap: wrap; padding: 6px 0 6px 16px; background: #fafdff; border-radius: 14px; margin: 6px 0; }
+    .data-row .label { min-width: 180px; font-weight: 500; color: #1b4b64; }
+    .data-row .value { font-weight: 500; color: #003153; background: #eef4fa; padding: 0 14px; border-radius: 30px; }
+    .mini-table { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; background: #f6faff; padding: 12px 14px; border-radius: 20px; margin: 6px 0 12px; font-weight: 500; }
+    .mini-table .head { color: #1e5777; font-weight: 600; }
+    .ppt-block { background: #f0f6fc; border-radius: 20px; padding: 14px 18px; margin-top: 16px; }
+    .ppt-block .row-ppt { display: flex; flex-wrap: wrap; gap: 18px 30px; }
+    .badge { background: #dcebf5; padding: 2px 12px; border-radius: 30px; font-size: 0.8rem; color: #003153; }
+    .empty-state { text-align: center; color: #5d7e94; padding: 40px 10px; }
+    .footer-note { margin-top: 22px; font-size: 0.8rem; color: #4d6f86; border-top: 1px solid #dde9f2; padding-top: 16px; text-align: right; }
+    @media print { body { background: white; padding: 0.2in; } .app { box-shadow: none; border: none; padding: 10px; } .manager-grid, .employee-list, .action-buttons, .no-print { display: none !important; } .report-container { border: none; box-shadow: none; padding: 0; } .report-header h2 { font-size: 1.8rem; } }
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+  <h1><i class="fas fa-chart-pie"></i> CLI · Manager Dashboard
+    <button class="refresh-btn" id="refreshBtn"><i class="fas fa-sync-alt"></i> Refresh</button>
+  </h1>
+  <div class="manager-grid" id="managerList"></div>
+  <div class="panel">
+    <div class="employee-list" id="employeeList">
+      <h3><i class="fas fa-users"></i> Team members</h3>
+      <div id="employeeItems"></div>
+    </div>
+    <div class="report-container" id="reportContainer">
+      <div class="report-header">
+        <h2 id="reportTitle">Individual report <small id="reportSub">select employee</small></h2>
+        <div class="action-buttons no-print">
+          <button class="action-btn" id="downloadBtn"><i class="fas fa-download"></i> Download</button>
+          <button class="action-btn print-btn" id="printBtn"><i class="fas fa-print"></i> Print</button>
+        </div>
+      </div>
+      <div id="reportContent" class="template-report">
+        <div class="empty-state"><i class="fas fa-user-circle" style="font-size:2.4rem; opacity:0.4; display:block; margin-bottom:12px;"></i> Select a manager, then an employee</div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  (function() {
+    // ============================================================
+    // CONFIGURATION — YOUR GOOGLE SHEETS API URL
+    // ============================================================
+    const CONFIG = {
+      SHEETS_API_URL: 'https://script.google.com/macros/s/AKfycbwugpfGcBYVvOGgf3Q83bIrZ6LzUNfykqK-c_28etL2gMArhYSoigJbXrfIZe_00uGo/exec'
+    };
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let allEmployees = [];
+    let currentManagerId = 'mgrD';
+    let currentEmployeeIndex = 0;
+    let isLoading = false;
+
+    // Managers (based on Section column)
+    const managers = [
+      { id: 'mgrA', label: 'Manager A', sections: ['A'] },
+      { id: 'mgrD', label: 'Manager D', sections: ['D'] },
+      { id: 'mgrE', label: 'Manager E', sections: ['E'] },
+      { id: 'mgrAll', label: 'All (dev)', sections: ['A','D','E'] }
+    ];
+
+    // DOM refs
+    const managerListEl = document.getElementById('managerList');
+    const employeeItemsEl = document.getElementById('employeeItems');
+    const reportContent = document.getElementById('reportContent');
+    const reportTitle = document.getElementById('reportTitle');
+    const reportSub = document.getElementById('reportSub');
+    const refreshBtn = document.getElementById('refreshBtn');
+
+    // ============================================================
+    // FETCH DATA FROM GOOGLE SHEETS
+    // ============================================================
+    async function fetchDataFromSheets() {
+      try {
+        isLoading = true;
+        showLoadingState('Fetching data from Google Sheets...');
+        const response = await fetch(CONFIG.SHEETS_API_URL);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        
+        // Parse different possible formats
+        let rawData = [];
+        if (Array.isArray(data)) rawData = data;
+        else if (data.data && Array.isArray(data.data)) rawData = data.data;
+        else if (data.table && data.table.rows) {
+          const rows = data.table.rows;
+          const cols = data.table.cols;
+          rawData = rows.map(row => {
+            const obj = {};
+            row.c.forEach((cell, idx) => {
+              const colName = cols[idx]?.label || `col${idx}`;
+              obj[colName] = cell?.v || '';
+            });
+            return obj;
+          });
+        } else throw new Error('Unexpected data format');
+
+        // Map to employee objects with all 70+ fields
+        allEmployees = rawData.map((row, idx) => {
+          const get = (key) => {
+            const keys = Object.keys(row);
+            const exact = keys.find(k => k === key);
+            if (exact) return row[exact];
+            const lower = keys.find(k => k.toLowerCase() === key.toLowerCase());
+            return lower ? row[lower] : '';
+          };
+          const toInt = (v) => parseInt(v) || 0;
+          const toStr = (v) => String(v || '').trim();
+
+          return {
+            // Core fields
+            sl: toInt(get('Sl. No')) || idx + 1,
+            roll: toStr(get('Roll Number')),
+            name: toStr(get('User full name')),
+            section: toStr(get('Section')),
+            email: toStr(get('student Email Address')),
+            op: toInt(get('Op')), opGrd: toStr(get('Op Grd')),
+            cst: toInt(get('Cst')), cstGrd: toStr(get('Cst Grd')),
+            ext: toInt(get('Ext')), extGrd: toStr(get('Ext Grd')),
+            // Additional fields
+            agr: toInt(get('Agr')), agrGrd: toStr(get('Agr Grd')),
+            stb: toInt(get('Stb')), stbGrd: toStr(get('Stb Grd')),
+            aown: toInt(get('Aown')), aownGrd: toStr(get('Aown Grd')),
+            cont: toInt(get('Cont')), contGrd: toStr(get('Cont Grd')),
+            adpt: toInt(get('Adpt')), adptGrd: toStr(get('Adpt Grd')),
+            post: toInt(get('Post')), postGrd: toStr(get('Post Grd')),
+            empth: toInt(get('Empth')), empthGrd: toStr(get('Empth Grd')),
+            conf: toInt(get('Conf')), confGrd: toStr(get('Conf Grd')),
+            aother: toInt(get('Aother')), aotherGrd: toStr(get('Aother Grd')),
+            eqTot: toInt(get('EqTot')), eqTotGrd: toStr(get('EqTot Grd')),
+            se: toInt(get('SE')), seGrd: toStr(get('SEGR1')),
+            loc: toInt(get('LOC')), locGrd: toStr(get('LOCGR1')),
+            // Full Range Leadership
+            iia: toInt(get('II-A')), iiaGrd: toStr(get('II-A Grd')),
+            iib: toInt(get('II-B')), iibGrd: toStr(get('II-B Grd')),
+            im: toInt(get('IM')), imGrd: toStr(get('IM Grd')),
+            is: toInt(get('IS')), isGrd: toStr(get('IS Grd')),
+            ic: toInt(get('IC')), icGrd: toStr(get('IC Grd')),
+            tflTot: toInt(get('TFL Tot')), tflGrd: toStr(get('TFL Grd')),
+            crew: toInt(get('CRew')), crewGrd: toStr(get('Crew Grd')),
+            mba: toInt(get('MBA')), mbaGrd: toStr(get('MBA Grd')),
+            mbp: toInt(get('MBP')), mbpGrd: toStr(get('MBP Grd')),
+            lf: toInt(get('LF')), lfGrd: toStr(get('LF Grd')),
+            effect: toInt(get('Effect')), effectGrd: toStr(get('Effect Grd')),
+            eefrt: toInt(get('EEfrt')), eefrtGrd: toStr(get('Eefrt Grd')),
+            satis: toInt(get('Satis')), satisGrd: toStr(get('Satis Grd')),
+            // FIRO
+            ei: toInt(get('EI')), eiGrd: toStr(get('EI Grd')),
+            wi: toInt(get('WI')), wiGrd: toStr(get('WI Grd')),
+            ec: toInt(get('EC')), ecGrd: toStr(get('EC Grd')),
+            wc: toInt(get('WC')), wcGrd: toStr(get('WC Grd')),
+            ea: toInt(get('EA')), eaGrd: toStr(get('EA Grd')),
+            wa: toInt(get('WA')), waGrd: toStr(get('WA Grd')),
+            incTot: toInt(get('Inc Tot')), incGrd: toStr(get('Inc Grd')),
+            contTot: toInt(get('Cont Tot')), contGrd: toStr(get('Cont Grd')),
+            affTot: toInt(get('Aff Tot')), affGrd: toStr(get('Aff Grd')),
+            expTot: toInt(get('Exp Tot')), expGrd: toStr(get('Exp Grd')),
+            wantTot: toInt(get('Want Tot')), wantGrd: toStr(get('Want Grd')),
+            firoTot: toInt(get('FIRO Tot')), firoGrd: toStr(get('FIRO Grd')),
+            // PPT
+            nPowInc: toInt(get('nPow Inc')), nPowPct: toStr(get('nPow%')), nPowInterp: toStr(get('nPow Interp')),
+            nAchInc: toInt(get('nAch Inc')), nAchPct: toStr(get('nAch%')), nAchInterp: toStr(get('nAch Interp')),
+            nAffInc: toInt(get('nAff Inc')), nAffPct: toStr(get('nAff%')), nAffInterp: toStr(get('nAff Interp')),
+            // Faculty
+            facultyName: toStr(get('Faculty Name')),
+            facultyEmail: toStr(get('Faculty Email'))
+          };
+        });
+
+        allEmployees = allEmployees.filter(emp => emp.name && emp.name !== '');
+        isLoading = false;
+        return true;
+      } catch (error) {
+        console.error('Fetch error:', error);
+        isLoading = false;
+        showErrorState('Failed to load data. Using sample data.');
+        loadSampleData();
+        return false;
+      }
+    }
+
+    // ============================================================
+    // SAMPLE DATA (FALLBACK)
+    // ============================================================
+    function loadSampleData() {
+      allEmployees = [
+        { sl:1, roll:'246213010', name:'Name1', section:'D', email:'Name1@email.kom', op:77, opGrd:'S', cst:82, cstGrd:'S', ext:60, extGrd:'R', agr:70, agrGrd:'S', stb:65, stbGrd:'R', aown:72, aownGrd:'S', cont:68, contGrd:'R', adpt:74, adptGrd:'S', post:66, postGrd:'R', empth:69, empthGrd:'S', conf:71, confGrd:'S', aother:63, aotherGrd:'R', eqTot:68, eqTotGrd:'S', se:75, seGrd:'S', loc:70, locGrd:'R', iia:22, iiaGrd:'S', iib:19, iibGrd:'R', im:17, imGrd:'S', is:24, isGrd:'S', ic:21, icGrd:'R', tflTot:103, tflGrd:'S', crew:12, crewGrd:'R', mba:9, mbaGrd:'R', mbp:8, mbpGrd:'R', lf:14, lfGrd:'S', effect:18, effectGrd:'S', eefrt:16, eefrtGrd:'R', satis:20, satisGrd:'S', ei:23, eiGrd:'S', wi:19, wiGrd:'R', ec:16, ecGrd:'S', wc:21, wcGrd:'R', ea:14, eaGrd:'S', wa:18, waGrd:'R', incTot:42, incGrd:'S', contTot:37, contGrd:'R', affTot:32, affGrd:'S', expTot:53, expGrd:'R', wantTot:58, wantGrd:'S', firoTot:111, firoGrd:'S', nPowInc:4, nPowPct:'36%', nPowInterp:'MOD', nAchInc:3, nAchPct:'27%', nAchInterp:'DOM', nAffInc:2, nAffPct:'18%', nAffInterp:'MIN', facultyName:'Dr. Smith', facultyEmail:'smith@email.kom' },
+        { sl:2, roll:'246213060', name:'Name2', section:'D', email:'Name2@email.kom', op:63, opGrd:'R', cst:56, cstGrd:'R', ext:53, extGrd:'R', agr:60, agrGrd:'R', stb:58, stbGrd:'R', aown:55, aownGrd:'R', cont:62, contGrd:'R', adpt:59, adptGrd:'R', post:57, postGrd:'R', empth:61, empthGrd:'R', conf:64, confGrd:'R', aother:52, aotherGrd:'R', eqTot:58, eqTotGrd:'R', se:60, seGrd:'R', loc:55, locGrd:'R', iia:18, iiaGrd:'R', iib:16, iibGrd:'R', im:14, imGrd:'R', is:19, isGrd:'R', ic:17, icGrd:'R', tflTot:84, tflGrd:'R', crew:10, crewGrd:'R', mba:7, mbaGrd:'R', mbp:6, mbpGrd:'R', lf:11, lfGrd:'R', effect:14, effectGrd:'R', eefrt:12, eefrtGrd:'R', satis:15, satisGrd:'R', ei:18, eiGrd:'R', wi:15, wiGrd:'R', ec:13, ecGrd:'R', wc:17, wcGrd:'R', ea:11, eaGrd:'R', wa:14, waGrd:'R', incTot:33, incGrd:'R', contTot:30, contGrd:'R', affTot:25, affGrd:'R', expTot:42, expGrd:'R', wantTot:46, wantGrd:'R', firoTot:88, firoGrd:'R', nPowInc:2, nPowPct:'18%', nPowInterp:'MIN', nAchInc:4, nAchPct:'36%', nAchInterp:'DOM', nAffInc:1, nAffPct:'9%', nAffInterp:'INS', facultyName:'Dr. Jones', facultyEmail:'jones@email.kom' }
+      ];
+    }
+
+    // ============================================================
+    // UI HELPERS
+    // ============================================================
+    function showLoadingState(msg) {
+      reportContent.innerHTML = `<div class="empty-state"><i class="fas fa-spinner fa-spin" style="font-size:2.4rem;display:block;margin-bottom:12px;"></i>${msg}</div>`;
+    }
+    function showErrorState(msg) {
+      reportContent.innerHTML = `<div class="empty-state" style="color:#b34a4a;"><i class="fas fa-exclamation-circle" style="font-size:2.4rem;display:block;margin-bottom:12px;"></i>${msg}</div>`;
+    }
+    function showEmptyReport(msg) {
+      reportTitle.innerText = 'Report'; reportSub.innerText = '';
+      reportContent.innerHTML = `<div class="empty-state"><i class="fas fa-user-slash" style="font-size:2.2rem;opacity:0.4;display:block;margin-bottom:12px;"></i>${msg}</div>`;
+    }
+
+    function getEmployeesForManager(managerId) {
+      const mgr = managers.find(m => m.id === managerId);
+      if (!mgr) return [];
+      return allEmployees.filter(p => mgr.sections.includes(p.section));
+    }
+
+    // ============================================================
+    // RENDER FUNCTIONS
+    // ============================================================
+    function renderManagers() {
+      managerListEl.innerHTML = '';
+      managers.forEach(mgr => {
+        const btn = document.createElement('button');
+        btn.className = `manager-btn ${mgr.id === currentManagerId ? 'active' : ''}`;
+        btn.innerHTML = `<i class="fas fa-user-tie"></i> ${mgr.label}`;
+        btn.dataset.mgr = mgr.id;
+        btn.addEventListener('click', () => {
+          currentManagerId = mgr.id;
+          const filtered = getEmployeesForManager(currentManagerId);
+          currentEmployeeIndex = 0;
+          renderManagers();
+          renderEmployeeList(filtered);
+          if (filtered.length > 0) renderReport(filtered[0]);
+          else showEmptyReport('No employees under this manager');
+        });
+        managerListEl.appendChild(btn);
+      });
+    }
+
+    function renderEmployeeList(employees) {
+      employeeItemsEl.innerHTML = '';
+      if (!employees || employees.length === 0) {
+        employeeItemsEl.innerHTML = '<div style="padding:20px;color:#4e738b;">No team members</div>';
+        return;
+      }
+      employees.forEach((emp, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `employee-item ${idx === currentEmployeeIndex ? 'active' : ''}`;
+        btn.innerHTML = `<i class="fas fa-user"></i> ${emp.name} (${emp.roll})`;
+        btn.addEventListener('click', () => {
+          currentEmployeeIndex = idx;
+          renderEmployeeList(employees);
+          renderReport(emp);
+        });
+        employeeItemsEl.appendChild(btn);
+      });
+      const active = employeeItemsEl.querySelector('.employee-item.active');
+      if (active) active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    // ============================================================
+    // RENDER FULL REPORT (with all new fields)
+    // ============================================================
+    function renderReport(emp) {
+      if (!emp) { showEmptyReport('No employee selected'); return; }
+      reportTitle.innerText = `${emp.name} · ${emp.roll}`;
+      reportSub.innerText = `Section ${emp.section} · ${emp.facultyName || 'Faculty'}`;
+
+      // Helper: format score + grade
+      const fmt = (score, grade) => (score || score === 0) ? `${score}-${grade || '—'}` : '—';
+
+      const html = `
+        <div class="title-cli">
+          <span>Consolidated Leadership Indicators (CLI) Template</span>
+          <span class="badge">${emp.section} · ${emp.roll}</span>
+        </div>
+        <div class="grid-4">
+          <span>G: ${emp.opGrd || '—'}</span>
+          <span>S: ${emp.cstGrd || '—'}</span>
+          <span>R: ${emp.extGrd || '—'}</span>
+          <span>I: ${emp.opGrd?.includes('I') ? 'I' : '—'}</span>
+        </div>
+
+        <!-- Self-Personality, Self-Efficacy & Locus of Control -->
+        <div class="section-title">Self-Personality, Self-Efficacy & Locus of Control</div>
+        <div class="data-row"><span class="label">O · C · E · A · S</span><span class="value">${fmt(emp.op, emp.opGrd)} · ${fmt(emp.cst, emp.cstGrd)} · ${fmt(emp.ext, emp.extGrd)} · ${fmt(emp.aown, emp.aownGrd)} · ${fmt(emp.stb, emp.stbGrd)}</span></div>
+        <div class="data-row"><span class="label">Agr · Adpt · Post · Empth · Conf</span><span class="value">${fmt(emp.agr, emp.agrGrd)} · ${fmt(emp.adpt, emp.adptGrd)} · ${fmt(emp.post, emp.postGrd)} · ${fmt(emp.empth, emp.empthGrd)} · ${fmt(emp.conf, emp.confGrd)}</span></div>
+        <div class="data-row"><span class="label">Aother · EqTot · SE · LOC</span><span class="value">${fmt(emp.aother, emp.aotherGrd)} · ${fmt(emp.eqTot, emp.eqTotGrd)} · ${fmt(emp.se, emp.seGrd)} · ${fmt(emp.loc, emp.locGrd)}</span></div>
+
+        <!-- Full Range Leadership -->
+        <div class="section-title">Full Range Leadership Scores</div>
+        <div class="data-row"><span class="label">II-A · II-B · IM · IS · IC</span><span class="value">${fmt(emp.iia, emp.iiaGrd)} · ${fmt(emp.iib, emp.iibGrd)} · ${fmt(emp.im, emp.imGrd)} · ${fmt(emp.is, emp.isGrd)} · ${fmt(emp.ic, emp.icGrd)}</span></div>
+        <div class="data-row"><span class="label">TFL Tot · CRew · MBA · MBP</span><span class="value">${fmt(emp.tflTot, emp.tflGrd)} · ${fmt(emp.crew, emp.crewGrd)} · ${fmt(emp.mba, emp.mbaGrd)} · ${fmt(emp.mbp, emp.mbpGrd)}</span></div>
+        <div class="data-row"><span class="label">LF · Effect · EEfrt · Satis</span><span class="value">${fmt(emp.lf, emp.lfGrd)} · ${fmt(emp.effect, emp.effectGrd)} · ${fmt(emp.eefrt, emp.eefrtGrd)} · ${fmt(emp.satis, emp.satisGrd)}</span></div>
+
+        <!-- Interpersonal / FIRO -->
+        <div class="section-title">Interpersonal (FIRO)</div>
+        <div class="mini-table">
+          <span class="head">EI</span><span>${fmt(emp.ei, emp.eiGrd)}</span>
+          <span class="head">WI</span><span>${fmt(emp.wi, emp.wiGrd)}</span>
+          <span class="head">EC</span><span>${fmt(emp.ec, emp.ecGrd)}</span>
+          <span class="head">WC</span><span>${fmt(emp.wc, emp.wcGrd)}</span>
+          <span class="head">EA</span><span>${fmt(emp.ea, emp.eaGrd)}</span>
+          <span class="head">WA</span><span>${fmt(emp.wa, emp.waGrd)}</span>
+        </div>
+        <div class="data-row"><span class="label">Inc Tot · Cont Tot · Aff Tot · Exp Tot · Want Tot · FIRO Tot</span><span class="value">${fmt(emp.incTot, emp.incGrd)} · ${fmt(emp.contTot, emp.contGrd)} · ${fmt(emp.affTot, emp.affGrd)} · ${fmt(emp.expTot, emp.expGrd)} · ${fmt(emp.wantTot, emp.wantGrd)} · ${fmt(emp.firoTot, emp.firoGrd)}</span></div>
+
+        <!-- PPT -->
+        <div class="section-title">SELF - Picture Perception Test (PPT)</div>
+        <div class="ppt-block">
+          <div class="row-ppt">
+            <span><strong>nPow</strong> Inc: ${emp.nPowInc || 0}  %: ${emp.nPowPct || '—'}  Interp: ${emp.nPowInterp || '—'}</span>
+            <span><strong>nAch</strong> Inc: ${emp.nAchInc || 0}  %: ${emp.nAchPct || '—'}  Interp: ${emp.nAchInterp || '—'}</span>
+            <span><strong>nAff</strong> Inc: ${emp.nAffInc || 0}  %: ${emp.nAffPct || '—'}  Interp: ${emp.nAffInterp || '—'}</span>
+          </div>
+          <div style="margin-top:8px;font-size:0.9rem;">DOM=Dominant; MOD=Moderate; MIN=Minor; INS=Insignificant; ABS=Absent</div>
+        </div>
+
+        <!-- Faculty -->
+        <div class="data-row" style="margin-top:12px;"><span class="label">Faculty</span><span class="value">${emp.facultyName || '—'} (${emp.facultyEmail || '—'})</span></div>
+
+        <div class="footer-note">CLI · data from Google Sheets · ${emp.name}</div>
+      `;
+      reportContent.innerHTML = html;
+    }
+
+    // ============================================================
+    // DOWNLOAD & PRINT
+    // ============================================================
+    function downloadReport() {
+      const content = document.getElementById('reportContent').innerHTML;
+      if (!content || content.includes('empty-state')) { alert('Please select an employee first.'); return; }
+      const title = document.getElementById('reportTitle').innerText || 'report';
+      const style = document.querySelector('style').innerHTML;
+      const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CLI Report</title><style>${style}</style></head>
+        <body style="background:white;padding:20px;"><div class="app" style="max-width:1000px;margin:auto;">${document.querySelector('.report-container').outerHTML}</div></body></html>`;
+      const blob = new Blob([html], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `CLI_${title.replace(/\s/g,'_')}.html`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    function printReport() { window.print(); }
+
+    // ============================================================
+    // REFRESH & INIT
+    // ============================================================
+    async function refreshData() {
+      const success = await fetchDataFromSheets();
+      if (success) {
+        const filtered = getEmployeesForManager(currentManagerId);
+        if (filtered.length > 0) {
+          currentEmployeeIndex = Math.min(currentEmployeeIndex, filtered.length - 1);
+          renderEmployeeList(filtered);
+          renderReport(filtered[currentEmployeeIndex]);
+        } else { showEmptyReport('No employees under this manager'); renderEmployeeList([]); }
+        renderManagers();
+      }
+    }
+
+    async function init() {
+      await fetchDataFromSheets();
+      renderManagers();
+      const filtered = getEmployeesForManager('mgrD');
+      if (filtered.length > 0) {
+        currentEmployeeIndex = 0;
+        renderEmployeeList(filtered);
+        renderReport(filtered[0]);
+      } else { showEmptyReport('No employees in section D'); renderEmployeeList([]); }
+      document.getElementById('downloadBtn').addEventListener('click', downloadReport);
+      document.getElementById('printBtn').addEventListener('click', printReport);
+      refreshBtn.addEventListener('click', refreshData);
+    }
+
+    init();
+  })();
+</script>
+</body>
+</html>
