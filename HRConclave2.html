@@ -89,9 +89,10 @@ body, html {
     object-fit: contain;
 }
 
-/* Team page logo - smaller */
+/* Team page logo - smaller on right */
 .header-banner.team-header .header-top-logo {
     width: 180px;
+    order: 2; /* Move to right */
 }
 
 .header-main-banner {
@@ -102,10 +103,11 @@ body, html {
     display: block;
 }
 
-/* Team page HRFSH - smaller */
+/* Team page HRFSH - smaller on left */
 .header-banner.team-header .header-main-banner {
     width: 25%;
     max-width: 300px;
+    order: 1; /* Move to left */
 }
 
 /* Home page HRFSH - original size */
@@ -248,7 +250,7 @@ body, html {
 
 .team-left-col img, .team-right-col img {
     width: 100%;
-    height: 80%;
+    height: 70%;
     object-fit: contain;
     border-radius: 10px;
 }
@@ -261,6 +263,15 @@ body, html {
     opacity: 0.8;
     letter-spacing: 1px;
     text-transform: uppercase;
+    padding: 5px 0;
+}
+
+.vote-text-top {
+    order: -1;
+}
+
+.vote-text-bottom {
+    order: 1;
 }
 
 .team-center-col {
@@ -283,10 +294,20 @@ body, html {
 }
 
 /* FINAL SCORES */
+.final-header-text {
+    color: #FFD700;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+    letter-spacing: 2px;
+}
+
 .leaderboard {
     width: 90%;
     max-width: 1200px;
-    margin: 20px auto;
+    margin: 0 auto 20px auto;
 }
 
 .first {
@@ -436,6 +457,7 @@ body, html {
     .header-main-banner { width: 95%; }
     .team-name-display { font-size: 2rem; }
     .team-score-final { font-size: 48px; }
+    .final-header-text { font-size: 1.8rem; }
     
     .header-banner.team-header {
         flex-direction: column;
@@ -445,11 +467,13 @@ body, html {
     
     .header-banner.team-header .header-top-logo {
         width: 120px;
+        order: 1;
     }
     
     .header-banner.team-header .header-main-banner {
         width: 60%;
         max-width: 200px;
+        order: 2;
     }
     
     .team-layout { 
@@ -476,16 +500,16 @@ body, html {
              alt="TAPMI Logo" 
              class="header-top-logo">
         
+        <!-- GLOBAL PAGE TITLE - Now between logos -->
+        <div class="page-title-section">
+            <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
+            <div id="roundTitle" class="round-title">Round 3</div>
+        </div>
+        
         <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
              alt="HR Conclave Banner" 
              class="header-main-banner">
     </header>
-
-    <!-- GLOBAL PAGE TITLE -->
-    <div class="page-title-section">
-        <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
-        <div id="roundTitle" class="round-title">Round 3</div>
-    </div>
 
     <!-- TEAM NAME & LIVE INDICATOR -->
     <div id="teamNameDisplay" class="team-name-display" style="display:none;">
@@ -510,15 +534,17 @@ body, html {
     <div id="team1" class="page-content">
         <div class="team-layout">
             <div class="team-left-col">
+                <div class="vote-text vote-text-top">Scan the code to vote</div>
                 <img id="leftImage1" src="" alt="Team Image">
-                <div class="vote-text">📱 Scan the code to vote</div>
+                <div class="vote-text vote-text-bottom">Scan the code to vote</div>
             </div>
             <div class="team-center-col">
                 <canvas id="chart1"></canvas>
             </div>
             <div class="team-right-col">
+                <div class="vote-text vote-text-top">Scan the code to vote</div>
                 <img id="rightImage1" src="" alt="Team Image">
-                <div class="vote-text">📱 Scan the code to vote</div>
+                <div class="vote-text vote-text-bottom">Scan the code to vote</div>
             </div>
         </div>
     </div>
@@ -527,15 +553,17 @@ body, html {
     <div id="team2" class="page-content">
         <div class="team-layout">
             <div class="team-left-col">
+                <div class="vote-text vote-text-top">Scan the code to vote</div>
                 <img id="leftImage2" src="" alt="Team Image">
-                <div class="vote-text">📱 Scan the code to vote</div>
+                <div class="vote-text vote-text-bottom">Scan the code to vote</div>
             </div>
             <div class="team-center-col">
                 <canvas id="chart2"></canvas>
             </div>
             <div class="team-right-col">
+                <div class="vote-text vote-text-top">Scan the code to vote</div>
                 <img id="rightImage2" src="" alt="Team Image">
-                <div class="vote-text">📱 Scan the code to vote</div>
+                <div class="vote-text vote-text-bottom">Scan the code to vote</div>
             </div>
         </div>
     </div>
@@ -544,21 +572,24 @@ body, html {
     <div id="team3" class="page-content">
         <div class="team-layout">
             <div class="team-left-col">
+                <div class="vote-text vote-text-top">Scan the code to vote</div>
                 <img id="leftImage3" src="" alt="Team Image">
-                <div class="vote-text">📱 Scan the code to vote</div>
+                <div class="vote-text vote-text-bottom">Scan the code to vote</div>
             </div>
             <div class="team-center-col">
                 <canvas id="chart3"></canvas>
             </div>
             <div class="team-right-col">
+                <div class="vote-text vote-text-top">Scan the code to vote</div>
                 <img id="rightImage3" src="" alt="Team Image">
-                <div class="vote-text">📱 Scan the code to vote</div>
+                <div class="vote-text vote-text-bottom">Scan the code to vote</div>
             </div>
         </div>
     </div>
 
     <!-- FINAL SCORES PAGE -->
     <div id="final-scores" class="page-content">
+        <div class="final-header-text">HR Innovation Challenge</div>
         <div class="leaderboard" id="leaderboard"></div>
     </div>
 
@@ -642,7 +673,7 @@ function showPage(pageId) {
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
         roundTitle.classList.add('hidden');
-        mainTitle.textContent = 'FINAL SCORES';
+        mainTitle.textContent = 'CASE PRESENTATION';
         // Call showFinal immediately and set up interval
         showFinal();
     } else {
