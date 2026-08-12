@@ -88,7 +88,7 @@ body, html {
     width: 100%;
 }
 
-/* Final scores header */
+/* Final scores header - HRFSH centered, TAPMI on right */
 .header-banner.final-header {
     flex-direction: row;
     justify-content: space-between;
@@ -109,10 +109,12 @@ body, html {
     width: 400px;
 }
 
-/* Team page logo - same size as HRFSH */
+/* Team page logo - same size as HRFSH with fixed height */
 .header-banner.team-header .header-top-logo {
     width: 22%;
     max-width: 280px;
+    height: 120px;
+    object-fit: contain;
     flex-shrink: 0;
 }
 
@@ -120,6 +122,8 @@ body, html {
 .header-banner.final-header .header-top-logo {
     width: 22%;
     max-width: 280px;
+    height: 120px;
+    object-fit: contain;
     flex-shrink: 0;
 }
 
@@ -137,17 +141,21 @@ body, html {
     max-width: 900px;
 }
 
-/* Team page HRFSH - on left */
+/* Team page HRFSH - on left with fixed height */
 .header-banner.team-header .header-main-banner {
     width: 22%;
     max-width: 280px;
+    height: 120px;
+    object-fit: contain;
     flex-shrink: 0;
 }
 
-/* Final scores HRFSH - centered above text */
+/* Final scores HRFSH - centered with fixed height */
 .header-banner.final-header .header-main-banner {
     width: 30%;
     max-width: 350px;
+    height: 120px;
+    object-fit: contain;
     flex-shrink: 0;
     order: 0;
 }
@@ -177,7 +185,7 @@ body, html {
     justify-content: center;
 }
 
-/* Final scores page title section - centered */
+/* Final scores page title section - centered with HRFSH image */
 .header-banner.final-header .page-title-section {
     flex: 1;
     min-width: 150px;
@@ -187,6 +195,16 @@ body, html {
     align-items: center;
     justify-content: center;
     order: 1;
+}
+
+/* Final scores - the image inside the title section */
+.header-banner.final-header .page-title-section .header-main-banner {
+    width: 80%;
+    max-width: 500px;
+    height: 120px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
 }
 
 .main-title {
@@ -202,11 +220,6 @@ body, html {
 
 /* Team page main title - smaller */
 .header-banner.team-header .main-title {
-    font-size: 2.2rem;
-}
-
-/* Final scores page main title */
-.header-banner.final-header .main-title {
     font-size: 2.2rem;
 }
 
@@ -564,11 +577,13 @@ body, html {
     .header-banner.team-header .header-top-logo {
         width: 40%;
         max-width: 150px;
+        height: 80px;
     }
     
     .header-banner.team-header .header-main-banner {
         width: 40%;
         max-width: 150px;
+        height: 80px;
     }
     
     .header-banner.team-header .page-title-section {
@@ -588,11 +603,17 @@ body, html {
     .header-banner.final-header .header-top-logo {
         width: 40%;
         max-width: 150px;
+        height: 80px;
     }
     
     .header-banner.final-header .header-main-banner {
         width: 50%;
         max-width: 200px;
+        height: 80px;
+    }
+    
+    .header-banner.final-header .page-title-section .header-main-banner {
+        height: 80px;
     }
     
     .team-layout { 
@@ -791,13 +812,16 @@ function showPage(pageId) {
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
     } else if (pageId === 'final-scores') {
-        // Final scores page - HRFSH centered, TAPMI on right
+        // Final scores page - HRFSH centered in the middle, TAPMI on right
         headerBanner.className = 'header-banner final-header';
         headerBanner.innerHTML = `
-            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
-                 alt="HR Conclave Banner" 
-                 class="header-main-banner">
+            <div style="width:22%; max-width:280px; flex-shrink:0;"></div>
             
+            <div class="page-title-section">
+                <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
+                     alt="HR Conclave Banner" 
+                     class="header-main-banner">
+            </div>
             
             <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
                  alt="TAPMI Logo" 
