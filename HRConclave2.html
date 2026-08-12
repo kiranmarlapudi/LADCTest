@@ -78,23 +78,23 @@ body, html {
     min-height: 40vh;
 }
 
-/* Team pages header - left and right layout */
+/* Team pages header - centered HRFSH only */
 .header-banner.team-header {
-    flex-direction: row;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    padding: 15px 30px;
-    gap: 15px;
+    justify-content: center;
+    padding: 15px 0;
+    gap: 10px;
     width: 100%;
 }
 
-/* Final scores header - HRFSH centered, TAPMI on right */
+/* Final scores header - centered HRFSH only */
 .header-banner.final-header {
-    flex-direction: row;
-    justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    padding: 15px 30px;
-    gap: 15px;
+    justify-content: center;
+    padding: 15px 0;
+    gap: 10px;
     width: 100%;
 }
 
@@ -109,20 +109,20 @@ body, html {
     width: 400px;
 }
 
-/* Team page logo - same size as HRFSH with fixed height */
-.header-banner.team-header .header-top-logo {
-    width: 22%;
-    max-width: 280px;
-    height: 120px;
+/* Team page HRFSH - centered */
+.header-banner.team-header .header-main-banner {
+    width: 35%;
+    max-width: 400px;
+    height: auto;
     object-fit: contain;
     flex-shrink: 0;
 }
 
-/* Final scores logo - same as team pages */
-.header-banner.final-header .header-top-logo {
-    width: 22%;
-    max-width: 280px;
-    height: 120px;
+/* Final scores HRFSH - centered */
+.header-banner.final-header .header-main-banner {
+    width: 35%;
+    max-width: 400px;
+    height: auto;
     object-fit: contain;
     flex-shrink: 0;
 }
@@ -141,70 +141,17 @@ body, html {
     max-width: 900px;
 }
 
-/* Team page HRFSH - on left with fixed height */
-.header-banner.team-header .header-main-banner {
-    width: 22%;
-    max-width: 280px;
-    height: 120px;
-    object-fit: contain;
-    flex-shrink: 0;
-}
-
-/* Final scores HRFSH - centered with fixed height */
-.header-banner.final-header .header-main-banner {
-    width: 30%;
-    max-width: 350px;
-    height: 120px;
-    object-fit: contain;
-    flex-shrink: 0;
-    order: 0;
-}
-
-/* Page Title Section */
+/* Page Title Section - for home page only */
 .page-title-section {
     position: relative;
     z-index: 2;
     text-align: center;
-    flex: 1;
     padding: 0 20px;
 }
 
 /* Home page title section */
 .header-banner.home-header .page-title-section {
     padding: 0;
-}
-
-/* Team page title section - centered */
-.header-banner.team-header .page-title-section {
-    flex: 1;
-    min-width: 150px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Final scores page title section - centered with HRFSH image */
-.header-banner.final-header .page-title-section {
-    flex: 1;
-    min-width: 150px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    order: 1;
-}
-
-/* Final scores - the image inside the title section */
-.header-banner.final-header .page-title-section .header-main-banner {
-    width: 80%;
-    max-width: 500px;
-    height: 120px;
-    object-fit: contain;
-    display: block;
-    margin: 0 auto;
 }
 
 .main-title {
@@ -216,11 +163,6 @@ body, html {
     line-height: 1.2;
     letter-spacing: 3px;
     text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
-}
-
-/* Team page main title - smaller */
-.header-banner.team-header .main-title {
-    font-size: 2.2rem;
 }
 
 .round-title {
@@ -569,51 +511,23 @@ body, html {
     }
     
     .header-banner.team-header {
-        flex-direction: column;
-        padding: 10px;
+        padding: 10px 0;
         gap: 10px;
-    }
-    
-    .header-banner.team-header .header-top-logo {
-        width: 40%;
-        max-width: 150px;
-        height: 80px;
     }
     
     .header-banner.team-header .header-main-banner {
-        width: 40%;
-        max-width: 150px;
-        height: 80px;
-    }
-    
-    .header-banner.team-header .page-title-section {
-        padding: 0;
-    }
-    
-    .header-banner.team-header .main-title {
-        font-size: 1.8rem;
+        width: 60%;
+        max-width: 250px;
     }
     
     .header-banner.final-header {
-        flex-direction: column;
-        padding: 10px;
+        padding: 10px 0;
         gap: 10px;
     }
     
-    .header-banner.final-header .header-top-logo {
-        width: 40%;
-        max-width: 150px;
-        height: 80px;
-    }
-    
     .header-banner.final-header .header-main-banner {
-        width: 50%;
-        max-width: 200px;
-        height: 80px;
-    }
-    
-    .header-banner.final-header .page-title-section .header-main-banner {
-        height: 80px;
+        width: 60%;
+        max-width: 250px;
     }
     
     .team-layout { 
@@ -812,41 +726,24 @@ function showPage(pageId) {
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
     } else if (pageId === 'final-scores') {
-        // Final scores page - HRFSH centered in the middle, TAPMI on right
+        // Final scores page - HRFSH centered only
         headerBanner.className = 'header-banner final-header';
         headerBanner.innerHTML = `
-            <div style="width:22%; max-width:280px; flex-shrink:0;"></div>
-            
-            <div class="page-title-section">
-                <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
-                     alt="HR Conclave Banner" 
-                     class="header-main-banner">
-            </div>
-            
-            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
-                 alt="TAPMI Logo" 
-                 class="header-top-logo">
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
+                 alt="HR Conclave Banner" 
+                 class="header-main-banner">
         `;
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
         // Call showFinal immediately
         showFinal();
     } else {
-        // Team pages - left and right header layout with equal sized images
+        // Team pages - HRFSH centered only
         headerBanner.className = 'header-banner team-header';
         headerBanner.innerHTML = `
             <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
                  alt="HR Conclave Banner" 
                  class="header-main-banner">
-            
-            <div class="page-title-section">
-                <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
-                <div id="roundTitle" class="round-title hidden">Round 3</div>
-            </div>
-            
-            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
-                 alt="TAPMI Logo" 
-                 class="header-top-logo">
         `;
         
         const teamNum = pageId.replace('team', '');
