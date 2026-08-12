@@ -1,1309 +1,267 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>HR Conclave 2026 Dashboard</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-
-body{
-
-height:100vh;
-overflow:hidden;
-
-font-family:'Segoe UI',sans-serif;
-
-background: 
-radial-gradient(circle at top left, rgba(107, 63, 160, 0.3), transparent 40%),
-radial-gradient(circle at bottom right, rgba(0, 180, 216, 0.25), transparent 40%),
-linear-gradient(135deg, #1a0a2e, #2d1b4e, #0a2a3a);
-
-color:white;
-
-}
-
-
-/* HEADER */
-
-.header{
-
-text-align:center;
-
-padding:15px;
-
-}
-
-
-.logo{
-
-width:130px;
-height:130px;
-
-object-fit:contain;
-
-margin:auto;
-
-}
-
-
-.title{
-
-font-size:58px;
-
-font-weight:800;
-
-letter-spacing:3px;
-
-margin-top:5px;
-
-background: linear-gradient(135deg, #a78bfa, #00b4d8);
--webkit-background-clip: text;
--webkit-text-fill-color: transparent;
-
-}
-
-
-.team{
-
-font-size:46px;
-
-font-weight:700;
-
-margin-top:10px;
-
-color: #e0d7f5;
-
-}
-
-
-.live{
-
-color:#00d4aa;
-
-margin-top:8px;
-
-font-size:14px;
-
-}
-
-
-.dot{
-
-height:10px;
-width:10px;
-
-background:#00d4aa;
-
-display:inline-block;
-
-border-radius:50%;
-
-margin-right:8px;
-
-animation: pulse 2s infinite;
-
-}
-
-@keyframes pulse {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
-
-/* SCORE */
-
-.total{
-
-text-align:center;
-
-margin:10px;
-
-}
-
-
-.total-label{
-
-opacity:.7;
-
-font-size:14px;
-
-color: #c4b5fd;
-
-}
-
-
-.total-score{
-
-font-size:42px;
-
-font-weight:700;
-
-color: #00d4aa;
-
-}
-
-
-
-/* MAIN */
-
-.main{
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-gap:25px;
-
-width:98%;
-
-margin:auto;
-
-}
-
-
-
-.side{
-
-width:230px;
-
-}
-
-
-
-.side img{
-
-width:100%;
-
-height:500px;
-
-object-fit:contain;
-
-}
-
-
-
-.chart-box{
-
-height:560px;
-
-flex:1;
-
-background:
-rgba(255,255,255,.05);
-
-border-radius:25px;
-
-padding:25px;
-
-border:
-1px solid rgba(167, 139, 250, 0.2);
-
-backdrop-filter: blur(10px);
-
-}
-
-
-
-canvas{
-
-height:100%!important;
-width:100%!important;
-
-}
-
-
-
-/* FINAL */
-
-.leaderboard{
-width:90%;
-max-width:1200px;
-margin:20px auto;
-}
-
-.first{
-background:
-linear-gradient(135deg, #a78bfa, #6B3FA0);
-
-color:white;
-
-padding:40px;
-
-margin-bottom:25px;
-
-border-radius:30px;
-position: relative;
-overflow: hidden;
-box-shadow: 0 0 40px rgba(167, 139, 250, 0.3);
-}
-
-.podium-row{
-display:flex;
-gap:25px;
-}
-
-.second{
-flex:1;
-
-background:
-linear-gradient(135deg, #7dd3fc, #0ea5e9);
-
-color:#111;
-
-border-radius:30px;
-}
-
-.third{
-flex:1;
-
-background:
-linear-gradient(135deg, #fcd34d, #f59e0b);
-
-color:#111;
-
-border-radius:30px;
-}
-
-.winner-card{
-padding:35px;
-text-align:center;
-}
-
-.position{
-font-size:34px;
-font-weight:800;
-}
-
-.team-name-final{
-font-size:52px;
-font-weight:800;
-margin-top:15px;
-}
-
-.team-score-final{
-font-size:88px;
-font-weight:900;
-margin-top:15px;
-}
-
-/* HOME PAGE */
-.home-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 70vh;
-    text-align: center;
-    padding: 20px;
-}
-
-.home-title {
-    font-size: 72px;
-    font-weight: 900;
-    background: linear-gradient(135deg, #a78bfa, #00b4d8, #7dd3fc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 20px;
-    letter-spacing: 5px;
-}
-
-.home-subtitle {
-    font-size: 42px;
-    font-weight: 700;
-    color: #c4b5fd;
-    margin-bottom: 15px;
-}
-
-.home-phase {
-    font-size: 32px;
-    font-weight: 600;
-    color: #00d4aa;
-    margin-bottom: 40px;
-    opacity: 0.9;
-}
-
-.home-teams {
-    display: flex;
-    gap: 40px;
-    margin-top: 20px;
-}
-
-.home-team-btn {
-    padding: 20px 50px;
-    font-size: 28px;
-    font-weight: 700;
-    background: rgba(167, 139, 250, 0.15);
-    border: 2px solid rgba(167, 139, 250, 0.3);
-    border-radius: 20px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.home-team-btn:hover {
-    background: rgba(167, 139, 250, 0.3);
-    transform: scale(1.05);
-    border-color: #a78bfa;
-    box-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
-}
-
-.home-team-btn.team1:hover {
-    border-color: #a78bfa;
-    box-shadow: 0 0 30px rgba(167, 139, 250, 0.4);
-}
-
-.home-team-btn.team2:hover {
-    border-color: #00b4d8;
-    box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
-}
-
-.home-team-btn.team3:hover {
-    border-color: #7dd3fc;
-    box-shadow: 0 0 30px rgba(125, 211, 252, 0.4);
-}
-
-.home-final-btn {
-    padding: 20px 50px;
-    font-size: 28px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #a78bfa, #6B3FA0);
-    border: none;
-    border-radius: 20px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-    margin-top: 20px;
-}
-
-.home-final-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 40px rgba(167, 139, 250, 0.5);
-}
-
-.home-buttons {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-}
-
-/* FOOTER - Always visible */
-.footer{
-
-position:fixed;
-
-bottom:12px;
-
-left:0;
-right:0;
-text-align:center;
-
-font-size:14px;
-
-z-index:9999;
-
-}
-
-.footer a{
-
-color:#c4b5fd;
-
-text-decoration:none;
-
-margin:0 10px;
-
-font-weight:600;
-
-transition:.2s;
-
-}
-
-.footer a:hover{
-
-color:#a78bfa;
-
-text-shadow:
-0 0 10px rgba(167, 139, 250, 0.5);
-
-}
-
-.footer .separator {
-    color: rgba(255,255,255,0.2);
-}
-
-/* Floating Sparkles - Only on Champion Card */
-.sparkle-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-    border-radius: 30px;
-}
-
-.sparkle-particle {
-    position: absolute;
-    width: 4px;
-    height: 4px;
-    background: #ffffff;
-    border-radius: 50%;
-    opacity: 0;
-    animation: floatSparkle 5s ease-in infinite;
-}
-
-@keyframes floatSparkle {
-    0% {
-        opacity: 0;
-        transform: translateY(100%) scale(0) rotate(0deg);
-    }
-    10% {
-        opacity: 0.8;
-    }
-    50% {
-        opacity: 1;
-        transform: translateY(-50%) scale(1) rotate(180deg);
-    }
-    90% {
-        opacity: 0.8;
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-100%) scale(0) rotate(360deg);
-    }
-}
-
-/* Pulse glow for champion */
-@keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 30px rgba(167, 139, 250, 0.3); }
-    50% { box-shadow: 0 0 60px rgba(167, 139, 250, 0.6), 0 0 100px rgba(167, 139, 250, 0.2); }
-}
-
-.first.glow-pulse {
-    animation: pulseGlow 3s ease-in-out infinite;
-}
-
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Conclave 2026</title>
+    <style>
+        /* CSS Reset and Base Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* 1. Background Setup (Image + #FEB6AB overlay) */
+        .app-container {
+            min-height: 100vh;
+            /* The background color #FEB6AB is blended with the image */
+            background-color: #FEB6AB; 
+            background-image: url('https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCBG.png');
+            background-size: cover;
+            background-position: center;
+            background-blend-mode: multiply; /* Blends the pink color with the image */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Dark overlay to achieve 50-70% opacity for text readability */
+        .app-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* 60% dark overlay */
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* 2. Banner Logo (Enlarged to 2x) */
+        .header-banner {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            position: relative;
+            z-index: 2;
+        }
+        .header-banner img {
+            /* Enlarged to 2x proportion */
+            width: 80%; 
+            max-width: 1200px; 
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* Navigation Styling (Bottom Links) */
+        .bottom-nav {
+            margin-top: auto; /* Pushes nav to bottom */
+            padding: 20px 0;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(5px);
+        }
+        .bottom-nav a {
+            color: #FFD700; /* Gold color to match aesthetic */
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin: 0 15px;
+            transition: color 0.3s;
+        }
+        .bottom-nav a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+        .bottom-nav .separator {
+            color: #888;
+        }
+
+        /* Page Content Handling */
+        .page-content {
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 900px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 0;
+        }
+
+        /* Homepage Specific Styling */
+        #home-page {
+            display: flex; /* Show by default */
+        }
+        
+        #home-page h1 {
+            font-size: 5rem; /* Extra large for "CASE PRESENTATION" */
+            margin: 0;
+            text-transform: uppercase;
+            background: linear-gradient(to right, #FEB47B, #FF7E5F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            letter-spacing: 2px;
+            line-height: 1.1;
+        }
+
+        #home-page h2 {
+            font-size: 3rem;
+            margin: 10px 0 0 0;
+            color: #cbcbf5;
+        }
+
+        #home-page h3 {
+            font-size: 2rem;
+            margin: 20px 0 0 0;
+            color: #FFD700;
+        }
+
+        /* Team Pages Styling (Hidden on Home) */
+        .team-page {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .team-page h1 {
+            font-size: 3.5rem;
+            margin: 0;
+            background: linear-gradient(to right, #FEB47B, #FF7E5F);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .team-page p {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            color: #fff;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            #home-page h1 { font-size: 3rem; }
+            #home-page h2 { font-size: 2rem; }
+            #home-page h3 { font-size: 1.5rem; }
+            .bottom-nav a { display: inline-block; margin: 5px 8px; font-size: 1rem; }
+            .header-banner img { width: 95%; }
+        }
+    </style>
 </head>
-
-
 <body>
 
-<div class="header">
-
-
-<img id="logo"
-class="logo">
-
-
-<div class="title">
-HR CONCLAVE 2026
-</div>
-
-
-<div id="teamName"
-class="team">
-TEAM 1
-</div>
-
-
-<div class="live">
-
-<span class="dot"></span>
-
-LIVE DASHBOARD
-
-</div>
-
-
-</div>
-
-
-
-<div id="totalArea"
-class="total">
-
-
-<div class="total-label">
-TOTAL SCORE
-</div>
-
-
-<div id="totalScore"
-class="total-score">
-0
-</div>
-
-
-</div>
-
-
-
-<!-- HOME PAGE -->
-<div id="homeView" class="main">
-    <div class="home-container">
-        <div class="home-title">HR CONCLAVE 2026</div>
-        <div class="home-subtitle">Phase 3</div>
-        <div class="home-phase">Case Presentation</div>
-        <div class="home-buttons">
-            <div class="home-teams">
-                <a href="?team=1" class="home-team-btn team1">Team 1</a>
-                <a href="?team=2" class="home-team-btn team2">Team 2</a>
-                <a href="?team=3" class="home-team-btn team3">Team 3</a>
-            </div>
-            <a href="?final=true" class="home-final-btn">🏆 Final Scores</a>
-        </div>
-    </div>
-</div>
-
-
-<!-- TEAM VIEW -->
-<div id="normalView"
-class="main" style="display:none">
-
-
-<div class="side">
-
-<img id="leftImage">
-
-</div>
-
-
-<div class="chart-box">
-
-<canvas id="chart"></canvas>
-
-</div>
-
-
-<div class="side">
-
-<img id="rightImage">
-
-</div>
-
-
-</div>
-
-
-<!-- FINAL VIEW -->
-<div id="finalView"
-style="display:none">
-
-
-<div class="leaderboard"
-id="leaderboard">
-
-</div>
-
-
-</div>
-
-
-
-
-<!-- FOOTER - Always visible -->
-<div class="footer">
-
-<a href="?">🏠 Home</a>
-
-<span class="separator">|</span>
-
-<a href="?team=1">Team 1</a>
-
-<span class="separator">|</span>
-
-<a href="?team=2">Team 2</a>
-
-<span class="separator">|</span>
-
-<a href="?team=3">Team 3</a>
-
-<span class="separator">|</span>
-
-<a href="?final=true">🏆 Final Scores</a>
-
-</div>
-
-
-
-
-
-<script>
-// Register the datalabels plugin
-Chart.register(ChartDataLabels);
-
-/* ======================
-   SETTINGS
-====================== */
-
-
-const SHEET_ID =
-"1zfoi-RiQ2_djE64bg3DMQXD7KBaz0j8ko54tPrQ9nf8";
-
-
-
-const EVENT_LOGO =
-"https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png";
-
-
-// Team-specific images
-const TEAM_IMAGES = {
-    "1": "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT1.png",
-    "2": "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT2.png",
-    "3": "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT1.png"
-};
-
-
-
-document.getElementById("logo").src =
-EVENT_LOGO;
-
-
-
-const params =
-new URLSearchParams(
-window.location.search
-);
-
-
-
-const isFinal =
-params.get("final")==="true";
-const currentTeam =
-params.get("team");
-const isHome = !currentTeam && !isFinal;
-
-// Show/hide appropriate views
-if (isHome) {
-    document.getElementById('homeView').style.display = 'flex';
-    document.getElementById('normalView').style.display = 'none';
-    document.getElementById('finalView').style.display = 'none';
-    document.getElementById('totalArea').style.display = 'none';
-    document.getElementById('teamName').innerHTML = '🏠';
-    document.querySelector('.live').style.display = 'none';
-} else if (isFinal) {
-    document.getElementById('homeView').style.display = 'none';
-    document.getElementById('normalView').style.display = 'none';
-    document.getElementById('finalView').style.display = 'block';
-    document.getElementById('totalArea').style.display = 'none';
-    document.querySelector('.live').style.display = 'block';
-} else {
-    document.getElementById('homeView').style.display = 'none';
-    document.getElementById('normalView').style.display = 'flex';
-    document.getElementById('finalView').style.display = 'none';
-    document.getElementById('totalArea').style.display = 'block';
-    document.querySelector('.live').style.display = 'block';
-    
-    // Set team-specific images
-    const teamImages = TEAM_IMAGES[currentTeam] || TEAM_IMAGES["1"];
-    document.getElementById("leftImage").src = teamImages;
-    document.getElementById("rightImage").src = teamImages;
-}
-
-// Highlight active link in footer
-window.addEventListener("load",()=>{
-
-document.querySelectorAll(".footer a")
-.forEach(link=>{
-
-const href = link.getAttribute("href");
-
-if(
-(currentTeam==="1" && href.includes("team=1")) ||
-(currentTeam==="2" && href.includes("team=2")) ||
-(currentTeam==="3" && href.includes("team=3")) ||
-(isFinal && href.includes("final=true")) ||
-(isHome && href === "?")
-){
-link.style.color="#a78bfa";
-link.style.fontWeight="800";
-}
-});
-
-});
-
-
-const selectedTeam =
-params.get("team") || "1";
-
-
-
-let chart;
-let sparkleInterval = null;
-
-
-
-/* ======================
- TEAM VIEW
-====================== */
-
-
-async function loadTeam(){
-
-
-const sheetName =
-"Team " + selectedTeam;
-
-
-
-const url =
-
-`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
-
-
-
-try{
-
-const response =
-await fetch(
-url+"&t="+Date.now()
-);
-
-
-
-const csv =
-await response.text();
-
-
-
-const rows =
-csv.trim()
-.split("\n")
-.map(r=>
-r.split(",")
-.map(c=>c.replace(/"/g,"").trim())
-);
-
-console.log(`Data for ${sheetName}:`, rows);
-
-const labels = [];
-const scores = [];
-
-let startRow = -1;
-for(let i = 0; i < rows.length; i++){
-    if(rows[i] && rows[i].length > 11){
-        const colL = rows[i][11] ? rows[i][11].toLowerCase() : '';
-        if(colL.includes('pillar') || colL.includes('category') || colL.includes('parameter') || colL.includes('criteria')){
-            startRow = i + 1;
-            break;
-        }
-    }
-}
-
-if(startRow === -1){
-    startRow = 10;
-}
-
-for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
-    if(rows[i] && rows[i].length > 12){
-        const label = rows[i][11] ? rows[i][11].trim() : '';
-        const score = Number(rows[i][12]);
+    <div class="app-container">
         
-        if(label && label !== '' && !isNaN(score) && score >= 0){
-            labels.push(label);
-            scores.push(score);
-        }
-    }
-}
+        <!-- Replaced HR CONCLAVE 2026 Text with HRFSH.png (Enlarged 2x via CSS) -->
+        <header class="header-banner">
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" alt="HR Conclave 2026 Logo">
+        </header>
 
-if(labels.length === 0){
-    console.log('No data found with header method, scanning all rows...');
-    for(let i = 0; i < rows.length; i++){
-        if(rows[i] && rows[i].length > 12){
-            const label = rows[i][11] ? rows[i][11].trim() : '';
-            const score = Number(rows[i][12]);
+        <!-- MAIN CONTENT -->
+        
+        <!-- HOME PAGE (Phase 3 Case Presentation) -->
+        <div id="home-page" class="page-content">
+            <!-- Removed 🏠 icon. Expanded CASE PRESENTATION text -->
+            <h1>CASE<br>PRESENTATION</h1>
             
-            if(label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50){
-                if(!label.toLowerCase().includes('total') && 
-                   !label.toLowerCase().includes('sum') &&
-                   !label.toLowerCase().includes('average')){
-                    labels.push(label);
-                    scores.push(score);
-                    if(labels.length >= 5) break;
-                }
+            <!-- Changed Phase 3 to Round 3 -->
+            <h2>Round 3</h2>
+            <h3>Case Presentation</h3>
+        </div>
+
+        <!-- TEAM PAGES (Hidden on Home) -->
+        <div id="team1" class="page-content team-page">
+            <h1>Team 1</h1>
+            <p>Presentation details go here...</p>
+        </div>
+
+        <div id="team2" class="page-content team-page">
+            <h1>Team 2</h1>
+            <p>Presentation details go here...</p>
+        </div>
+
+        <div id="team3" class="page-content team-page">
+            <h1>Team 3</h1>
+            <p>Presentation details go here...</p>
+        </div>
+
+        <div id="final-scores" class="page-content team-page">
+            <h1>Final Scores</h1>
+            <p>Leaderboard details go here...</p>
+        </div>
+
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="bottom-nav">
+            <!-- Removed 🏠 icon from Home link -->
+            <a href="#" onclick="showPage('home')">Home</a>
+            
+            <!-- These links are only hidden on the homepage via JS -->
+            <span class="separator" id="sep1">|</span>
+            <a href="#" onclick="showPage('team1')" id="link-team1">Team 1</a>
+            
+            <span class="separator" id="sep2">|</span>
+            <a href="#" onclick="showPage('team2')" id="link-team2">Team 2</a>
+            
+            <span class="separator" id="sep3">|</span>
+            <a href="#" onclick="showPage('team3')" id="link-team3">Team 3</a>
+            
+            <span class="separator" id="sep4">|</span>
+            <!-- Removed 🏆 icon from Final Scores link -->
+            <a href="#" onclick="showPage('final-scores')" id="link-scores">Final Scores</a>
+        </nav>
+
+    </div>
+
+    <!-- JAVASCRIPT TO CONTROL PAGE SWITCHING -->
+    <script>
+        function showPage(pageId) {
+            // Hide all pages
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('team1').style.display = 'none';
+            document.getElementById('team2').style.display = 'none';
+            document.getElementById('team3').style.display = 'none';
+            document.getElementById('final-scores').style.display = 'none';
+
+            // Show the selected page
+            if(pageId === 'home') {
+                document.getElementById('home-page').style.display = 'flex';
+            } else {
+                document.getElementById(pageId).style.display = 'flex';
+            }
+
+            // Handle Visibility of Navigation Tabs
+            const navLinks = ['link-team1', 'link-team2', 'link-team3', 'link-scores'];
+            const separators = ['sep1', 'sep2', 'sep3', 'sep4'];
+
+            if (pageId === 'home') {
+                // HIDE team links on the homepage
+                navLinks.forEach(id => document.getElementById(id).style.display = 'none');
+                separators.forEach(id => document.getElementById(id).style.display = 'none');
+            } else {
+                // SHOW team links on other pages
+                navLinks.forEach(id => document.getElementById(id).style.display = 'inline');
+                separators.forEach(id => document.getElementById(id).style.display = 'inline');
             }
         }
-    }
-}
 
-if(labels.length === 0){
-    console.log('No data found, using fallback');
-    const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
-    for(let i = 0; i < 5; i++){
-        labels.push(fallbackLabels[i]);
-        scores.push(0);
-    }
-}
-
-while(labels.length < 5){
-    labels.push(`Item ${labels.length + 1}`);
-    scores.push(0);
-}
-
-const finalLabels = labels.slice(0, 5);
-const finalScores = scores.slice(0, 5);
-
-const total = finalScores.reduce((a,b)=>a+b,0);
-
-document.getElementById("teamName")
-.innerHTML =
-"TEAM "+selectedTeam;
-
-document.getElementById("totalScore")
-.innerHTML =
-total;
-
-drawChart(finalLabels, finalScores);
-
-}
-catch(err){
-    console.error("Error loading team data:", err);
-    document.getElementById("teamName").innerHTML = "TEAM "+selectedTeam;
-    document.getElementById("totalScore").innerHTML = "0";
-    
-    const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
-    drawChart(fallbackLabels, [0,0,0,0,0]);
-}
-
-
-
-
-}
-
-
-
-
-function drawChart(labels,scores){
-
-
-if(chart)
-chart.destroy();
-
-
-
-chart =
-new Chart(
-document.getElementById("chart"),
-{
-
-type:"bar",
-
-data:{
-
-
-labels,
-
-
-datasets:[{
-
-data:scores,
-
-
-backgroundColor:[
-
-"#a78bfa",
-"#00b4d8",
-"#7dd3fc",
-"#00d4aa",
-"#c084fc"
-
-],
-
-
-borderRadius:18
-
-}]
-
-},
-
-
-
-options:{
-
-
-responsive:true,
-
-maintainAspectRatio:false,
-
-
-plugins:{
-
-
-legend:{
-display:false
-},
-
-datalabels: {
-    color: '#ffffff',
-    anchor: 'end',
-    align: 'end',
-    font: {
-        weight: 'bold',
-        size: 18
-    },
-    formatter: function(value) {
-        return value + '';
-    },
-    offset: 2
-},
-
-tooltip:{
-    callbacks: {
-        label: function(context) {
-            return context.parsed.y + ' points';
-        }
-    }
-}
-
-},
-
-
-scales:{
-
-
-x:{
-
-
-ticks:{
-color:"#e0d7f5",
-font:{
-size:15
-}
-},
-
-grid:{
-display:false
-}
-
-
-},
-
-
-y:{
-
-
-beginAtZero:true,
-
-max:Math.max(100, ...scores) + 15,
-
-
-ticks:{
-color:"#e0d7f5"
-}
-
-
-}
-
-
-}
-
-
-}
-
-
-});
-
-chart.update();
-
-}
-
-
-
-/* ======================
- FINAL PAGE - SUBTLE SPARKLES ON CHAMPION ONLY
-====================== */
-
-
-function addSparklesToChampion() {
-    const existingContainers = document.querySelectorAll('.sparkle-container');
-    existingContainers.forEach(container => container.remove());
-    
-    const championCard = document.querySelector('.first');
-    if (!championCard) return;
-    
-    championCard.classList.add('glow-pulse');
-    
-    const sparkleContainer = document.createElement('div');
-    sparkleContainer.className = 'sparkle-container';
-    championCard.appendChild(sparkleContainer);
-    
-    const colors = ['#ffffff', '#a78bfa', '#00b4d8', '#7dd3fc', '#c084fc'];
-    for (let i = 0; i < 15; i++) {
-        const sparkle = document.createElement('div');
-        sparkle.className = 'sparkle-particle';
-        sparkle.style.left = (10 + Math.random() * 80) + '%';
-        sparkle.style.top = (10 + Math.random() * 80) + '%';
-        sparkle.style.animationDelay = (Math.random() * 5) + 's';
-        sparkle.style.animationDuration = (4 + Math.random() * 3) + 's';
-        sparkle.style.width = (3 + Math.random() * 5) + 'px';
-        sparkle.style.height = sparkle.style.width;
-        sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
-        sparkle.style.boxShadow = `0 0 6px ${sparkle.style.background}`;
-        sparkleContainer.appendChild(sparkle);
-    }
-}
-
-function removeSparkles() {
-    const existingContainers = document.querySelectorAll('.sparkle-container');
-    existingContainers.forEach(container => container.remove());
-    
-    const championCard = document.querySelector('.first');
-    if (championCard) {
-        championCard.classList.remove('glow-pulse');
-    }
-}
-
-async function showFinal(){
-
-document.getElementById('homeView').style.display = 'none';
-document.getElementById("normalView")
-.style.display="none";
-
-document.getElementById("totalArea")
-.style.display="none";
-
-document.getElementById("finalView")
-.style.display="block";
-
-document.getElementById("teamName")
-.innerHTML =
-"🏆 FINAL LEADERBOARD";
-
-document.querySelector('.live').style.display = 'block';
-
-const sideElements = document.querySelectorAll(".side");
-sideElements.forEach(el => el.style.display = "none");
-
-const teams = [
-"Team 1",
-"Team 2",
-"Team 3"
-];
-
-const results = [];
-
-for(const teamName of teams){
-
-try{
-
-const url =
-`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(teamName)}`;
-
-const response =
-await fetch(url + "&t=" + Date.now());
-
-const csv =
-await response.text();
-
-const rows =
-csv.trim()
-.split("\n")
-.map(r =>
-r.split(",")
-.map(c =>
-c.replace(/"/g,"").trim()
-)
-);
-
-const scores = [];
-let startRow = -1;
-for(let i = 0; i < rows.length; i++){
-    if(rows[i] && rows[i].length > 11){
-        const colL = rows[i][11] ? rows[i][11].toLowerCase() : '';
-        if(colL.includes('pillar') || colL.includes('category') || colL.includes('parameter') || colL.includes('criteria')){
-            startRow = i + 1;
-            break;
-        }
-    }
-}
-
-if(startRow === -1){
-    startRow = 10;
-}
-
-for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
-    if(rows[i] && rows[i].length > 12){
-        const score = Number(rows[i][12]);
-        if(!isNaN(score) && score >= 0){
-            scores.push(score);
-        }
-    }
-}
-
-if(scores.length === 0){
-    for(let i = 0; i < rows.length; i++){
-        if(rows[i] && rows[i].length > 12){
-            const label = rows[i][11] ? rows[i][11].trim() : '';
-            const score = Number(rows[i][12]);
-            if(label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50){
-                if(!label.toLowerCase().includes('total') && 
-                   !label.toLowerCase().includes('sum') &&
-                   !label.toLowerCase().includes('average')){
-                    scores.push(score);
-                    if(scores.length >= 5) break;
-                }
-            }
-        }
-    }
-}
-
-while(scores.length < 5){
-    scores.push(0);
-}
-
-const total = scores.slice(0,5).reduce((a,b)=>a+b,0);
-
-results.push({
-team:teamName,
-score:total
-});
-
-}
-catch(err){
-
-console.error(
-teamName,
-err
-);
-results.push({
-team:teamName,
-score:0
-});
-
-}
-
-}
-
-results.sort(
-(a,b)=>b.score-a.score
-);
-
-while(results.length < 3){
-    results.push({
-        team: `Team ${results.length + 1}`,
-        score: 0
-    });
-}
-
-document.getElementById("leaderboard")
-.innerHTML =
-
-`
-
-<div class="winner-card first">
-
-<div class="position">
-🏆 CHAMPION
-</div>
-
-<div class="team-name-final">
-${results[0].team}
-</div>
-
-<div class="team-score-final">
-${results[0].score}
-</div>
-
-</div>
-
-<div class="podium-row">
-
-<div class="winner-card second">
-
-<div class="position">
-🥈 SECOND PLACE
-</div>
-
-<div class="team-name-final">
-${results[1].team}
-</div>
-
-<div class="team-score-final">
-${results[1].score}
-</div>
-
-</div>
-
-<div class="winner-card third">
-
-<div class="position">
-🥉 THIRD PLACE
-</div>
-
-<div class="team-name-final">
-${results[2].team}
-</div>
-
-<div class="team-score-final">
-${results[2].score}
-</div>
-
-</div>
-
-</div>
-
-`;
-
-setTimeout(() => {
-    addSparklesToChampion();
-}, 100);
-
-}
-
-
-
-
-// Main execution
-if (isHome) {
-    removeSparkles();
-} else if(isFinal){
-
-showFinal();
-
-setInterval(
-showFinal,
-5000
-);
-
-} else {
-
-loadTeam();
-
-setInterval(
-loadTeam,
-2000
-);
-
-}
-
-
-
-</script>
-
+        // Initialize the page to Home on load
+        showPage('home');
+    </script>
 </body>
-
 </html>
