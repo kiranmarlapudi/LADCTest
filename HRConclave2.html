@@ -68,10 +68,14 @@ body, html {
     gap: 15px;
 }
 
-/* Home page header - centered */
+/* Home page header - centered with more spacing */
 .header-banner.home-header {
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    padding: 30px 0 20px 0;
+    gap: 30px;
+    min-height: 40vh;
 }
 
 /* Team pages header - left and right layout */
@@ -81,12 +85,18 @@ body, html {
     align-items: center;
     padding: 15px 40px;
     gap: 20px;
+    width: 100%;
 }
 
 .header-top-logo {
     width: 320px; 
     height: auto;
     object-fit: contain;
+}
+
+/* Home page logo - larger */
+.header-banner.home-header .header-top-logo {
+    width: 400px;
 }
 
 /* Team page logo - smaller on right */
@@ -103,6 +113,12 @@ body, html {
     display: block;
 }
 
+/* Home page HRFSH - larger */
+.header-banner.home-header .header-main-banner {
+    width: 70%;
+    max-width: 900px;
+}
+
 /* Team page HRFSH - smaller on left */
 .header-banner.team-header .header-main-banner {
     width: 22%;
@@ -110,13 +126,7 @@ body, html {
     flex-shrink: 0;
 }
 
-/* Home page HRFSH - original size */
-.header-banner.home-header .header-main-banner {
-    width: 75%;
-    max-width: 950px;
-}
-
-/* Page Title Section - positioned between logos on team pages */
+/* Page Title Section */
 .page-title-section {
     position: relative;
     z-index: 2;
@@ -125,9 +135,20 @@ body, html {
     padding: 0 20px;
 }
 
+/* Home page title section */
+.header-banner.home-header .page-title-section {
+    padding: 0;
+}
+
+/* Team page title section - centered */
 .header-banner.team-header .page-title-section {
     flex: 1;
     min-width: 200px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .main-title {
@@ -139,6 +160,11 @@ body, html {
     line-height: 1.2;
     letter-spacing: 3px;
     text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+}
+
+/* Team page main title - smaller */
+.header-banner.team-header .main-title {
+    font-size: 2.2rem;
 }
 
 .round-title {
@@ -476,6 +502,16 @@ body, html {
     .final-header-text { font-size: 2rem; }
     .final-subtitle { font-size: 1.5rem; }
     
+    .header-banner.home-header {
+        padding: 15px 0;
+        gap: 15px;
+        min-height: auto;
+    }
+    
+    .header-banner.home-header .header-top-logo {
+        width: 200px;
+    }
+    
     .header-banner.team-header {
         flex-direction: column;
         padding: 10px;
@@ -493,6 +529,10 @@ body, html {
     
     .header-banner.team-header .page-title-section {
         padding: 0;
+    }
+    
+    .header-banner.team-header .main-title {
+        font-size: 1.8rem;
     }
     
     .team-layout { 
@@ -515,21 +555,7 @@ body, html {
     
     <!-- HEADER AREA -->
     <header id="headerBanner" class="header-banner home-header">
-        <!-- For home page, everything is centered -->
-        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; gap: 15px;">
-            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
-                 alt="TAPMI Logo" 
-                 class="header-top-logo">
-            
-            <div class="page-title-section">
-                <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
-                <div id="roundTitle" class="round-title">Round 3</div>
-            </div>
-            
-            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
-                 alt="HR Conclave Banner" 
-                 class="header-main-banner">
-        </div>
+        <!-- This will be dynamically populated -->
     </header>
 
     <!-- TEAM NAME & LIVE INDICATOR -->
@@ -611,7 +637,7 @@ body, html {
     <!-- FINAL SCORES PAGE -->
     <div id="final-scores" class="page-content">
         <div class="final-header">
-            <div class="final-header-text">🏆 HR Innovation Challenge</div>
+            <div class="final-header-text">HR Innovation Challenge</div>
             <div class="final-subtitle">Final Scores</div>
         </div>
         <div class="leaderboard" id="leaderboard"></div>
@@ -680,28 +706,24 @@ function showPage(pageId) {
 
     // Get elements
     const headerBanner = document.getElementById('headerBanner');
-    const mainTitle = document.getElementById('mainTitle');
-    const roundTitle = document.getElementById('roundTitle');
 
     // Handle page-specific logic
     if (pageId === 'home') {
-        // Home page - centered header with full size
+        // Home page - centered header with larger elements and more spacing
         headerBanner.className = 'header-banner home-header';
         headerBanner.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; width: 100%; gap: 15px;">
-                <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
-                     alt="TAPMI Logo" 
-                     class="header-top-logo">
-                
-                <div class="page-title-section">
-                    <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
-                    <div id="roundTitle" class="round-title">Round 3</div>
-                </div>
-                
-                <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
-                     alt="HR Conclave Banner" 
-                     class="header-main-banner">
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
+                 alt="TAPMI Logo" 
+                 class="header-top-logo">
+            
+            <div class="page-title-section">
+                <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
+                <div id="roundTitle" class="round-title">Round 3</div>
             </div>
+            
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
+                 alt="HR Conclave Banner" 
+                 class="header-main-banner">
         `;
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
@@ -714,7 +736,7 @@ function showPage(pageId) {
                  class="header-main-banner">
             
             <div class="page-title-section">
-                <div id="mainTitle" class="main-title" style="font-size: 2.5rem;">🏆 HR Innovation Challenge</div>
+                <div id="mainTitle" class="main-title" style="font-size: 2.2rem;">HR Innovation Challenge</div>
                 <div id="roundTitle" class="round-title hidden">Round 3</div>
             </div>
             
@@ -735,7 +757,7 @@ function showPage(pageId) {
                  class="header-main-banner">
             
             <div class="page-title-section">
-                <div id="mainTitle" class="main-title" style="font-size: 2.2rem;">CASE PRESENTATION</div>
+                <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
                 <div id="roundTitle" class="round-title hidden">Round 3</div>
             </div>
             
