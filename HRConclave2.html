@@ -1246,28 +1246,83 @@ async function showFinal() {
 
 function displayLeaderboard(results) {
     document.getElementById("leaderboard").innerHTML = `
-        <div class="winner-card first">
-            <div class="position">🏆 CHAMPION</div>
-            <div class="team-name-final">${results[0].team}</div>
-            <div class="team-score-final">${results[0].score}</div>
-        </div>
-        <div class="podium-row">
-            <div class="winner-card second">
-                <div class="position">🥈 SECOND PLACE</div>
-                <div class="team-name-final">${results[1].team}</div>
-                <div class="team-score-final">${results[1].score}</div>
+        <div class="classic-podium">
+
+            <!-- FINAL RESULTS HEADING -->
+            <div class="podium-heading">
+                <div class="podium-heading-line"></div>
+                <div class="podium-heading-text">FINAL RESULTS</div>
+                <div class="podium-heading-line"></div>
             </div>
-            <div class="winner-card third">
-                <div class="position">🥉 THIRD PLACE</div>
-                <div class="team-name-final">${results[2].team}</div>
-                <div class="team-score-final">${results[2].score}</div>
+
+            <!-- WINNERS -->
+            <div class="podium-stage">
+
+                <!-- SECOND PLACE -->
+                <div class="podium-contestant podium-second">
+                    <div class="podium-medal">🥈</div>
+
+                    <div class="podium-team-name">
+                        ${results[1].team}
+                    </div>
+
+                    <div class="podium-score">
+                        ${results[1].score}
+                        <span>PTS</span>
+                    </div>
+
+                    <div class="podium-block podium-block-second">
+                        <div class="podium-place-number">2</div>
+                        <div class="podium-place-label">SECOND</div>
+                    </div>
+                </div>
+
+
+                <!-- FIRST PLACE -->
+                <div class="podium-contestant podium-first">
+                    <div class="champion-label">CHAMPION</div>
+
+                    <div class="podium-trophy">🏆</div>
+
+                    <div class="podium-team-name champion-name">
+                        ${results[0].team}
+                    </div>
+
+                    <div class="podium-score champion-score">
+                        ${results[0].score}
+                        <span>PTS</span>
+                    </div>
+
+                    <div class="podium-block podium-block-first">
+                        <div class="podium-place-number">1</div>
+                        <div class="podium-place-label">WINNER</div>
+                    </div>
+                </div>
+
+
+                <!-- THIRD PLACE -->
+                <div class="podium-contestant podium-third">
+                    <div class="podium-medal">🥉</div>
+
+                    <div class="podium-team-name">
+                        ${results[2].team}
+                    </div>
+
+                    <div class="podium-score">
+                        ${results[2].score}
+                        <span>PTS</span>
+                    </div>
+
+                    <div class="podium-block podium-block-third">
+                        <div class="podium-place-number">3</div>
+                        <div class="podium-place-label">THIRD</div>
+                    </div>
+                </div>
+
             </div>
         </div>
     `;
-
-    setTimeout(() => addSparklesToChampion(), 100);
 }
-
     
 function showFallbackLeaderboard() {
     const fallbackResults = [
