@@ -1006,7 +1006,7 @@ function drawChart(teamNum, labels, scores) {
 }
 
 /* ======================
-   FINAL SCORES - FIXED
+   FINAL SCORES - UPDATED TO USE "Scoring" SHEET
 ====================== */
 
 function addSparklesToChampion() {
@@ -1039,106 +1039,109 @@ function addSparklesToChampion() {
 }
 
 async function showFinal() {
-    const teams = [
-        { id: "1", name: "Presenter_1", display: "Team 1" },
-        { id: "2", name: "Presenter_2", display: "Team 2" },
-        { id: "3", name: "Presenter_3", display: "Team 3" }
-    ];
-    const results = [];
-
-    for (const team of teams) {
-        try {
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0&sheet=${encodeURIComponent(team.name)}`;
-            console.log(`Fetching final scores for ${team.name}...`);
-            
-            const response = await fetch(url + "&t=" + Date.now());
-            if (!response.ok) {
-                console.error(`HTTP error! status: ${response.status}`);
-                results.push({ team: team.display, score: 0 });
-                continue;
-            }
-            
-            const csv = await response.text();
-            const lines = csv.trim().split("\n");
-            const rows = lines.map(line => {
-                const fields = [];
-                let current = '';
-                let inQuotes = false;
-                for (let i = 0; i < line.length; i++) {
-                    const char = line[i];
-                    if (char === '"') {
-                        inQuotes = !inQuotes;
-                    } else if (char === ',' && !inQuotes) {
-                        fields.push(current.trim());
-                        current = '';
-                    } else {
-                        current += char;
-                    }
+    try {
+        // Fetch data from the "Scoring" sheet
+        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0&sheet=Scoring`;
+        console.log('Fetching final scores from Scoring sheet...');
+        
+        const response = await fetch(url + "&t=" + Date.now());
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}`);
+            // Show fallback if sheet not found
+            showFallbackLeaderboard();
+            return;
+        }
+        
+        const csv = await response.text();
+        console.log('Scoring sheet data:', csv.substring(0, 300) + '...');
+        
+        // Parse CSV
+        const lines = csv.trim().split("\n");
+        const rows = lines.map(line => {
+            const fields = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    fields.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
                 }
-                fields.push(current.trim());
-                return fields.map(f => f.replace(/^"|"$/g, '').trim());
-            });
+            }
+            fields.push(current.trim());
+            return fields.map(f => f.replace(/^"|"$/g, '').trim());
+        });
 
-            const scores = [];
+        if (rows.length === 0) {
+            console.error('No data found in Scoring sheet');
+            showFallbackLeaderboard();
+            return;
+        }
+
+        console.log('Rows in Scoring sheet:', rows.slice(0, 10));
+
+        // Extract data from L13:M15 (rows 12-14 in 0-indexed, columns L=11, M=12)
+        const results = [];
+        const startRow = 12; // Row 13 in Excel (0-indexed)
+        const endRow = 14;   // Row 15 in Excel (0-indexed)
+        
+        for (let i = startRow; i <= endRow && i < rows.length; i++) {
+            if (rows[i] && rows[i].length > 12) {
+                const teamName = rows[i][11] ? rows[i][11].trim() : '';
+                const score = parseFloat(rows[i][12]);
+                
+                console.log(`Row ${i+1}: Team="${teamName}", Score=${score}`);
+                
+                if (teamName && teamName !== '' && !isNaN(score) && score >= 0) {
+                    results.push({ team: teamName, score: score });
+                }
+            }
+        }
+
+        // If no data found, try scanning for any data
+        if (results.length === 0) {
+            console.log('No data found in L13:M15, scanning all rows...');
             for (let i = 0; i < Math.min(rows.length, 30); i++) {
                 if (rows[i] && rows[i].length > 12) {
-                    const label = rows[i][11] ? rows[i][11].trim() : '';
+                    const teamName = rows[i][11] ? rows[i][11].trim() : '';
                     const score = parseFloat(rows[i][12]);
-                    if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
-                        if (!label.toLowerCase().includes('total') && 
-                            !label.toLowerCase().includes('sum') &&
-                            !label.toLowerCase().includes('average')) {
-                            scores.push(score);
-                            if (scores.length >= 5) break;
+                    if (teamName && teamName !== '' && !isNaN(score) && score >= 0 && teamName.length < 50) {
+                        if (!teamName.toLowerCase().includes('total') && 
+                            !teamName.toLowerCase().includes('sum') &&
+                            !teamName.toLowerCase().includes('average')) {
+                            results.push({ team: teamName, score: score });
+                            if (results.length >= 3) break;
                         }
                     }
                 }
             }
-
-            // If no scores found, try other columns
-            if (scores.length === 0) {
-                for (let i = 0; i < Math.min(rows.length, 30); i++) {
-                    if (rows[i] && rows[i].length > 12) {
-                        const label = rows[i][11] ? rows[i][11].trim() : '';
-                        let score = parseFloat(rows[i][12]);
-                        if (isNaN(score) && rows[i][13]) score = parseFloat(rows[i][13]);
-                        if (isNaN(score) && rows[i][14]) score = parseFloat(rows[i][14]);
-                        
-                        if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
-                            if (!label.toLowerCase().includes('total') && 
-                                !label.toLowerCase().includes('sum') &&
-                                !label.toLowerCase().includes('average')) {
-                                scores.push(score);
-                                if (scores.length >= 5) break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Use sample data if still no scores
-            if (scores.length === 0) {
-                const sampleScores = [85, 72, 90, 78, 88];
-                for (let i = 0; i < 5; i++) {
-                    scores.push(sampleScores[i] + Math.floor(Math.random() * 10));
-                }
-            }
-
-            while (scores.length < 5) scores.push(0);
-            const total = scores.slice(0, 5).reduce((a, b) => a + b, 0);
-            results.push({ team: team.display, score: total });
-
-        } catch (err) {
-            console.error(team.name, err);
-            results.push({ team: team.display, score: 0 });
         }
-    }
 
-    results.sort((a, b) => b.score - a.score);
-    while (results.length < 3) {
-        results.push({ team: `Team ${results.length + 1}`, score: 0 });
-    }
+        // Sort and display
+        if (results.length === 0) {
+            console.log('No data found, using fallback');
+            showFallbackLeaderboard();
+            return;
+        }
 
+        results.sort((a, b) => b.score - a.score);
+        while (results.length < 3) {
+            results.push({ team: `Team ${results.length + 1}`, score: 0 });
+        }
+
+        displayLeaderboard(results);
+
+    } catch (err) {
+        console.error('Error fetching final scores:', err);
+        showFallbackLeaderboard();
+    }
+}
+
+function displayLeaderboard(results) {
     document.getElementById("leaderboard").innerHTML = `
         <div class="winner-card first">
             <div class="position">🏆 CHAMPION</div>
@@ -1160,6 +1163,16 @@ async function showFinal() {
     `;
 
     setTimeout(() => addSparklesToChampion(), 100);
+}
+
+function showFallbackLeaderboard() {
+    // Show fallback data if scoring sheet is not accessible
+    const fallbackResults = [
+        { team: "Team 1", score: 0 },
+        { team: "Team 2", score: 0 },
+        { team: "Team 3", score: 0 }
+    ];
+    displayLeaderboard(fallbackResults);
 }
 
 /* ======================
