@@ -15,22 +15,21 @@
             overflow-x: hidden;
         }
 
-        /* 1. Background Setup (Image + #FEB6AB overlay) */
+        /* 1. Background Setup (Image + #FEB6AB blend + 60% dark overlay) */
         .app-container {
             min-height: 100vh;
-            /* The background color #FEB6AB is blended with the image */
             background-color: #FEB6AB; 
             background-image: url('https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCBG.png');
             background-size: cover;
             background-position: center;
-            background-blend-mode: multiply; /* Blends the pink color with the image */
+            background-blend-mode: multiply; /* Blends the pink color into the image */
             display: flex;
             flex-direction: column;
             align-items: center;
             position: relative;
         }
 
-        /* Dark overlay to achieve 50-70% opacity for text readability */
+        /* Dark overlay to ensure text readability */
         .app-container::before {
             content: "";
             position: absolute;
@@ -38,57 +37,67 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6); /* 60% dark overlay */
+            background: rgba(0, 0, 0, 0.6); /* 60% dark opacity */
             z-index: 1;
             pointer-events: none;
         }
 
-        /* 2. Banner Logo (Enlarged to 2x) */
+        /* 2. Header Logos */
         .header-banner {
             width: 100%;
             display: flex;
-            justify-content: center;
-            padding: 20px 0;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0 0 0;
             position: relative;
             z-index: 2;
+            gap: 10px;
         }
-        .header-banner img {
-            /* Enlarged to 2x proportion */
-            width: 80%; 
-            max-width: 1200px; 
+        
+        /* Small Logo (TAPMI) - Enlarged to 2x as requested */
+        .header-top-logo {
+            width: 300px; /* Adjusted to 2x proportional size */
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* Large Main Banner (HRFSH) - Kept at 1x standard size */
+        .header-main-banner {
+            width: 70%;
+            max-width: 900px;
             height: auto;
             object-fit: contain;
             display: block;
         }
 
-        /* Navigation Styling (Bottom Links) */
+        /* 3. Navigation Styling (Always Visible at Bottom) */
         .bottom-nav {
-            margin-top: auto; /* Pushes nav to bottom */
-            padding: 20px 0;
+            margin-top: auto;
+            padding: 20px 0 30px 0;
             position: relative;
             z-index: 2;
             width: 100%;
             text-align: center;
             background: rgba(0,0,0,0.3);
             backdrop-filter: blur(5px);
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
         .bottom-nav a {
-            color: #FFD700; /* Gold color to match aesthetic */
+            color: #e0e0e0;
             text-decoration: none;
             font-weight: bold;
-            font-size: 1.2rem;
-            margin: 0 15px;
+            font-size: 1.1rem;
+            margin: 0 12px;
             transition: color 0.3s;
         }
         .bottom-nav a:hover {
-            color: #ffffff;
-            text-decoration: underline;
+            color: #FFD700; /* Yellow on hover */
         }
         .bottom-nav .separator {
-            color: #888;
+            color: #666;
         }
 
-        /* Page Content Handling */
+        /* 4. Page Content */
         .page-content {
             position: relative;
             z-index: 2;
@@ -100,46 +109,51 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 40px 0;
+            padding: 20px 0;
         }
 
-        /* Homepage Specific Styling */
+        /* 5. Homepage Specific Styling (Fixed Duplicate text & Yellow color) */
         #home-page {
-            display: flex; /* Show by default */
+            display: flex;
         }
         
-        #home-page h1 {
-            font-size: 5rem; /* Extra large for "CASE PRESENTATION" */
-            margin: 0;
+        #home-page .main-title {
+            font-size: 5rem;
+            margin: 0 0 10px 0;
             text-transform: uppercase;
-            background: linear-gradient(to right, #FEB47B, #FF7E5F);
+            /* YELLOW COLOR applied here as requested */
+            background: linear-gradient(to right, #fceabb, #f8b500); 
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            letter-spacing: 2px;
+            font-weight: 800;
             line-height: 1.1;
+            letter-spacing: 3px;
+            text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
         }
 
-        #home-page h2 {
-            font-size: 3rem;
-            margin: 10px 0 0 0;
-            color: #cbcbf5;
+        #home-page .round-title {
+            font-size: 3.5rem;
+            margin: 0;
+            color: #c4b5fd; /* Lighter purple for contrast */
+            font-weight: 600;
         }
 
-        #home-page h3 {
+        #home-page .sub-title {
             font-size: 2rem;
-            margin: 20px 0 0 0;
-            color: #FFD700;
+            margin: 15px 0 0 0;
+            font-weight: 400;
+            color: #FFD700; /* Yellow subtitle */
         }
 
-        /* Team Pages Styling (Hidden on Home) */
-        .team-page {
-            display: none; /* Hidden by default */
+        /* Hidden Pages Styling */
+        .other-page {
+            display: none;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
         }
         
-        .team-page h1 {
+        .other-page h1 {
             font-size: 3.5rem;
             margin: 0;
             background: linear-gradient(to right, #FEB47B, #FF7E5F);
@@ -147,19 +161,20 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .team-page p {
+        .other-page p {
             font-size: 1.5rem;
             margin-top: 20px;
             color: #fff;
         }
 
-        /* Responsive adjustments */
+        /* Responsive adjustments for mobile */
         @media (max-width: 768px) {
-            #home-page h1 { font-size: 3rem; }
-            #home-page h2 { font-size: 2rem; }
-            #home-page h3 { font-size: 1.5rem; }
+            #home-page .main-title { font-size: 2.8rem; }
+            #home-page .round-title { font-size: 2.2rem; }
+            #home-page .sub-title { font-size: 1.5rem; }
             .bottom-nav a { display: inline-block; margin: 5px 8px; font-size: 1rem; }
-            .header-banner img { width: 95%; }
+            .header-top-logo { width: 150px; }
+            .header-main-banner { width: 95%; }
         }
     </style>
 </head>
@@ -167,71 +182,76 @@
 
     <div class="app-container">
         
-        <!-- Replaced HR CONCLAVE 2026 Text with HRFSH.png (Enlarged 2x via CSS) -->
+        <!-- HEADER AREA -->
         <header class="header-banner">
-            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" alt="HR Conclave 2026 Logo">
+            <!-- TAPMI Logo (2x Size) -->
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
+                 alt="TAPMI Logo" 
+                 class="header-top-logo">
+            
+            <!-- HRFSH Banner (Normal 1x Size) -->
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
+                 alt="HR Conclave Banner" 
+                 class="header-main-banner">
         </header>
 
-        <!-- MAIN CONTENT -->
+        <!-- MAIN PAGES -->
         
-        <!-- HOME PAGE (Phase 3 Case Presentation) -->
+        <!-- HOME PAGE -->
         <div id="home-page" class="page-content">
-            <!-- Removed 🏠 icon. Expanded CASE PRESENTATION text -->
-            <h1>CASE<br>PRESENTATION</h1>
-            
-            <!-- Changed Phase 3 to Round 3 -->
-            <h2>Round 3</h2>
-            <h3>Case Presentation</h3>
+            <!-- CASE PRESENTATION in Yellow/Gold -->
+            <div class="main-title">CASE<br>PRESENTATION</div>
+            <!-- Round 3 in Purple -->
+            <div class="round-title">Round 3</div>
+            <!-- Subtitle in Yellow -->
+            <div class="sub-title">Case Presentation</div>
         </div>
 
-        <!-- TEAM PAGES (Hidden on Home) -->
-        <div id="team1" class="page-content team-page">
+        <!-- TEAM 1 PAGE -->
+        <div id="team1" class="page-content other-page">
             <h1>Team 1</h1>
             <p>Presentation details go here...</p>
         </div>
 
-        <div id="team2" class="page-content team-page">
+        <!-- TEAM 2 PAGE -->
+        <div id="team2" class="page-content other-page">
             <h1>Team 2</h1>
             <p>Presentation details go here...</p>
         </div>
 
-        <div id="team3" class="page-content team-page">
+        <!-- TEAM 3 PAGE -->
+        <div id="team3" class="page-content other-page">
             <h1>Team 3</h1>
             <p>Presentation details go here...</p>
         </div>
 
-        <div id="final-scores" class="page-content team-page">
+        <!-- FINAL SCORES PAGE -->
+        <div id="final-scores" class="page-content other-page">
             <h1>Final Scores</h1>
             <p>Leaderboard details go here...</p>
         </div>
 
 
-        <!-- BOTTOM NAVIGATION -->
+        <!-- BOTTOM NAVIGATION (ALWAYS VISIBLE) -->
         <nav class="bottom-nav">
-            <!-- Removed 🏠 icon from Home link -->
+            <!-- No icons present. All links visible on every page. -->
             <a href="#" onclick="showPage('home')">Home</a>
-            
-            <!-- These links are only hidden on the homepage via JS -->
-            <span class="separator" id="sep1">|</span>
-            <a href="#" onclick="showPage('team1')" id="link-team1">Team 1</a>
-            
-            <span class="separator" id="sep2">|</span>
-            <a href="#" onclick="showPage('team2')" id="link-team2">Team 2</a>
-            
-            <span class="separator" id="sep3">|</span>
-            <a href="#" onclick="showPage('team3')" id="link-team3">Team 3</a>
-            
-            <span class="separator" id="sep4">|</span>
-            <!-- Removed 🏆 icon from Final Scores link -->
-            <a href="#" onclick="showPage('final-scores')" id="link-scores">Final Scores</a>
+            <span class="separator">|</span>
+            <a href="#" onclick="showPage('team1')">Team 1</a>
+            <span class="separator">|</span>
+            <a href="#" onclick="showPage('team2')">Team 2</a>
+            <span class="separator">|</span>
+            <a href="#" onclick="showPage('team3')">Team 3</a>
+            <span class="separator">|</span>
+            <a href="#" onclick="showPage('final-scores')">Final Scores</a>
         </nav>
 
     </div>
 
-    <!-- JAVASCRIPT TO CONTROL PAGE SWITCHING -->
+    <!-- JAVASCRIPT TO SWITCH PAGES (Nav stays visible) -->
     <script>
         function showPage(pageId) {
-            // Hide all pages
+            // Hide all content pages
             document.getElementById('home-page').style.display = 'none';
             document.getElementById('team1').style.display = 'none';
             document.getElementById('team2').style.display = 'none';
@@ -244,23 +264,9 @@
             } else {
                 document.getElementById(pageId).style.display = 'flex';
             }
-
-            // Handle Visibility of Navigation Tabs
-            const navLinks = ['link-team1', 'link-team2', 'link-team3', 'link-scores'];
-            const separators = ['sep1', 'sep2', 'sep3', 'sep4'];
-
-            if (pageId === 'home') {
-                // HIDE team links on the homepage
-                navLinks.forEach(id => document.getElementById(id).style.display = 'none');
-                separators.forEach(id => document.getElementById(id).style.display = 'none');
-            } else {
-                // SHOW team links on other pages
-                navLinks.forEach(id => document.getElementById(id).style.display = 'inline');
-                separators.forEach(id => document.getElementById(id).style.display = 'inline');
-            }
         }
 
-        // Initialize the page to Home on load
+        // Initialize to Home on load
         showPage('home');
     </script>
 </body>
