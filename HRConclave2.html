@@ -1006,7 +1006,7 @@ function drawChart(teamNum, labels, scores) {
 }
 
 /* ======================
-   FINAL SCORES - UPDATED TO USE "Scoring" SHEET
+   FINAL SCORES - FIXED FOR "Scoring" SHEET
 ====================== */
 
 function addSparklesToChampion() {
@@ -1040,22 +1040,52 @@ function addSparklesToChampion() {
 
 async function showFinal() {
     try {
-        // Fetch data from the "Scoring" sheet
-        const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0&sheet=Scoring`;
-        console.log('Fetching final scores from Scoring sheet...');
+        // Fetch data from the "Scoring" sheet - try multiple URL formats
+        const sheetName = encodeURIComponent("Scoring");
         
-        const response = await fetch(url + "&t=" + Date.now());
-        if (!response.ok) {
-            console.error(`HTTP error! status: ${response.status}`);
-            // Show fallback if sheet not found
+        // Try different URL formats
+        const urls = [
+            `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${sheetName}`,
+            `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&sheet=${sheetName}`,
+            `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pub?output=csv&sheet=${sheetName}`
+        ];
+        
+        let csv = null;
+        let successUrl = '';
+        
+        for (const url of urls) {
+            try {
+                console.log(`Trying URL: ${url}`);
+                const response = await fetch(url + "&t=" + Date.now(), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/csv',
+                    }
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    if (text && text.trim().length > 0 && !text.includes('<!DOCTYPE') && !text.includes('Login')) {
+                        csv = text;
+                        successUrl = url;
+                        console.log(`Successfully fetched from: ${url}`);
+                        break;
+                    }
+                }
+            } catch (e) {
+                console.log(`URL failed: ${url}`, e.message);
+            }
+        }
+        
+        if (!csv) {
+            console.error('All fetch attempts failed for Scoring sheet');
             showFallbackLeaderboard();
             return;
         }
         
-        const csv = await response.text();
         console.log('Scoring sheet data:', csv.substring(0, 300) + '...');
         
-        // Parse CSV
+        // Parse CSV - handle potential issues with quotes and commas
         const lines = csv.trim().split("\n");
         const rows = lines.map(line => {
             const fields = [];
@@ -1102,18 +1132,33 @@ async function showFinal() {
             }
         }
 
-        // If no data found, try scanning for any data
+        // If no data found in L13:M15, try scanning other rows
         if (results.length === 0) {
             console.log('No data found in L13:M15, scanning all rows...');
             for (let i = 0; i < Math.min(rows.length, 30); i++) {
                 if (rows[i] && rows[i].length > 12) {
+                    // Try to find team names in column L and scores in column M
                     const teamName = rows[i][11] ? rows[i][11].trim() : '';
                     const score = parseFloat(rows[i][12]);
+                    
+                    // Also try columns K and L if no data in L and M
+                    const altTeamName = rows[i][10] ? rows[i][10].trim() : '';
+                    const altScore = parseFloat(rows[i][11]);
+                    
                     if (teamName && teamName !== '' && !isNaN(score) && score >= 0 && teamName.length < 50) {
                         if (!teamName.toLowerCase().includes('total') && 
                             !teamName.toLowerCase().includes('sum') &&
-                            !teamName.toLowerCase().includes('average')) {
+                            !teamName.toLowerCase().includes('average') &&
+                            !teamName.toLowerCase().includes('pillar')) {
                             results.push({ team: teamName, score: score });
+                            if (results.length >= 3) break;
+                        }
+                    } else if (altTeamName && altTeamName !== '' && !isNaN(altScore) && altScore >= 0 && altTeamName.length < 50) {
+                        if (!altTeamName.toLowerCase().includes('total') && 
+                            !altTeamName.toLowerCase().includes('sum') &&
+                            !altTeamName.toLowerCase().includes('average') &&
+                            !altTeamName.toLowerCase().includes('pillar')) {
+                            results.push({ team: altTeamName, score: altScore });
                             if (results.length >= 3) break;
                         }
                     }
@@ -1174,7 +1219,6 @@ function showFallbackLeaderboard() {
     ];
     displayLeaderboard(fallbackResults);
 }
-
 /* ======================
    AUTO-REFRESH
 ====================== */
