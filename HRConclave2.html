@@ -1006,7 +1006,7 @@ function drawChart(teamNum, labels, scores) {
 }
 
 /* ======================
-   FINAL SCORES - FIXED FOR "Scoring" SHEET
+   FINAL SCORES - FIXED WITH BETTER SHEET DETECTION
 ====================== */
 
 function addSparklesToChampion() {
@@ -1040,52 +1040,95 @@ function addSparklesToChampion() {
 
 async function showFinal() {
     try {
-        // Fetch data from the "Scoring" sheet - try multiple URL formats
-        const sheetName = encodeURIComponent("Scoring");
+        console.log('Fetching final scores from Scoring sheet...');
         
-        // Try different URL formats
-        const urls = [
-            `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${sheetName}`,
-            `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&sheet=${sheetName}`,
-            `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pub?output=csv&sheet=${sheetName}`
-        ];
-        
+        // Try multiple approaches to find the Scoring sheet
+        const possibleSheetNames = ['Scoring', 'scoring', 'SCORING', 'Final Scores', 'Final'];
         let csv = null;
-        let successUrl = '';
+        let foundSheet = false;
         
-        for (const url of urls) {
+        // Approach 1: Try each possible sheet name with the gviz API
+        for (const sheetName of possibleSheetNames) {
             try {
-                console.log(`Trying URL: ${url}`);
+                const encodedName = encodeURIComponent(sheetName);
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodedName}`;
+                console.log(`Trying sheet name: "${sheetName}" with URL: ${url}`);
+                
                 const response = await fetch(url + "&t=" + Date.now(), {
                     method: 'GET',
-                    headers: {
-                        'Accept': 'text/csv',
-                    }
+                    headers: { 'Accept': 'text/csv' }
                 });
                 
                 if (response.ok) {
                     const text = await response.text();
-                    if (text && text.trim().length > 0 && !text.includes('<!DOCTYPE') && !text.includes('Login')) {
+                    // Check if we got valid CSV data (not an error page)
+                    if (text && text.trim().length > 0 && 
+                        !text.includes('<!DOCTYPE') && 
+                        !text.includes('Login') &&
+                        !text.includes('error')) {
                         csv = text;
-                        successUrl = url;
-                        console.log(`Successfully fetched from: ${url}`);
+                        foundSheet = true;
+                        console.log(`Successfully found sheet: "${sheetName}"`);
                         break;
                     }
                 }
             } catch (e) {
-                console.log(`URL failed: ${url}`, e.message);
+                console.log(`Sheet "${sheetName}" failed:`, e.message);
             }
         }
         
-        if (!csv) {
-            console.error('All fetch attempts failed for Scoring sheet');
+        // Approach 2: If no sheet found, try using the export URL without specifying gid
+        if (!foundSheet) {
+            console.log('Trying export URL without gid...');
+            try {
+                const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+                const response = await fetch(url + "&t=" + Date.now());
+                if (response.ok) {
+                    const text = await response.text();
+                    if (text && text.trim().length > 0 && !text.includes('<!DOCTYPE')) {
+                        csv = text;
+                        foundSheet = true;
+                        console.log('Successfully fetched using export URL (first sheet)');
+                    }
+                }
+            } catch (e) {
+                console.log('Export URL failed:', e.message);
+            }
+        }
+        
+        // Approach 3: Try using the published URL with specific sheet
+        if (!foundSheet) {
+            for (const sheetName of possibleSheetNames) {
+                try {
+                    const encodedName = encodeURIComponent(sheetName);
+                    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pub?output=csv&sheet=${encodedName}`;
+                    console.log(`Trying published URL with sheet: "${sheetName}"`);
+                    
+                    const response = await fetch(url + "&t=" + Date.now());
+                    if (response.ok) {
+                        const text = await response.text();
+                        if (text && text.trim().length > 0 && !text.includes('<!DOCTYPE')) {
+                            csv = text;
+                            foundSheet = true;
+                            console.log(`Successfully found sheet: "${sheetName}" via pub URL`);
+                            break;
+                        }
+                    }
+                } catch (e) {
+                    console.log(`Pub URL for "${sheetName}" failed:`, e.message);
+                }
+            }
+        }
+        
+        if (!foundSheet || !csv) {
+            console.error('Could not find any sheet with scoring data');
             showFallbackLeaderboard();
             return;
         }
         
-        console.log('Scoring sheet data:', csv.substring(0, 300) + '...');
+        console.log('CSV data received:', csv.substring(0, 500) + '...');
         
-        // Parse CSV - handle potential issues with quotes and commas
+        // Parse CSV
         const lines = csv.trim().split("\n");
         const rows = lines.map(line => {
             const fields = [];
@@ -1107,17 +1150,22 @@ async function showFinal() {
         });
 
         if (rows.length === 0) {
-            console.error('No data found in Scoring sheet');
+            console.error('No data found in CSV');
             showFallbackLeaderboard();
             return;
         }
 
-        console.log('Rows in Scoring sheet:', rows.slice(0, 10));
+        console.log(`Total rows: ${rows.length}`);
+        console.log('First 10 rows:', rows.slice(0, 10));
 
-        // Extract data from L13:M15 (rows 12-14 in 0-indexed, columns L=11, M=12)
+        // Try to find data by scanning for team names and scores
         const results = [];
-        const startRow = 12; // Row 13 in Excel (0-indexed)
-        const endRow = 14;   // Row 15 in Excel (0-indexed)
+        
+        // First, try specific range L13:M15 (rows 12-14)
+        const startRow = 12;
+        const endRow = 14;
+        
+        console.log(`Looking for data in rows ${startRow+1} to ${endRow+1}...`);
         
         for (let i = startRow; i <= endRow && i < rows.length; i++) {
             if (rows[i] && rows[i].length > 12) {
@@ -1132,36 +1180,67 @@ async function showFinal() {
             }
         }
 
-        // If no data found in L13:M15, try scanning other rows
+        // If no data found in specific range, scan all rows
         if (results.length === 0) {
             console.log('No data found in L13:M15, scanning all rows...');
-            for (let i = 0; i < Math.min(rows.length, 30); i++) {
-                if (rows[i] && rows[i].length > 12) {
-                    // Try to find team names in column L and scores in column M
-                    const teamName = rows[i][11] ? rows[i][11].trim() : '';
-                    const score = parseFloat(rows[i][12]);
+            
+            for (let i = 0; i < Math.min(rows.length, 50); i++) {
+                if (rows[i] && rows[i].length > 11) {
+                    // Try different column combinations
+                    const combinations = [
+                        { teamIdx: 11, scoreIdx: 12 },  // L, M
+                        { teamIdx: 10, scoreIdx: 11 },  // K, L
+                        { teamIdx: 9, scoreIdx: 10 },   // J, K
+                        { teamIdx: 0, scoreIdx: 1 }     // A, B
+                    ];
                     
-                    // Also try columns K and L if no data in L and M
-                    const altTeamName = rows[i][10] ? rows[i][10].trim() : '';
-                    const altScore = parseFloat(rows[i][11]);
-                    
-                    if (teamName && teamName !== '' && !isNaN(score) && score >= 0 && teamName.length < 50) {
-                        if (!teamName.toLowerCase().includes('total') && 
-                            !teamName.toLowerCase().includes('sum') &&
-                            !teamName.toLowerCase().includes('average') &&
-                            !teamName.toLowerCase().includes('pillar')) {
-                            results.push({ team: teamName, score: score });
-                            if (results.length >= 3) break;
-                        }
-                    } else if (altTeamName && altTeamName !== '' && !isNaN(altScore) && altScore >= 0 && altTeamName.length < 50) {
-                        if (!altTeamName.toLowerCase().includes('total') && 
-                            !altTeamName.toLowerCase().includes('sum') &&
-                            !altTeamName.toLowerCase().includes('average') &&
-                            !altTeamName.toLowerCase().includes('pillar')) {
-                            results.push({ team: altTeamName, score: altScore });
-                            if (results.length >= 3) break;
+                    for (const combo of combinations) {
+                        if (rows[i].length > combo.scoreIdx) {
+                            const teamName = rows[i][combo.teamIdx] ? rows[i][combo.teamIdx].trim() : '';
+                            const score = parseFloat(rows[i][combo.scoreIdx]);
+                            
+                            // Check if this looks like a team row (contains "Team" or "Presenter")
+                            const isTeamRow = teamName.toLowerCase().includes('team') || 
+                                            teamName.toLowerCase().includes('presenter') ||
+                                            teamName.toLowerCase().includes('group');
+                            
+                            if (teamName && teamName !== '' && !isNaN(score) && score >= 0 && teamName.length < 50) {
+                                if (isTeamRow || results.length === 0) {
+                                    // Avoid duplicates
+                                    const exists = results.some(r => r.team === teamName);
+                                    if (!exists) {
+                                        results.push({ team: teamName, score: score });
+                                        console.log(`Found data at row ${i+1}, col ${combo.teamIdx+1}: Team="${teamName}", Score=${score}`);
+                                        break;
+                                    }
+                                }
+                            }
                         }
                     }
+                    
+                    if (results.length >= 3) break;
+                }
+            }
+        }
+
+        // If we still have no results, look for any numeric data
+        if (results.length === 0) {
+            console.log('No team data found, looking for any numeric data...');
+            for (let i = 0; i < Math.min(rows.length, 30); i++) {
+                if (rows[i] && rows[i].length > 1) {
+                    for (let j = 0; j < Math.min(rows[i].length, 15); j++) {
+                        const val = parseFloat(rows[i][j]);
+                        if (!isNaN(val) && val > 0 && val < 1000) {
+                            // Found a numeric value, try to use the previous column as label
+                            const label = (j > 0 && rows[i][j-1]) ? rows[i][j-1].trim() : `Item ${i+1}`;
+                            if (label && label !== '' && label.length < 50) {
+                                results.push({ team: label, score: val });
+                                console.log(`Found numeric data at row ${i+1}, col ${j+1}: Label="${label}", Score=${val}`);
+                                if (results.length >= 3) break;
+                            }
+                        }
+                    }
+                    if (results.length >= 3) break;
                 }
             }
         }
@@ -1173,11 +1252,13 @@ async function showFinal() {
             return;
         }
 
+        // If we have more than 3, sort and take top 3
         results.sort((a, b) => b.score - a.score);
         while (results.length < 3) {
             results.push({ team: `Team ${results.length + 1}`, score: 0 });
         }
 
+        console.log('Final results:', results);
         displayLeaderboard(results);
 
     } catch (err) {
@@ -1211,7 +1292,6 @@ function displayLeaderboard(results) {
 }
 
 function showFallbackLeaderboard() {
-    // Show fallback data if scoring sheet is not accessible
     const fallbackResults = [
         { team: "Team 1", score: 0 },
         { team: "Team 2", score: 0 },
@@ -1219,6 +1299,7 @@ function showFallbackLeaderboard() {
     ];
     displayLeaderboard(fallbackResults);
 }
+
 /* ======================
    AUTO-REFRESH
 ====================== */
