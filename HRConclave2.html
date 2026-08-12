@@ -1006,7 +1006,7 @@ function drawChart(teamNum, labels, scores) {
 }
 
 /* ======================
-   FINAL SCORES - FIXED WITH BETTER SHEET DETECTION
+   FINAL SCORES - FIXED TO READ L13:M15 CORRECTLY
 ====================== */
 
 function addSparklesToChampion() {
@@ -1156,91 +1156,68 @@ async function showFinal() {
         }
 
         console.log(`Total rows: ${rows.length}`);
-        console.log('First 10 rows:', rows.slice(0, 10));
+        console.log('First 15 rows:', rows.slice(0, 15));
 
-        // Try to find data by scanning for team names and scores
+        // EXACTLY extract data from L13:M15
+        // Row 13 = index 12, Row 14 = index 13, Row 15 = index 14
+        // Column L = index 11, Column M = index 12
         const results = [];
+        const startRow = 12; // Row 13 in Excel (0-indexed)
+        const endRow = 14;   // Row 15 in Excel (0-indexed)
+        const teamCol = 11;  // Column L
+        const scoreCol = 12; // Column M
         
-        // First, try specific range L13:M15 (rows 12-14)
-        const startRow = 12;
-        const endRow = 14;
-        
-        console.log(`Looking for data in rows ${startRow+1} to ${endRow+1}...`);
+        console.log(`Looking for data in rows ${startRow+1} to ${endRow+1} (L13:M15)...`);
+        console.log(`Using column L (index ${teamCol}) for team names and column M (index ${scoreCol}) for scores`);
         
         for (let i = startRow; i <= endRow && i < rows.length; i++) {
-            if (rows[i] && rows[i].length > 12) {
-                const teamName = rows[i][11] ? rows[i][11].trim() : '';
-                const score = parseFloat(rows[i][12]);
+            if (rows[i] && rows[i].length > Math.max(teamCol, scoreCol)) {
+                const teamName = rows[i][teamCol] ? rows[i][teamCol].trim() : '';
+                const scoreStr = rows[i][scoreCol] ? rows[i][scoreCol].trim() : '';
+                const score = parseFloat(scoreStr);
                 
-                console.log(`Row ${i+1}: Team="${teamName}", Score=${score}`);
+                console.log(`Row ${i+1}: Team Name (L)="${teamName}", Score (M)="${scoreStr}" -> ${score}`);
                 
+                // Only add if we have a valid team name and score
                 if (teamName && teamName !== '' && !isNaN(score) && score >= 0) {
                     results.push({ team: teamName, score: score });
+                } else if (teamName && teamName !== '') {
+                    // If team name exists but score is invalid, log warning
+                    console.warn(`Row ${i+1}: Team name "${teamName}" but invalid score: "${scoreStr}"`);
                 }
+            } else {
+                console.warn(`Row ${i+1}: Not enough columns (needs at least ${Math.max(teamCol, scoreCol)+1})`);
             }
         }
 
-        // If no data found in specific range, scan all rows
+        // If no data found in L13:M15, try scanning other rows but with the same column logic
         if (results.length === 0) {
-            console.log('No data found in L13:M15, scanning all rows...');
+            console.log('No data found in L13:M15, scanning all rows for data in columns L and M...');
             
-            for (let i = 0; i < Math.min(rows.length, 50); i++) {
-                if (rows[i] && rows[i].length > 11) {
-                    // Try different column combinations
-                    const combinations = [
-                        { teamIdx: 11, scoreIdx: 12 },  // L, M
-                        { teamIdx: 10, scoreIdx: 11 },  // K, L
-                        { teamIdx: 9, scoreIdx: 10 },   // J, K
-                        { teamIdx: 0, scoreIdx: 1 }     // A, B
-                    ];
-                    
-                    for (const combo of combinations) {
-                        if (rows[i].length > combo.scoreIdx) {
-                            const teamName = rows[i][combo.teamIdx] ? rows[i][combo.teamIdx].trim() : '';
-                            const score = parseFloat(rows[i][combo.scoreIdx]);
-                            
-                            // Check if this looks like a team row (contains "Team" or "Presenter")
-                            const isTeamRow = teamName.toLowerCase().includes('team') || 
-                                            teamName.toLowerCase().includes('presenter') ||
-                                            teamName.toLowerCase().includes('group');
-                            
-                            if (teamName && teamName !== '' && !isNaN(score) && score >= 0 && teamName.length < 50) {
-                                if (isTeamRow || results.length === 0) {
-                                    // Avoid duplicates
-                                    const exists = results.some(r => r.team === teamName);
-                                    if (!exists) {
-                                        results.push({ team: teamName, score: score });
-                                        console.log(`Found data at row ${i+1}, col ${combo.teamIdx+1}: Team="${teamName}", Score=${score}`);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    if (results.length >= 3) break;
-                }
-            }
-        }
-
-        // If we still have no results, look for any numeric data
-        if (results.length === 0) {
-            console.log('No team data found, looking for any numeric data...');
             for (let i = 0; i < Math.min(rows.length, 30); i++) {
-                if (rows[i] && rows[i].length > 1) {
-                    for (let j = 0; j < Math.min(rows[i].length, 15); j++) {
-                        const val = parseFloat(rows[i][j]);
-                        if (!isNaN(val) && val > 0 && val < 1000) {
-                            // Found a numeric value, try to use the previous column as label
-                            const label = (j > 0 && rows[i][j-1]) ? rows[i][j-1].trim() : `Item ${i+1}`;
-                            if (label && label !== '' && label.length < 50) {
-                                results.push({ team: label, score: val });
-                                console.log(`Found numeric data at row ${i+1}, col ${j+1}: Label="${label}", Score=${val}`);
-                                if (results.length >= 3) break;
+                if (rows[i] && rows[i].length > Math.max(teamCol, scoreCol)) {
+                    const teamName = rows[i][teamCol] ? rows[i][teamCol].trim() : '';
+                    const score = parseFloat(rows[i][scoreCol]);
+                    
+                    // Check if this looks like a team row (contains "Team" or "Presenter")
+                    const isTeamRow = teamName.toLowerCase().includes('team') || 
+                                    teamName.toLowerCase().includes('presenter') ||
+                                    teamName.toLowerCase().includes('group') ||
+                                    teamName.toLowerCase().includes('team 1') ||
+                                    teamName.toLowerCase().includes('team 2') ||
+                                    teamName.toLowerCase().includes('team 3');
+                    
+                    if (teamName && teamName !== '' && !isNaN(score) && score >= 0 && teamName.length < 50) {
+                        // Only add if it looks like a team or if we have no results yet
+                        if (isTeamRow || results.length === 0) {
+                            // Avoid duplicates
+                            const exists = results.some(r => r.team === teamName);
+                            if (!exists) {
+                                results.push({ team: teamName, score: score });
+                                console.log(`Found data at row ${i+1}: Team="${teamName}", Score=${score}`);
                             }
                         }
                     }
-                    if (results.length >= 3) break;
                 }
             }
         }
