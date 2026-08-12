@@ -1244,22 +1244,19 @@ async function showFinal() {
     }
 }
 
-function displayLeaderboard(results) {
+    function displayLeaderboard(results) {
     const medals = ['🥇', '🥈', '🥉'];
-    const rankClasses = ['gold', 'silver', 'bronze'];
+    const podiumClasses = ['podium-1', 'podium-2', 'podium-3'];
+    const positions = ['🏆 CHAMPION', '2ND PLACE', '3RD PLACE'];
     
     document.getElementById("leaderboard").innerHTML = `
-        <div class="leaderboard-modern">
+        <div class="podium-container">
             ${results.map((result, index) => `
-                <div class="rank-item">
-                    <div class="rank-number ${rankClasses[index] || 'default'}">
-                        ${medals[index] || `#${index + 1}`}
-                    </div>
-                    <div class="rank-details">
-                        <div class="team">${result.team}</div>
-                        <div class="sub-text">${index === 0 ? '🏆 Winner' : index === 1 ? '🥈 Runner-up' : '🥉 Third Place'}</div>
-                    </div>
-                    <div class="rank-score">${result.score}</div>
+                <div class="podium-item ${podiumClasses[index]}">
+                    <div class="rank-icon">${medals[index]}</div>
+                    <div class="podium-position">${positions[index]}</div>
+                    <div class="team-name">${result.team}</div>
+                    <div class="score">${result.score}</div>
                 </div>
             `).join('')}
         </div>
