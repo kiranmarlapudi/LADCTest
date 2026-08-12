@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HR Conclave 2026 Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+<style>
+
+/* CSS Reset and Base Styles */
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    overflow-x: hidden;
+}
+
+/* 1. Background Setup (Image + #FEB6AB blend) */
+.app-container {
+    min-height: 100vh;
+    background-color: #FEB6AB; 
+    background-image: url('https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCBG.png');
+    background-size: cover;
+    background-position: center;
+    background-blend-mode: multiply;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* Dark overlay to ensure text readability */
+.app-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* HEADER */
+.header-banner {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0 10px 0;
+    position: relative;
+    z-index: 2;
+    gap: 15px;
+}
+
+/* Home page header - centered */
+.header-banner.home-header {
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Team pages header - left and right layout */
+.header-banner.team-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    gap: 0;
+}
+
+.header-top-logo {
+    width: 320px; 
+    height: auto;
+    object-fit: contain;
+}
+
+/* Team page logo - smaller */
+.header-banner.team-header .header-top-logo {
+    width: 180px;
+}
+
+.header-main-banner {
+    width: 37.5%;
+    max-width: 475px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+/* Team page HRFSH - smaller */
+.header-banner.team-header .header-main-banner {
+    width: 25%;
+    max-width: 300px;
+}
+
+/* Home page HRFSH - original size */
+.header-banner.home-header .header-main-banner {
+    width: 75%;
+    max-width: 950px;
+}
+
+/* Page Title Section */
+.page-title-section {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin: 10px 0 20px 0;
+    width: 100%;
+}
+
+.main-title {
+    font-size: 3.5rem;
+    margin: 0;
+    text-transform: uppercase;
+    color: #FFD700;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: 3px;
+    text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+}
+
+.round-title {
+    font-size: 2.5rem;
+    margin: 5px 0 0 0;
+    color: #c4b5fd;
+    font-weight: 600;
+}
+
+/* Hide round title by default */
+.round-title.hidden {
+    display: none;
+}
+
+/* TEAM NAME DISPLAY */
+.team-name-display {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #e0d7f5;
+    margin: 5px 0 10px 0;
+    text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.team-name-display .dot {
+    height: 12px;
+    width: 12px;
+    background: #00d4aa;
+    display: inline-block;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* SCORE DISPLAY */
+.total-score-container {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    margin: 5px 0 15px 0;
+}
+
+.total-label {
+    opacity: .7;
+    font-size: 14px;
+    color: #c4b5fd;
+}
+
+.total-score {
+    font-size: 42px;
+    font-weight: 700;
+    color: #00d4aa;
+}
+
+/* Page Content Area */
+.page-content {
+    position: relative;
+    z-index: 2;
+    width: 90%;
+    max-width: 1200px;
+    flex-grow: 1;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.page-content.active {
+    display: flex;
+}
+
+/* Homepage Layout */
+#home-page {
+    justify-content: center;
+    min-height: 300px;
+}
+
+/* Team Pages Layout - 3 column structure */
+.team-layout {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    width: 100%;
+    height: 100%;
+    gap: 20px;
+    margin-top: 10px;
+}
+
+.team-left-col, .team-right-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    min-height: 400px;
+    gap: 10px;
+}
+
+.team-left-col img, .team-right-col img {
+    width: 100%;
+    height: 80%;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+.vote-text {
+    color: #FFD700;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    opacity: 0.8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.team-center-col {
+    flex: 1.5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    min-height: 400px;
+}
+
+.team-center-col canvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 500px;
+}
+
+/* FINAL SCORES */
+.leaderboard {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+.first {
+    background: linear-gradient(135deg, #FFD700, #f59e0b);
+    color: #111;
+    padding: 40px;
+    margin-bottom: 25px;
+    border-radius: 30px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.3);
+}
+
+.podium-row {
+    display: flex;
+    gap: 25px;
+}
+
+.second {
+    flex: 1;
+    background: linear-gradient(135deg, #cbd5e1, #94a3b8);
+    color: #111;
+    border-radius: 30px;
+}
+
+.third {
+    flex: 1;
+    background: linear-gradient(135deg, #d97706, #92400e);
+    border-radius: 30px;
+}
+
+.winner-card {
+    padding: 35px;
+    text-align: center;
+}
+
+.position {
+    font-size: 34px;
+    font-weight: 800;
+}
+
+.team-name-final {
+    font-size: 52px;
+    font-weight: 800;
+    margin-top: 15px;
+}
+
+.team-score-final {
+    font-size: 88px;
+    font-weight: 900;
+    margin-top: 15px;
+}
+
+/* Sparkles on Champion */
+.sparkle-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 30px;
+}
+
+.sparkle-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ffffff;
+    border-radius: 50%;
+    opacity: 0;
+    animation: floatSparkle 5s ease-in infinite;
+}
+
+@keyframes floatSparkle {
+    0% {
+        opacity: 0;
+        transform: translateY(100%) scale(0) rotate(0deg);
+    }
+    10% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1) rotate(180deg);
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-100%) scale(0) rotate(360deg);
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); }
+    50% { box-shadow: 0 0 60px rgba(255, 215, 0, 0.6), 0 0 100px rgba(255, 215, 0, 0.2); }
+}
+
+.first.glow-pulse {
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+
+/* Navigation - Always Visible at Bottom */
+.bottom-nav {
+    margin-top: auto;
+    padding: 20px 0 30px 0;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    text-align: center;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(5px);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.bottom-nav a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin: 0 12px;
+    transition: color 0.3s;
+}
+
+.bottom-nav a:hover {
+    color: #FFD700;
+}
+
+.bottom-nav .separator {
+    color: #666;
+}
+
+.bottom-nav a.active-link {
+    color: #FFD700;
+    font-weight: 800;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-title { font-size: 2.2rem; }
+    .round-title { font-size: 1.8rem; }
+    .bottom-nav a { display: inline-block; margin: 5px 8px; font-size: 1rem; }
+    .header-top-logo { width: 150px; }
+    .header-main-banner { width: 95%; }
+    .team-name-display { font-size: 2rem; }
+    .team-score-final { font-size: 48px; }
+    
+    .header-banner.team-header {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .header-banner.team-header .header-top-logo {
+        width: 120px;
+    }
+    
+    .header-banner.team-header .header-main-banner {
+        width: 60%;
+        max-width: 200px;
+    }
+    
+    .team-layout { 
+        flex-direction: column; 
+    }
+    .team-left-col, .team-right-col, .team-center-col { 
+        flex: auto; 
+        width: 100%;
+        min-height: 200px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="app-container">
+    
+    <!-- HEADER AREA -->
+    <header id="headerBanner" class="header-banner home-header">
+        <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
+             alt="TAPMI Logo" 
+             class="header-top-logo">
+        
+        <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
+             alt="HR Conclave Banner" 
+             class="header-main-banner">
+    </header>
+
+    <!-- GLOBAL PAGE TITLE -->
+    <div class="page-title-section">
+        <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
+        <div id="roundTitle" class="round-title">Round 3</div>
+    </div>
+
+    <!-- TEAM NAME & LIVE INDICATOR -->
+    <div id="teamNameDisplay" class="team-name-display" style="display:none;">
+        <span class="dot"></span>
+        <span id="teamNameText">TEAM 1</span>
+    </div>
+
+    <!-- TOTAL SCORE -->
+    <div id="totalScoreContainer" class="total-score-container" style="display:none;">
+        <div class="total-label">TOTAL SCORE</div>
+        <div id="totalScore" class="total-score">0</div>
+    </div>
+
+    <!-- MAIN PAGES -->
+    
+    <!-- HOME PAGE -->
+    <div id="home-page" class="page-content active">
+        <!-- Home page is empty below the global title -->
+    </div>
+
+    <!-- TEAM 1 PAGE -->
+    <div id="team1" class="page-content">
+        <div class="team-layout">
+            <div class="team-left-col">
+                <img id="leftImage1" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
+            </div>
+            <div class="team-center-col">
+                <canvas id="chart1"></canvas>
+            </div>
+            <div class="team-right-col">
+                <img id="rightImage1" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEAM 2 PAGE -->
+    <div id="team2" class="page-content">
+        <div class="team-layout">
+            <div class="team-left-col">
+                <img id="leftImage2" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
+            </div>
+            <div class="team-center-col">
+                <canvas id="chart2"></canvas>
+            </div>
+            <div class="team-right-col">
+                <img id="rightImage2" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEAM 3 PAGE -->
+    <div id="team3" class="page-content">
+        <div class="team-layout">
+            <div class="team-left-col">
+                <img id="leftImage3" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
+            </div>
+            <div class="team-center-col">
+                <canvas id="chart3"></canvas>
+            </div>
+            <div class="team-right-col">
+                <img id="rightImage3" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINAL SCORES PAGE -->
+    <div id="final-scores" class="page-content">
+        <div class="leaderboard" id="leaderboard"></div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+        <a href="#" onclick="showPage('home')" data-page="home">🏠 Home</a>
+        <span class="separator">|</span>
+        <a href="#" onclick="showPage('team1')" data-page="team1">Team 1</a>
+        <span class="separator">|</span>
+        <a href="#" onclick="showPage('team2')" data-page="team2">Team 2</a>
+        <span class="separator">|</span>
+        <a href="#" onclick="showPage('team3')" data-page="team3">Team 3</a>
+        <span class="separator">|</span>
+        <a href="#" onclick="showPage('final-scores')" data-page="final-scores">🏆 Final Scores</a>
+    </nav>
+
+</div>
+
+<script>
+// Register the datalabels plugin
+Chart.register(ChartDataLabels);
+
+/* ======================
+   SETTINGS
+====================== */
+
+const SHEET_ID = "1zfoi-RiQ2_djE64bg3DMQXD7KBaz0j8ko54tPrQ9nf8";
+
+// Team-specific images
+const TEAM_IMAGES = {
+    "1": "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT1.png",
+    "2": "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT2.png",
+    "3": "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT1.png"
+};
+
+let currentPage = 'home';
+let chartInstances = {};
+let currentTeam = '1';
+
+/* ======================
+   PAGE NAVIGATION
+====================== */
+
+function showPage(pageId) {
+    // Hide all content pages
+    const pages = document.querySelectorAll('.page-content');
+    pages.forEach(page => page.classList.remove('active'));
+
+    // Show the selected page
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) {
+        targetPage.classList.add('active');
+    }
+
+    // Update nav links
+    document.querySelectorAll('.bottom-nav a').forEach(link => {
+        link.classList.remove('active-link');
+        if (link.dataset.page === pageId) {
+            link.classList.add('active-link');
+        }
+    });
+
+    currentPage = pageId;
+
+    // Get elements
+    const headerBanner = document.getElementById('headerBanner');
+    const mainTitle = document.getElementById('mainTitle');
+    const roundTitle = document.getElementById('roundTitle');
+
+    // Handle page-specific logic
+    if (pageId === 'home') {
+        // Home page - centered header with full size
+        headerBanner.className = 'header-banner home-header';
+        document.getElementById('teamNameDisplay').style.display = 'none';
+        document.getElementById('totalScoreContainer').style.display = 'none';
+        roundTitle.classList.remove('hidden');
+        mainTitle.textContent = 'CASE PRESENTATION';
+    } else if (pageId === 'final-scores') {
+        // Final scores page - use team header layout
+        headerBanner.className = 'header-banner team-header';
+        document.getElementById('teamNameDisplay').style.display = 'none';
+        document.getElementById('totalScoreContainer').style.display = 'none';
+        roundTitle.classList.add('hidden');
+        mainTitle.textContent = 'FINAL SCORES';
+        // Call showFinal immediately and set up interval
+        showFinal();
+    } else {
+        // Team pages - left and right header layout with smaller images
+        headerBanner.className = 'header-banner team-header';
+        roundTitle.classList.add('hidden');
+        mainTitle.textContent = 'CASE PRESENTATION';
+        const teamNum = pageId.replace('team', '');
+        currentTeam = teamNum;
+        document.getElementById('teamNameDisplay').style.display = 'flex';
+        document.getElementById('teamNameText').textContent = `TEAM ${teamNum}`;
+        document.getElementById('totalScoreContainer').style.display = 'block';
+        
+        // Set team images
+        const imgUrl = TEAM_IMAGES[teamNum];
+        document.getElementById(`leftImage${teamNum}`).src = imgUrl;
+        document.getElementById(`rightImage${teamNum}`).src = imgUrl;
+        
+        loadTeam(teamNum);
+    }
+}
+
+/* ======================
+   TEAM VIEW
+====================== */
+
+async function loadTeam(teamNum) {
+    const sheetName = "Team " + teamNum;
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+
+    try {
+        const response = await fetch(url + "&t=" + Date.now());
+        const csv = await response.text();
+
+        const rows = csv.trim()
+            .split("\n")
+            .map(r => r.split(",").map(c => c.replace(/"/g, "").trim()));
+
+        const labels = [];
+        const scores = [];
+
+        let startRow = -1;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i] && rows[i].length > 11) {
+                const colL = rows[i][11] ? rows[i][11].toLowerCase() : '';
+                if (colL.includes('pillar') || colL.includes('category') || colL.includes('parameter') || colL.includes('criteria')) {
+                    startRow = i + 1;
+                    break;
+                }
+            }
+        }
+
+        if (startRow === -1) startRow = 10;
+
+        for (let i = startRow; i < Math.min(startRow + 5, rows.length); i++) {
+            if (rows[i] && rows[i].length > 12) {
+                const label = rows[i][11] ? rows[i][11].trim() : '';
+                const score = Number(rows[i][12]);
+                if (label && label !== '' && !isNaN(score) && score >= 0) {
+                    labels.push(label);
+                    scores.push(score);
+                }
+            }
+        }
+
+        if (labels.length === 0) {
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i] && rows[i].length > 12) {
+                    const label = rows[i][11] ? rows[i][11].trim() : '';
+                    const score = Number(rows[i][12]);
+                    if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
+                        if (!label.toLowerCase().includes('total') && 
+                            !label.toLowerCase().includes('sum') &&
+                            !label.toLowerCase().includes('average')) {
+                            labels.push(label);
+                            scores.push(score);
+                            if (labels.length >= 5) break;
+                        }
+                    }
+                }
+            }
+        }
+
+        while (labels.length < 5) {
+            labels.push(`Item ${labels.length + 1}`);
+            scores.push(0);
+        }
+
+        const finalLabels = labels.slice(0, 5);
+        const finalScores = scores.slice(0, 5);
+        const total = finalScores.reduce((a, b) => a + b, 0);
+
+        document.getElementById('totalScore').innerHTML = total;
+        drawChart(teamNum, finalLabels, finalScores);
+
+    } catch (err) {
+        console.error("Error loading team data:", err);
+        document.getElementById('totalScore').innerHTML = "0";
+        const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
+        drawChart(teamNum, fallbackLabels, [0, 0, 0, 0, 0]);
+    }
+}
+
+function drawChart(teamNum, labels, scores) {
+    const canvasId = `chart${teamNum}`;
+    const ctx = document.getElementById(canvasId);
+
+    // Destroy existing chart if it exists
+    if (chartInstances[canvasId]) {
+        chartInstances[canvasId].destroy();
+    }
+
+    chartInstances[canvasId] = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [{
+                data: scores,
+                backgroundColor: [
+                    "#a78bfa",
+                    "#00b4d8",
+                    "#7dd3fc",
+                    "#00d4aa",
+                    "#c084fc"
+                ],
+                borderRadius: 18
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                datalabels: {
+                    color: '#ffffff',
+                    anchor: 'end',
+                    align: 'end',
+                    font: {
+                        weight: 'bold',
+                        size: 18
+                    },
+                    formatter: function(value) {
+                        return value + '';
+                    },
+                    offset: 2
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y + ' points';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: "#e0d7f5",
+                        font: { size: 15 }
+                    },
+                    grid: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    max: Math.max(100, ...scores) + 15,
+                    ticks: { color: "#e0d7f5" }
+                }
+            }
+        }
+    });
+}
+
+/* ======================
+   FINAL SCORES
+====================== */
+
+function addSparklesToChampion() {
+    const existingContainers = document.querySelectorAll('.sparkle-container');
+    existingContainers.forEach(container => container.remove());
+    
+    const championCard = document.querySelector('.first');
+    if (!championCard) return;
+    
+    championCard.classList.add('glow-pulse');
+    
+    const sparkleContainer = document.createElement('div');
+    sparkleContainer.className = 'sparkle-container';
+    championCard.appendChild(sparkleContainer);
+    
+    const colors = ['#ffffff', '#FFD700', '#fbbf24', '#fff5e6', '#ffe4b5'];
+    for (let i = 0; i < 15; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle-particle';
+        sparkle.style.left = (10 + Math.random() * 80) + '%';
+        sparkle.style.top = (10 + Math.random() * 80) + '%';
+        sparkle.style.animationDelay = (Math.random() * 5) + 's';
+        sparkle.style.animationDuration = (4 + Math.random() * 3) + 's';
+        sparkle.style.width = (3 + Math.random() * 5) + 'px';
+        sparkle.style.height = sparkle.style.width;
+        sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        sparkle.style.boxShadow = `0 0 6px ${sparkle.style.background}`;
+        sparkleContainer.appendChild(sparkle);
+    }
+}
+
+async function showFinal() {
+    const teams = ["Team 1", "Team 2", "Team 3"];
+    const results = [];
+
+    for (const teamName of teams) {
+        try {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(teamName)}`;
+            const response = await fetch(url + "&t=" + Date.now());
+            const csv = await response.text();
+
+            const rows = csv.trim()
+                .split("\n")
+                .map(r => r.split(",").map(c => c.replace(/"/g, "").trim()));
+
+            const scores = [];
+            let startRow = -1;
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i] && rows[i].length > 11) {
+                    const colL = rows[i][11] ? rows[i][11].toLowerCase() : '';
+                    if (colL.includes('pillar') || colL.includes('category') || colL.includes('parameter') || colL.includes('criteria')) {
+                        startRow = i + 1;
+                        break;
+                    }
+                }
+            }
+
+            if (startRow === -1) startRow = 10;
+
+            for (let i = startRow; i < Math.min(startRow + 5, rows.length); i++) {
+                if (rows[i] && rows[i].length > 12) {
+                    const score = Number(rows[i][12]);
+                    if (!isNaN(score) && score >= 0) {
+                        scores.push(score);
+                    }
+                }
+            }
+
+            if (scores.length === 0) {
+                for (let i = 0; i < rows.length; i++) {
+                    if (rows[i] && rows[i].length > 12) {
+                        const label = rows[i][11] ? rows[i][11].trim() : '';
+                        const score = Number(rows[i][12]);
+                        if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
+                            if (!label.toLowerCase().includes('total') && 
+                                !label.toLowerCase().includes('sum') &&
+                                !label.toLowerCase().includes('average')) {
+                                scores.push(score);
+                                if (scores.length >= 5) break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            while (scores.length < 5) scores.push(0);
+            const total = scores.slice(0, 5).reduce((a, b) => a + b, 0);
+            results.push({ team: teamName, score: total });
+
+        } catch (err) {
+            console.error(teamName, err);
+            results.push({ team: teamName, score: 0 });
+        }
+    }
+
+    results.sort((a, b) => b.score - a.score);
+    while (results.length < 3) {
+        results.push({ team: `Team ${results.length + 1}`, score: 0 });
+    }
+
+    document.getElementById("leaderboard").innerHTML = `
+        <div class="winner-card first">
+            <div class="position">🏆 CHAMPION</div>
+            <div class="team-name-final">${results[0].team}</div>
+            <div class="team-score-final">${results[0].score}</div>
+        </div>
+        <div class="podium-row">
+            <div class="winner-card second">
+                <div class="position">🥈 SECOND PLACE</div>
+                <div class="team-name-final">${results[1].team}</div>
+                <div class="team-score-final">${results[1].score}</div>
+            </div>
+            <div class="winner-card third">
+                <div class="position">🥉 THIRD PLACE</div>
+                <div class="team-name-final">${results[2].team}</div>
+                <div class="team-score-final">${results[2].score}</div>
+            </div>
+        </div>
+    `;
+
+    setTimeout(() => addSparklesToChampion(), 100);
+}
+
+/* ======================
+   AUTO-REFRESH
+====================== */
+
+// Show home page by default
+showPage('home');
+
+// Auto-refresh team data every 2 seconds
+setInterval(() => {
+    if (currentPage.startsWith('team')) {
+        const teamNum = currentPage.replace('team', '');
+        loadTeam(teamNum);
+    }
+}, 2000);
+
+// Auto-refresh final scores every 5 seconds
+setInterval(() => {
+    if (currentPage === 'final-scores') {
+        showFinal();
+    }
+}, 5000);
+
+</script>
+
+</body>
+
+</html>
