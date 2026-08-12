@@ -1245,29 +1245,27 @@ async function showFinal() {
 }
 
 function displayLeaderboard(results) {
+    const medals = ['🥇', '🥈', '🥉'];
+    const rankClasses = ['gold', 'silver', 'bronze'];
+    
     document.getElementById("leaderboard").innerHTML = `
-        <div class="winner-card first">
-            <div class="position">🏆 CHAMPION</div>
-            <div class="team-name-final">${results[0].team}</div>
-            <div class="team-score-final">${results[0].score}</div>
-        </div>
-        <div class="podium-row">
-            <div class="winner-card second">
-                <div class="position">🥈 SECOND PLACE</div>
-                <div class="team-name-final">${results[1].team}</div>
-                <div class="team-score-final">${results[1].score}</div>
-            </div>
-            <div class="winner-card third">
-                <div class="position">🥉 THIRD PLACE</div>
-                <div class="team-name-final">${results[2].team}</div>
-                <div class="team-score-final">${results[2].score}</div>
-            </div>
+        <div class="leaderboard-modern">
+            ${results.map((result, index) => `
+                <div class="rank-item">
+                    <div class="rank-number ${rankClasses[index] || 'default'}">
+                        ${medals[index] || `#${index + 1}`}
+                    </div>
+                    <div class="rank-details">
+                        <div class="team">${result.team}</div>
+                        <div class="sub-text">${index === 0 ? '🏆 Winner' : index === 1 ? '🥈 Runner-up' : '🥉 Third Place'}</div>
+                    </div>
+                    <div class="rank-score">${result.score}</div>
+                </div>
+            `).join('')}
         </div>
     `;
-
     setTimeout(() => addSparklesToChampion(), 100);
 }
-
 function showFallbackLeaderboard() {
     const fallbackResults = [
         { team: "Team 1", score: 0 },
