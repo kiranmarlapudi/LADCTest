@@ -79,8 +79,8 @@ body, html {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 30px;
-    gap: 0;
+    padding: 15px 40px;
+    gap: 20px;
 }
 
 .header-top-logo {
@@ -91,8 +91,8 @@ body, html {
 
 /* Team page logo - smaller on right */
 .header-banner.team-header .header-top-logo {
-    width: 180px;
-    order: 2; /* Move to right */
+    width: 160px;
+    flex-shrink: 0;
 }
 
 .header-main-banner {
@@ -105,9 +105,9 @@ body, html {
 
 /* Team page HRFSH - smaller on left */
 .header-banner.team-header .header-main-banner {
-    width: 25%;
-    max-width: 300px;
-    order: 1; /* Move to left */
+    width: 22%;
+    max-width: 280px;
+    flex-shrink: 0;
 }
 
 /* Home page HRFSH - original size */
@@ -116,13 +116,18 @@ body, html {
     max-width: 950px;
 }
 
-/* Page Title Section */
+/* Page Title Section - positioned between logos on team pages */
 .page-title-section {
     position: relative;
     z-index: 2;
     text-align: center;
-    margin: 10px 0 20px 0;
-    width: 100%;
+    flex: 1;
+    padding: 0 20px;
+}
+
+.header-banner.team-header .page-title-section {
+    flex: 1;
+    min-width: 200px;
 }
 
 .main-title {
@@ -294,14 +299,25 @@ body, html {
 }
 
 /* FINAL SCORES */
+.final-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
 .final-header-text {
     color: #FFD700;
-    font-size: 2.5rem;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 20px;
+    font-size: 3rem;
+    font-weight: 800;
     text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
-    letter-spacing: 2px;
+    letter-spacing: 3px;
+}
+
+.final-subtitle {
+    color: #c4b5fd;
+    font-size: 2.2rem;
+    font-weight: 600;
+    margin-top: 5px;
+    text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
 }
 
 .leaderboard {
@@ -457,7 +473,8 @@ body, html {
     .header-main-banner { width: 95%; }
     .team-name-display { font-size: 2rem; }
     .team-score-final { font-size: 48px; }
-    .final-header-text { font-size: 1.8rem; }
+    .final-header-text { font-size: 2rem; }
+    .final-subtitle { font-size: 1.5rem; }
     
     .header-banner.team-header {
         flex-direction: column;
@@ -467,13 +484,15 @@ body, html {
     
     .header-banner.team-header .header-top-logo {
         width: 120px;
-        order: 1;
     }
     
     .header-banner.team-header .header-main-banner {
         width: 60%;
         max-width: 200px;
-        order: 2;
+    }
+    
+    .header-banner.team-header .page-title-section {
+        padding: 0;
     }
     
     .team-layout { 
@@ -496,19 +515,21 @@ body, html {
     
     <!-- HEADER AREA -->
     <header id="headerBanner" class="header-banner home-header">
-        <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
-             alt="TAPMI Logo" 
-             class="header-top-logo">
-        
-        <!-- GLOBAL PAGE TITLE - Now between logos -->
-        <div class="page-title-section">
-            <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
-            <div id="roundTitle" class="round-title">Round 3</div>
+        <!-- For home page, everything is centered -->
+        <div style="display: flex; flex-direction: column; align-items: center; width: 100%; gap: 15px;">
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
+                 alt="TAPMI Logo" 
+                 class="header-top-logo">
+            
+            <div class="page-title-section">
+                <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
+                <div id="roundTitle" class="round-title">Round 3</div>
+            </div>
+            
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
+                 alt="HR Conclave Banner" 
+                 class="header-main-banner">
         </div>
-        
-        <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
-             alt="HR Conclave Banner" 
-             class="header-main-banner">
     </header>
 
     <!-- TEAM NAME & LIVE INDICATOR -->
@@ -589,7 +610,10 @@ body, html {
 
     <!-- FINAL SCORES PAGE -->
     <div id="final-scores" class="page-content">
-        <div class="final-header-text">HR Innovation Challenge</div>
+        <div class="final-header">
+            <div class="final-header-text">🏆 HR Innovation Challenge</div>
+            <div class="final-subtitle">Final Scores</div>
+        </div>
         <div class="leaderboard" id="leaderboard"></div>
     </div>
 
@@ -663,24 +687,63 @@ function showPage(pageId) {
     if (pageId === 'home') {
         // Home page - centered header with full size
         headerBanner.className = 'header-banner home-header';
+        headerBanner.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; width: 100%; gap: 15px;">
+                <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
+                     alt="TAPMI Logo" 
+                     class="header-top-logo">
+                
+                <div class="page-title-section">
+                    <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
+                    <div id="roundTitle" class="round-title">Round 3</div>
+                </div>
+                
+                <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
+                     alt="HR Conclave Banner" 
+                     class="header-main-banner">
+            </div>
+        `;
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
-        roundTitle.classList.remove('hidden');
-        mainTitle.textContent = 'CASE PRESENTATION';
     } else if (pageId === 'final-scores') {
-        // Final scores page - use team header layout
+        // Final scores page - team header layout with both images on sides
         headerBanner.className = 'header-banner team-header';
+        headerBanner.innerHTML = `
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
+                 alt="HR Conclave Banner" 
+                 class="header-main-banner">
+            
+            <div class="page-title-section">
+                <div id="mainTitle" class="main-title" style="font-size: 2.5rem;">🏆 HR Innovation Challenge</div>
+                <div id="roundTitle" class="round-title hidden">Round 3</div>
+            </div>
+            
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
+                 alt="TAPMI Logo" 
+                 class="header-top-logo">
+        `;
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
-        roundTitle.classList.add('hidden');
-        mainTitle.textContent = 'CASE PRESENTATION';
-        // Call showFinal immediately and set up interval
+        // Call showFinal immediately
         showFinal();
     } else {
         // Team pages - left and right header layout with smaller images
         headerBanner.className = 'header-banner team-header';
-        roundTitle.classList.add('hidden');
-        mainTitle.textContent = 'CASE PRESENTATION';
+        headerBanner.innerHTML = `
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
+                 alt="HR Conclave Banner" 
+                 class="header-main-banner">
+            
+            <div class="page-title-section">
+                <div id="mainTitle" class="main-title" style="font-size: 2.2rem;">CASE PRESENTATION</div>
+                <div id="roundTitle" class="round-title hidden">Round 3</div>
+            </div>
+            
+            <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
+                 alt="TAPMI Logo" 
+                 class="header-top-logo">
+        `;
+        
         const teamNum = pageId.replace('team', '');
         currentTeam = teamNum;
         document.getElementById('teamNameDisplay').style.display = 'flex';
