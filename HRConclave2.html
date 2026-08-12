@@ -661,10 +661,10 @@ body, html {
 Chart.register(ChartDataLabels);
 
 /* ======================
-   SETTINGS - UPDATED
+   SETTINGS
 ====================== */
 
-// New Sheet ID from your link
+// Sheet ID from your link
 const SHEET_ID = "1B92Jqb0V-RUXtcwnLwqEAvEp_LmvUnM-77frByI4-Ek";
 
 // Sheet names mapping
@@ -672,6 +672,21 @@ const SHEET_NAMES = {
     "1": "Presenter 1",
     "2": "Presenter 2", 
     "3": "Presenter 3"
+};
+
+// Team-specific data ranges for charts (L=column 11, M=column 12 in 0-indexed)
+const TEAM_DATA_RANGES = {
+    "1": { startRow: 12, endRow: 16 }, // L13:M17 (0-indexed: 12-16)
+    "2": { startRow: 11, endRow: 15 }, // L12:M16 (0-indexed: 11-15)
+    "3": { startRow: 10, endRow: 14 }  // L11:M15 (0-indexed: 10-14)
+};
+
+// Final scores ranges - O19:P21 (O=column 14, P=column 15 in 0-indexed)
+const FINAL_SCORES_RANGE = { 
+    startRow: 18,  // O19 (0-indexed: 18)
+    endRow: 20,    // O21 (0-indexed: 20)
+    labelCol: 14,  // O column (0-indexed: 14)
+    scoreCol: 15   // P column (0-indexed: 15)
 };
 
 // Team-specific images
@@ -770,55 +785,48 @@ function showPage(pageId) {
 }
 
 /* ======================
-   TEAM VIEW - UPDATED FOR NEW SHEET NAMES AND CELL RANGE
+   TEAM VIEW - WITH SPECIFIC RANGES
 ====================== */
 
 async function loadTeam(teamNum) {
     const sheetName = SHEET_NAMES[teamNum];
-    // Using the Google Visualization API to get CSV data
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
-
+    const range = TEAM_DATA_RANGES[teamNum];
+    
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0&sheet=${encodeURIComponent(sheetName)}`;
+    
     try {
         console.log(`Fetching data for ${sheetName}...`);
-        const response = await fetch(url + "&t=" + Date.now());
+        console.log(`Using range: rows ${range.startRow+1} to ${range.endRow+1} (0-indexed: ${range.startRow} to ${range.endRow})`);
         
+        const response = await fetch(url + "&t=" + Date.now());
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const csv = await response.text();
-        console.log(`CSV data for ${sheetName}:`, csv.substring(0, 200) + '...');
-
+        console.log(`CSV data for ${sheetName}:`, csv.substring(0, 300) + '...');
+        
         // Parse CSV
-        const rows = csv.trim()
-            .split("\n")
-            .map(r => r.split(",").map(c => c.replace(/"/g, "").trim()));
-
+        const rows = parseCSV(csv);
+        
         if (rows.length === 0) {
             throw new Error("No data found in sheet");
         }
-
-        // Log the first few rows to help debug
-        console.log(`First 5 rows of ${sheetName}:`, rows.slice(0, 5));
-
-        // Extract data from L12:M16 (rows 11-15 in 0-indexed, columns L=11, M=12)
+        
+        console.log(`Total rows: ${rows.length}`);
+        console.log(`First 5 rows:`, rows.slice(0, 5));
+        
+        // Extract data from the specific range
         const labels = [];
         const scores = [];
         
-        // Start from row 11 (0-indexed) which is row 12 in Excel
-        const startRow = 11; // Row 12 in Excel (0-indexed)
-        const endRow = Math.min(startRow + 5, rows.length); // 5 rows for 5 pillars
-        
-        console.log(`Looking for data in rows ${startRow} to ${endRow-1}, columns L and M`);
-        
-        for (let i = startRow; i < endRow; i++) {
+        for (let i = range.startRow; i <= range.endRow && i < rows.length; i++) {
             if (rows[i] && rows[i].length > 12) {
-                const label = rows[i][11] ? rows[i][11].trim() : `Pillar ${i - startRow + 1}`;
-                const score = Number(rows[i][12]);
+                const label = rows[i][11] ? rows[i][11].trim() : `Pillar ${i - range.startRow + 1}`;
+                const score = parseFloat(rows[i][12]);
                 
                 console.log(`Row ${i+1}: Label="${label}", Score=${score}`);
                 
-                // Only add if we have a valid label and score
                 if (label && label !== '' && !isNaN(score) && score >= 0) {
                     labels.push(label);
                     scores.push(score);
@@ -829,14 +837,14 @@ async function loadTeam(teamNum) {
                 }
             }
         }
-
-        // If we didn't get any data, try scanning for any data in column L
+        
+        // If no data found in the specific range, try scanning
         if (labels.length === 0) {
-            console.log('No data found in expected range, scanning all rows...');
+            console.log('No data found in specific range, scanning all rows...');
             for (let i = 0; i < Math.min(rows.length, 30); i++) {
                 if (rows[i] && rows[i].length > 12) {
                     const label = rows[i][11] ? rows[i][11].trim() : '';
-                    const score = Number(rows[i][12]);
+                    const score = parseFloat(rows[i][12]);
                     if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
                         if (!label.toLowerCase().includes('total') && 
                             !label.toLowerCase().includes('sum') &&
@@ -849,29 +857,50 @@ async function loadTeam(teamNum) {
                 }
             }
         }
-
-        // Ensure we have 5 items (pad with zeros if needed)
+        
+        // Ensure we have 5 items
         while (labels.length < 5) {
             labels.push(`Pillar ${labels.length + 1}`);
             scores.push(0);
         }
-
-        // Take only first 5 items
+        
         const finalLabels = labels.slice(0, 5);
         const finalScores = scores.slice(0, 5);
         const total = finalScores.reduce((a, b) => a + b, 0);
-
+        
         console.log(`Final data for ${sheetName}:`, { labels: finalLabels, scores: finalScores, total });
-
+        
         document.getElementById('totalScore').innerHTML = total;
         drawChart(teamNum, finalLabels, finalScores);
-
+        
     } catch (err) {
         console.error("Error loading team data:", err);
         document.getElementById('totalScore').innerHTML = "0";
         const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
         drawChart(teamNum, fallbackLabels, [0, 0, 0, 0, 0]);
     }
+}
+
+function parseCSV(csv) {
+    const lines = csv.trim().split("\n");
+    return lines.map(line => {
+        const fields = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                fields.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        fields.push(current.trim());
+        return fields.map(f => f.replace(/^"|"$/g, '').trim());
+    });
 }
 
 function drawChart(teamNum, labels, scores) {
@@ -944,7 +973,7 @@ function drawChart(teamNum, labels, scores) {
 }
 
 /* ======================
-   FINAL SCORES - UPDATED FOR NEW SHEET NAMES
+   FINAL SCORES - EXTRACTED FROM O19:P21
 ====================== */
 
 function addSparklesToChampion() {
@@ -986,58 +1015,66 @@ async function showFinal() {
 
     for (const team of teams) {
         try {
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(team.name)}`;
-            const response = await fetch(url + "&t=" + Date.now());
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0&sheet=${encodeURIComponent(team.name)}`;
+            console.log(`Fetching final scores for ${team.name}...`);
             
+            const response = await fetch(url + "&t=" + Date.now());
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                console.error(`HTTP error! status: ${response.status}`);
+                results.push({ team: team.display, score: 0 });
+                continue;
             }
             
             const csv = await response.text();
-            const rows = csv.trim()
-                .split("\n")
-                .map(r => r.split(",").map(c => c.replace(/"/g, "").trim()));
-
-            const scores = [];
-            const startRow = 11; // Row 12 in Excel (0-indexed)
+            const rows = parseCSV(csv);
             
-            for (let i = startRow; i < Math.min(startRow + 5, rows.length); i++) {
-                if (rows[i] && rows[i].length > 12) {
-                    const score = Number(rows[i][12]);
+            console.log(`Rows in ${team.name}:`, rows.length);
+            
+            // Extract scores from O19:P21
+            let totalScore = 0;
+            let foundData = false;
+            
+            for (let i = FINAL_SCORES_RANGE.startRow; i <= FINAL_SCORES_RANGE.endRow && i < rows.length; i++) {
+                if (rows[i] && rows[i].length > 15) {
+                    const label = rows[i][FINAL_SCORES_RANGE.labelCol] ? rows[i][FINAL_SCORES_RANGE.labelCol].trim() : '';
+                    const score = parseFloat(rows[i][FINAL_SCORES_RANGE.scoreCol]);
+                    
+                    console.log(`Row ${i+1}: Label="${label}", Score=${score}`);
+                    
                     if (!isNaN(score) && score >= 0) {
-                        scores.push(score);
+                        totalScore += score;
+                        foundData = true;
                     }
                 }
             }
-
-            // If no scores found, try scanning all rows
-            if (scores.length === 0) {
+            
+            // If no data found in O19:P21, try scanning for any numeric data
+            if (!foundData) {
+                console.log('No data found in O19:P21, scanning all rows...');
                 for (let i = 0; i < Math.min(rows.length, 30); i++) {
                     if (rows[i] && rows[i].length > 12) {
-                        const label = rows[i][11] ? rows[i][11].trim() : '';
-                        const score = Number(rows[i][12]);
-                        if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
-                            if (!label.toLowerCase().includes('total') && 
-                                !label.toLowerCase().includes('sum') &&
-                                !label.toLowerCase().includes('average')) {
-                                scores.push(score);
-                                if (scores.length >= 5) break;
+                        // Try columns O, P, Q, R (14, 15, 16, 17)
+                        for (let col = 14; col <= 17 && col < rows[i].length; col++) {
+                            const score = parseFloat(rows[i][col]);
+                            if (!isNaN(score) && score >= 0 && score < 200) { // Reasonable score range
+                                totalScore += score;
+                                foundData = true;
+                                break;
                             }
                         }
                     }
                 }
             }
-
-            while (scores.length < 5) scores.push(0);
-            const total = scores.slice(0, 5).reduce((a, b) => a + b, 0);
-            results.push({ team: team.display, score: total });
-
+            
+            results.push({ team: team.display, score: foundData ? totalScore : 0 });
+            
         } catch (err) {
             console.error(team.name, err);
             results.push({ team: team.display, score: 0 });
         }
     }
 
+    // Sort and display
     results.sort((a, b) => b.score - a.score);
     while (results.length < 3) {
         results.push({ team: `Team ${results.length + 1}`, score: 0 });
@@ -1073,13 +1110,13 @@ async function showFinal() {
 // Show home page by default
 showPage('home');
 
-// Auto-refresh team data every 2 seconds
+// Auto-refresh team data every 3 seconds
 setInterval(() => {
     if (currentPage.startsWith('team')) {
         const teamNum = currentPage.replace('team', '');
         loadTeam(teamNum);
     }
-}, 2000);
+}, 3000);
 
 // Auto-refresh final scores every 5 seconds
 setInterval(() => {
