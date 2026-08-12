@@ -75,8 +75,8 @@ body, html {
 }
 
 .header-main-banner {
-    width: 37.5%;        /* Reduced from 75% to half */
-    max-width: 475px;    /* Reduced from 950px to half */
+    width: 37.5%;
+    max-width: 475px;
     height: auto;
     object-fit: contain;
     display: block;
@@ -109,6 +109,11 @@ body, html {
     font-weight: 600;
 }
 
+/* Hide round title by default */
+.round-title.hidden {
+    display: none;
+}
+
 /* TEAM NAME DISPLAY */
 .team-name-display {
     position: relative;
@@ -119,24 +124,18 @@ body, html {
     color: #e0d7f5;
     margin: 5px 0 10px 0;
     text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
 }
 
-.live-indicator {
-    color: #00d4aa;
-    margin-top: 5px;
-    font-size: 14px;
-    position: relative;
-    z-index: 2;
-    text-align: center;
-}
-
-.dot {
-    height: 10px;
-    width: 10px;
+.team-name-display .dot {
+    height: 12px;
+    width: 12px;
     background: #00d4aa;
     display: inline-block;
     border-radius: 50%;
-    margin-right: 8px;
     animation: pulse 2s infinite;
 }
 
@@ -390,7 +389,7 @@ body, html {
     .round-title { font-size: 1.8rem; }
     .bottom-nav a { display: inline-block; margin: 5px 8px; font-size: 1rem; }
     .header-top-logo { width: 150px; }
-    .header-main-banner { width: 95%; }
+    .header-main-banner { width: 70%; max-width: 350px; }
     .team-name-display { font-size: 2rem; }
     .team-score-final { font-size: 48px; }
     
@@ -426,18 +425,17 @@ body, html {
     <!-- GLOBAL PAGE TITLE -->
     <div class="page-title-section">
         <div class="main-title">CASE PRESENTATION</div>
-        <div class="round-title">Round 3</div>
+        <div id="roundTitle" class="round-title">Round 3</div>
     </div>
 
     <!-- TEAM NAME & LIVE INDICATOR -->
-    <div id="teamNameDisplay" class="team-name-display">TEAM 1</div>
-    <div class="live-indicator">
+    <div id="teamNameDisplay" class="team-name-display" style="display:none;">
         <span class="dot"></span>
-        LIVE DASHBOARD
+        <span id="teamNameText">TEAM 1</span>
     </div>
 
     <!-- TOTAL SCORE -->
-    <div id="totalScoreContainer" class="total-score-container">
+    <div id="totalScoreContainer" class="total-score-container" style="display:none;">
         <div class="total-label">TOTAL SCORE</div>
         <div id="totalScore" class="total-score">0</div>
     </div>
@@ -564,21 +562,22 @@ function showPage(pageId) {
     if (pageId === 'home') {
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
-        document.querySelector('.live-indicator').style.display = 'none';
+        document.getElementById('roundTitle').classList.remove('hidden');
     } else if (pageId === 'final-scores') {
-        document.getElementById('teamNameDisplay').style.display = 'block';
-        document.getElementById('teamNameDisplay').innerHTML = '🏆 FINAL LEADERBOARD';
+        document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
-        document.querySelector('.live-indicator').style.display = 'block';
+        document.getElementById('roundTitle').classList.add('hidden');
+        // Set the page title for final scores
+        document.querySelector('.main-title').textContent = 'FINAL SCORES';
         showFinal();
     } else {
         // Team pages
+        document.getElementById('roundTitle').classList.add('hidden');
         const teamNum = pageId.replace('team', '');
         currentTeam = teamNum;
-        document.getElementById('teamNameDisplay').style.display = 'block';
-        document.getElementById('teamNameDisplay').innerHTML = `TEAM ${teamNum}`;
+        document.getElementById('teamNameDisplay').style.display = 'flex';
+        document.getElementById('teamNameText').textContent = `TEAM ${teamNum}`;
         document.getElementById('totalScoreContainer').style.display = 'block';
-        document.querySelector('.live-indicator').style.display = 'block';
         
         // Set team images
         const imgUrl = TEAM_IMAGES[teamNum];
@@ -805,6 +804,23 @@ async function showFinal() {
                     const score = Number(rows[i][12]);
                     if (!isNaN(score) && score >= 0) {
                         scores.push(score);
+                    }
+                }
+            }
+
+            if (scores.length === 0) {
+                for (let i = 0; i < rows.length; i++) {
+                    if (rows[i] && rows[i].length > 12) {
+                        const label = rows[i][11] ? rows[i][11].trim() : '';
+                        const score = Number(rows[i][12]);
+                        if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
+                            if (!label.toLowerCase().includes('total') && 
+                                !label.toLowerCase().includes('sum') &&
+                                !label.toLowerCase().includes('average')) {
+                                scores.push(score);
+                                if (scores.length >= 5) break;
+                            }
+                        }
                     }
                 }
             }
