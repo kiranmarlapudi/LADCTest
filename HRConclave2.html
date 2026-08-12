@@ -661,10 +661,18 @@ body, html {
 Chart.register(ChartDataLabels);
 
 /* ======================
-   SETTINGS
+   SETTINGS - UPDATED
 ====================== */
 
+// New Sheet ID from your link
 const SHEET_ID = "1B92Jqb0V-RUXtcwnLwqEAvEp_LmvUnM-77frByI4-Ek";
+
+// Sheet names mapping
+const SHEET_NAMES = {
+    "1": "Presenter 1",
+    "2": "Presenter 2", 
+    "3": "Presenter 3"
+};
 
 // Team-specific images
 const TEAM_IMAGES = {
@@ -762,50 +770,70 @@ function showPage(pageId) {
 }
 
 /* ======================
-   TEAM VIEW
+   TEAM VIEW - UPDATED FOR NEW SHEET NAMES AND CELL RANGE
 ====================== */
 
 async function loadTeam(teamNum) {
-    const sheetName = "Team " + teamNum;
+    const sheetName = SHEET_NAMES[teamNum];
+    // Using the Google Visualization API to get CSV data
     const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
 
     try {
+        console.log(`Fetching data for ${sheetName}...`);
         const response = await fetch(url + "&t=" + Date.now());
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const csv = await response.text();
+        console.log(`CSV data for ${sheetName}:`, csv.substring(0, 200) + '...');
 
+        // Parse CSV
         const rows = csv.trim()
             .split("\n")
             .map(r => r.split(",").map(c => c.replace(/"/g, "").trim()));
 
-        const labels = [];
-        const scores = [];
-
-        let startRow = -1;
-        for (let i = 0; i < rows.length; i++) {
-            if (rows[i] && rows[i].length > 11) {
-                const colL = rows[i][11] ? rows[i][11].toLowerCase() : '';
-                if (colL.includes('pillar') || colL.includes('category') || colL.includes('parameter') || colL.includes('criteria')) {
-                    startRow = i + 1;
-                    break;
-                }
-            }
+        if (rows.length === 0) {
+            throw new Error("No data found in sheet");
         }
 
-        if (startRow === -1) startRow = 10;
+        // Log the first few rows to help debug
+        console.log(`First 5 rows of ${sheetName}:`, rows.slice(0, 5));
 
-        for (let i = startRow; i < Math.min(startRow + 5, rows.length); i++) {
+        // Extract data from L12:M16 (rows 11-15 in 0-indexed, columns L=11, M=12)
+        const labels = [];
+        const scores = [];
+        
+        // Start from row 11 (0-indexed) which is row 12 in Excel
+        const startRow = 11; // Row 12 in Excel (0-indexed)
+        const endRow = Math.min(startRow + 5, rows.length); // 5 rows for 5 pillars
+        
+        console.log(`Looking for data in rows ${startRow} to ${endRow-1}, columns L and M`);
+        
+        for (let i = startRow; i < endRow; i++) {
             if (rows[i] && rows[i].length > 12) {
-                const label = rows[i][11] ? rows[i][11].trim() : '';
+                const label = rows[i][11] ? rows[i][11].trim() : `Pillar ${i - startRow + 1}`;
                 const score = Number(rows[i][12]);
+                
+                console.log(`Row ${i+1}: Label="${label}", Score=${score}`);
+                
+                // Only add if we have a valid label and score
                 if (label && label !== '' && !isNaN(score) && score >= 0) {
                     labels.push(label);
                     scores.push(score);
+                } else if (label && label !== '') {
+                    // If score is invalid but label exists, treat as 0
+                    labels.push(label);
+                    scores.push(0);
                 }
             }
         }
 
+        // If we didn't get any data, try scanning for any data in column L
         if (labels.length === 0) {
-            for (let i = 0; i < rows.length; i++) {
+            console.log('No data found in expected range, scanning all rows...');
+            for (let i = 0; i < Math.min(rows.length, 30); i++) {
                 if (rows[i] && rows[i].length > 12) {
                     const label = rows[i][11] ? rows[i][11].trim() : '';
                     const score = Number(rows[i][12]);
@@ -822,14 +850,18 @@ async function loadTeam(teamNum) {
             }
         }
 
+        // Ensure we have 5 items (pad with zeros if needed)
         while (labels.length < 5) {
-            labels.push(`Item ${labels.length + 1}`);
+            labels.push(`Pillar ${labels.length + 1}`);
             scores.push(0);
         }
 
+        // Take only first 5 items
         const finalLabels = labels.slice(0, 5);
         const finalScores = scores.slice(0, 5);
         const total = finalScores.reduce((a, b) => a + b, 0);
+
+        console.log(`Final data for ${sheetName}:`, { labels: finalLabels, scores: finalScores, total });
 
         document.getElementById('totalScore').innerHTML = total;
         drawChart(teamNum, finalLabels, finalScores);
@@ -912,7 +944,7 @@ function drawChart(teamNum, labels, scores) {
 }
 
 /* ======================
-   FINAL SCORES
+   FINAL SCORES - UPDATED FOR NEW SHEET NAMES
 ====================== */
 
 function addSparklesToChampion() {
@@ -945,33 +977,30 @@ function addSparklesToChampion() {
 }
 
 async function showFinal() {
-    const teams = ["Team 1", "Team 2", "Team 3"];
+    const teams = [
+        { id: "1", name: "Presenter 1", display: "Team 1" },
+        { id: "2", name: "Presenter 2", display: "Team 2" },
+        { id: "3", name: "Presenter 3", display: "Team 3" }
+    ];
     const results = [];
 
-    for (const teamName of teams) {
+    for (const team of teams) {
         try {
-            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(teamName)}`;
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(team.name)}`;
             const response = await fetch(url + "&t=" + Date.now());
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
             const csv = await response.text();
-
             const rows = csv.trim()
                 .split("\n")
                 .map(r => r.split(",").map(c => c.replace(/"/g, "").trim()));
 
             const scores = [];
-            let startRow = -1;
-            for (let i = 0; i < rows.length; i++) {
-                if (rows[i] && rows[i].length > 11) {
-                    const colL = rows[i][11] ? rows[i][11].toLowerCase() : '';
-                    if (colL.includes('pillar') || colL.includes('category') || colL.includes('parameter') || colL.includes('criteria')) {
-                        startRow = i + 1;
-                        break;
-                    }
-                }
-            }
-
-            if (startRow === -1) startRow = 10;
-
+            const startRow = 11; // Row 12 in Excel (0-indexed)
+            
             for (let i = startRow; i < Math.min(startRow + 5, rows.length); i++) {
                 if (rows[i] && rows[i].length > 12) {
                     const score = Number(rows[i][12]);
@@ -981,8 +1010,9 @@ async function showFinal() {
                 }
             }
 
+            // If no scores found, try scanning all rows
             if (scores.length === 0) {
-                for (let i = 0; i < rows.length; i++) {
+                for (let i = 0; i < Math.min(rows.length, 30); i++) {
                     if (rows[i] && rows[i].length > 12) {
                         const label = rows[i][11] ? rows[i][11].trim() : '';
                         const score = Number(rows[i][12]);
@@ -1000,11 +1030,11 @@ async function showFinal() {
 
             while (scores.length < 5) scores.push(0);
             const total = scores.slice(0, 5).reduce((a, b) => a + b, 0);
-            results.push({ team: teamName, score: total });
+            results.push({ team: team.display, score: total });
 
         } catch (err) {
-            console.error(teamName, err);
-            results.push({ team: teamName, score: 0 });
+            console.error(team.name, err);
+            results.push({ team: team.display, score: 0 });
         }
     }
 
