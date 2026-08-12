@@ -235,6 +235,7 @@ body, html {
 .team-left-col, .team-right-col {
     flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.05);
@@ -242,13 +243,24 @@ body, html {
     padding: 15px;
     border: 1px solid rgba(255,255,255,0.1);
     min-height: 400px;
+    gap: 10px;
 }
 
 .team-left-col img, .team-right-col img {
     width: 100%;
-    height: 100%;
+    height: 80%;
     object-fit: contain;
     border-radius: 10px;
+}
+
+.vote-text {
+    color: #FFD700;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    opacity: 0.8;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 .team-center-col {
@@ -499,12 +511,14 @@ body, html {
         <div class="team-layout">
             <div class="team-left-col">
                 <img id="leftImage1" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
             </div>
             <div class="team-center-col">
                 <canvas id="chart1"></canvas>
             </div>
             <div class="team-right-col">
                 <img id="rightImage1" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
             </div>
         </div>
     </div>
@@ -514,12 +528,14 @@ body, html {
         <div class="team-layout">
             <div class="team-left-col">
                 <img id="leftImage2" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
             </div>
             <div class="team-center-col">
                 <canvas id="chart2"></canvas>
             </div>
             <div class="team-right-col">
                 <img id="rightImage2" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
             </div>
         </div>
     </div>
@@ -529,12 +545,14 @@ body, html {
         <div class="team-layout">
             <div class="team-left-col">
                 <img id="leftImage3" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
             </div>
             <div class="team-center-col">
                 <canvas id="chart3"></canvas>
             </div>
             <div class="team-right-col">
                 <img id="rightImage3" src="" alt="Team Image">
+                <div class="vote-text">📱 Scan the code to vote</div>
             </div>
         </div>
     </div>
@@ -625,6 +643,7 @@ function showPage(pageId) {
         document.getElementById('totalScoreContainer').style.display = 'none';
         roundTitle.classList.add('hidden');
         mainTitle.textContent = 'FINAL SCORES';
+        // Call showFinal immediately and set up interval
         showFinal();
     } else {
         // Team pages - left and right header layout with smaller images
