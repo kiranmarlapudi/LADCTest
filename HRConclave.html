@@ -68,10 +68,30 @@ body, html {
     gap: 15px;
 }
 
+/* Home page header - centered */
+.header-banner.home-header {
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Team pages header - left and right layout */
+.header-banner.team-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    gap: 0;
+}
+
 .header-top-logo {
     width: 320px; 
     height: auto;
     object-fit: contain;
+}
+
+/* Team page logo - smaller */
+.header-banner.team-header .header-top-logo {
+    width: 180px;
 }
 
 .header-main-banner {
@@ -80,6 +100,18 @@ body, html {
     height: auto;
     object-fit: contain;
     display: block;
+}
+
+/* Team page HRFSH - smaller */
+.header-banner.team-header .header-main-banner {
+    width: 25%;
+    max-width: 300px;
+}
+
+/* Home page HRFSH - original size */
+.header-banner.home-header .header-main-banner {
+    width: 75%;
+    max-width: 950px;
 }
 
 /* Page Title Section */
@@ -389,9 +421,24 @@ body, html {
     .round-title { font-size: 1.8rem; }
     .bottom-nav a { display: inline-block; margin: 5px 8px; font-size: 1rem; }
     .header-top-logo { width: 150px; }
-    .header-main-banner { width: 70%; max-width: 350px; }
+    .header-main-banner { width: 95%; }
     .team-name-display { font-size: 2rem; }
     .team-score-final { font-size: 48px; }
+    
+    .header-banner.team-header {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .header-banner.team-header .header-top-logo {
+        width: 120px;
+    }
+    
+    .header-banner.team-header .header-main-banner {
+        width: 60%;
+        max-width: 200px;
+    }
     
     .team-layout { 
         flex-direction: column; 
@@ -412,7 +459,7 @@ body, html {
 <div class="app-container">
     
     <!-- HEADER AREA -->
-    <header class="header-banner">
+    <header id="headerBanner" class="header-banner home-header">
         <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
              alt="TAPMI Logo" 
              class="header-top-logo">
@@ -424,7 +471,7 @@ body, html {
 
     <!-- GLOBAL PAGE TITLE -->
     <div class="page-title-section">
-        <div class="main-title">CASE PRESENTATION</div>
+        <div id="mainTitle" class="main-title">CASE PRESENTATION</div>
         <div id="roundTitle" class="round-title">Round 3</div>
     </div>
 
@@ -558,21 +605,32 @@ function showPage(pageId) {
 
     currentPage = pageId;
 
+    // Get elements
+    const headerBanner = document.getElementById('headerBanner');
+    const mainTitle = document.getElementById('mainTitle');
+    const roundTitle = document.getElementById('roundTitle');
+
     // Handle page-specific logic
     if (pageId === 'home') {
+        // Home page - centered header with full size
+        headerBanner.className = 'header-banner home-header';
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
-        document.getElementById('roundTitle').classList.remove('hidden');
+        roundTitle.classList.remove('hidden');
+        mainTitle.textContent = 'CASE PRESENTATION';
     } else if (pageId === 'final-scores') {
+        // Final scores page - use team header layout
+        headerBanner.className = 'header-banner team-header';
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
-        document.getElementById('roundTitle').classList.add('hidden');
-        // Set the page title for final scores
-        document.querySelector('.main-title').textContent = 'FINAL SCORES';
+        roundTitle.classList.add('hidden');
+        mainTitle.textContent = 'FINAL SCORES';
         showFinal();
     } else {
-        // Team pages
-        document.getElementById('roundTitle').classList.add('hidden');
+        // Team pages - left and right header layout with smaller images
+        headerBanner.className = 'header-banner team-header';
+        roundTitle.classList.add('hidden');
+        mainTitle.textContent = 'CASE PRESENTATION';
         const teamNum = pageId.replace('team', '');
         currentTeam = teamNum;
         document.getElementById('teamNameDisplay').style.display = 'flex';
