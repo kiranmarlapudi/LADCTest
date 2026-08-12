@@ -1245,24 +1245,34 @@ async function showFinal() {
 }
 
     function displayLeaderboard(results) {
-    const medals = ['🥇', '🥈', '🥉'];
-    const podiumClasses = ['podium-1', 'podium-2', 'podium-3'];
-    const positions = ['🏆 CHAMPION', '2ND PLACE', '3RD PLACE'];
+    const maxScore = Math.max(...results.map(r => r.score));
+    const medalEmojis = ['🥇', '🥈', '🥉'];
+    const barClasses = ['gold', 'silver', 'bronze'];
     
     document.getElementById("leaderboard").innerHTML = `
-        <div class="podium-container">
-            ${results.map((result, index) => `
-                <div class="podium-item ${podiumClasses[index]}">
-                    <div class="rank-icon">${medals[index]}</div>
-                    <div class="podium-position">${positions[index]}</div>
-                    <div class="team-name">${result.team}</div>
-                    <div class="score">${result.score}</div>
-                </div>
-            `).join('')}
+        <div class="leaderboard-bars">
+            ${results.map((result, index) => {
+                const percentage = maxScore > 0 ? (result.score / maxScore) * 100 : 0;
+                return `
+                    <div class="bar-item">
+                        <div class="bar-header">
+                            <span>${medalEmojis[index] || ''} ${result.team}</span>
+                            <span>${result.score}</span>
+                        </div>
+                        <div class="bar-track">
+                            <div class="bar-fill ${barClasses[index] || 'default'}" style="width: ${percentage}%">
+                                ${percentage > 20 ? `${Math.round(percentage)}%` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
         </div>
     `;
     setTimeout(() => addSparklesToChampion(), 100);
 }
+
+    
 function showFallbackLeaderboard() {
     const fallbackResults = [
         { team: "Team 1", score: 0 },
