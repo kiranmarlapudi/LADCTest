@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>HR Conclave 2026 Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Add Chart.js Data Labels Plugin -->
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+
+body{
+
+height:100vh;
+overflow:hidden;
+
+font-family:'Segoe UI',sans-serif;
+
+background:
+
+radial-gradient(circle at top left,
+rgba(139,92,246,.25),
+transparent 35%),
+
+radial-gradient(circle at bottom right,
+rgba(56,189,248,.20),
+transparent 35%),
+
+linear-gradient(
+135deg,
+#12081f,
+#251341,
+#102442
+);
+
+color:white;
+
+}
+
+
+/* HEADER */
+
+.header{
+
+text-align:center;
+
+padding:15px;
+
+}
+
+
+.logo{
+
+width:130px;
+height:130px;
+
+object-fit:contain;
+
+margin:auto;
+
+}
+
+
+.title{
+
+font-size:58px;
+
+font-weight:800;
+
+letter-spacing:3px;
+
+margin-top:5px;
+
+}
+
+
+.team{
+
+font-size:46px;
+
+font-weight:700;
+
+margin-top:10px;
+
+}
+
+
+.live{
+
+color:#4ade80;
+
+margin-top:8px;
+
+font-size:14px;
+
+}
+
+
+.dot{
+
+height:10px;
+width:10px;
+
+background:#4ade80;
+
+display:inline-block;
+
+border-radius:50%;
+
+margin-right:8px;
+
+}
+
+
+/* SCORE */
+
+.total{
+
+text-align:center;
+
+margin:10px;
+
+}
+
+
+.total-label{
+
+opacity:.7;
+
+font-size:14px;
+
+}
+
+
+.total-score{
+
+font-size:42px;
+
+font-weight:700;
+
+color:#fbbf24;
+
+}
+
+
+
+/* MAIN */
+
+.main{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:25px;
+
+width:98%;
+
+margin:auto;
+
+}
+
+
+
+.side{
+
+width:230px;
+
+}
+
+
+
+.side img{
+
+width:100%;
+
+height:500px;
+
+object-fit:contain;
+
+}
+
+
+
+.chart-box{
+
+height:560px;
+
+flex:1;
+
+background:
+rgba(255,255,255,.05);
+
+border-radius:25px;
+
+padding:25px;
+
+border:
+1px solid rgba(255,255,255,.1);
+
+}
+
+
+
+canvas{
+
+height:100%!important;
+width:100%!important;
+
+}
+
+
+
+/* FINAL */
+
+.leaderboard{
+width:90%;
+max-width:1200px;
+margin:20px auto;
+}
+
+.first{
+background:
+linear-gradient(
+135deg,
+#fbbf24,
+#f59e0b
+);
+
+color:#111;
+
+padding:40px;
+
+margin-bottom:25px;
+
+border-radius:30px;
+position: relative;
+overflow: hidden;
+}
+
+.podium-row{
+display:flex;
+gap:25px;
+}
+
+.second{
+flex:1;
+
+background:
+linear-gradient(
+135deg,
+#cbd5e1,
+#94a3b8
+);
+
+color:#111;
+
+border-radius:30px;
+}
+
+.third{
+flex:1;
+
+background:
+linear-gradient(
+135deg,
+#d97706,
+#92400e
+);
+
+border-radius:30px;
+}
+
+.winner-card{
+padding:35px;
+text-align:center;
+}
+
+.position{
+font-size:34px;
+font-weight:800;
+}
+
+.team-name-final{
+font-size:52px;
+font-weight:800;
+margin-top:15px;
+}
+
+.team-score-final{
+font-size:88px;
+font-weight:900;
+margin-top:15px;
+}
+
+/* HOME PAGE */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
+    text-align: center;
+    padding: 20px;
+}
+
+.home-title {
+    font-size: 72px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #fbbf24, #8b5cf6, #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px;
+    letter-spacing: 5px;
+}
+
+.home-subtitle {
+    font-size: 42px;
+    font-weight: 700;
+    color: #c4b5fd;
+    margin-bottom: 15px;
+}
+
+.home-phase {
+    font-size: 32px;
+    font-weight: 600;
+    color: #fbbf24;
+    margin-bottom: 40px;
+    opacity: 0.9;
+}
+
+.home-teams {
+    display: flex;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+.home-team-btn {
+    padding: 20px 50px;
+    font-size: 28px;
+    font-weight: 700;
+    background: rgba(255,255,255,.1);
+    border: 2px solid rgba(255,255,255,.2);
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.home-team-btn:hover {
+    background: rgba(255,255,255,.2);
+    transform: scale(1.05);
+    border-color: #fbbf24;
+    box-shadow: 0 0 30px rgba(251,191,36,.2);
+}
+
+.home-team-btn.team1:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 30px rgba(139,92,246,.3);
+}
+
+.home-team-btn.team2:hover {
+    border-color: #38bdf8;
+    box-shadow: 0 0 30px rgba(56,189,248,.3);
+}
+
+.home-team-btn.team3:hover {
+    border-color: #f472b6;
+    box-shadow: 0 0 30px rgba(244,114,182,.3);
+}
+
+.home-final-btn {
+    padding: 20px 50px;
+    font-size: 28px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border: none;
+    border-radius: 20px;
+    color: #111;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+}
+
+.home-final-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(251,191,36,.4);
+}
+
+.home-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+/* FOOTER - Always visible */
+.footer{
+
+position:fixed;
+
+bottom:12px;
+
+left:0;
+right:0;
+text-align:center;
+
+font-size:14px;
+
+z-index:9999;
+
+}
+
+.footer a{
+
+color:#c4b5fd;
+
+text-decoration:none;
+
+margin:0 10px;
+
+font-weight:600;
+
+transition:.2s;
+
+}
+
+.footer a:hover{
+
+color:#ffffff;
+
+text-shadow:
+0 0 10px rgba(255,255,255,.6);
+
+}
+
+.footer .separator {
+    color: rgba(255,255,255,0.3);
+}
+
+/* Floating Sparkles - Only on Champion Card */
+.sparkle-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: 30px;
+}
+
+.sparkle-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #ffffff;
+    border-radius: 50%;
+    opacity: 0;
+    animation: floatSparkle 5s ease-in infinite;
+}
+
+@keyframes floatSparkle {
+    0% {
+        opacity: 0;
+        transform: translateY(100%) scale(0) rotate(0deg);
+    }
+    10% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1) rotate(180deg);
+    }
+    90% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-100%) scale(0) rotate(360deg);
+    }
+}
+
+/* Pulse glow for champion */
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 30px rgba(251,191,36,0.3); }
+    50% { box-shadow: 0 0 60px rgba(251,191,36,0.7), 0 0 100px rgba(251,191,36,0.2); }
+}
+
+.first.glow-pulse {
+    animation: pulseGlow 3s ease-in-out infinite;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="header">
+
+
+<img id="logo"
+class="logo">
+
+
+<div class="title">
+HR CONCLAVE 2026
+</div>
+
+
+<div id="teamName"
+class="team">
+TEAM 1
+</div>
+
+
+<div class="live">
+
+<span class="dot"></span>
+
+LIVE DASHBOARD
+
+</div>
+
+
+</div>
+
+
+
+<div id="totalArea"
+class="total">
+
+
+<div class="total-label">
+TOTAL SCORE
+</div>
+
+
+<div id="totalScore"
+class="total-score">
+0
+</div>
+
+
+</div>
+
+
+
+<!-- HOME PAGE -->
+<div id="homeView" class="main">
+    <div class="home-container">
+        <div class="home-title">HR CONCLAVE 2026</div>
+        <div class="home-subtitle">Phase 3</div>
+        <div class="home-phase">Case Presentation</div>
+        <div class="home-buttons">
+            <div class="home-teams">
+                <a href="?team=1" class="home-team-btn team1">Team 1</a>
+                <a href="?team=2" class="home-team-btn team2">Team 2</a>
+                <a href="?team=3" class="home-team-btn team3">Team 3</a>
+            </div>
+            <a href="?final=true" class="home-final-btn">🏆 Final Scores</a>
+        </div>
+    </div>
+</div>
+
+
+<!-- TEAM VIEW -->
+<div id="normalView"
+class="main" style="display:none">
+
+
+<div class="side">
+
+<img id="leftImage">
+
+</div>
+
+
+<div class="chart-box">
+
+<canvas id="chart"></canvas>
+
+</div>
+
+
+<div class="side">
+
+<img id="rightImage">
+
+</div>
+
+
+</div>
+
+
+<!-- FINAL VIEW -->
+<div id="finalView"
+style="display:none">
+
+
+<div class="leaderboard"
+id="leaderboard">
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- FOOTER - Always visible -->
+<div class="footer">
+
+<a href="?">🏠 Home</a>
+
+<span class="separator">|</span>
+
+<a href="?team=1">Team 1</a>
+
+<span class="separator">|</span>
+
+<a href="?team=2">Team 2</a>
+
+<span class="separator">|</span>
+
+<a href="?team=3">Team 3</a>
+
+<span class="separator">|</span>
+
+<a href="?final=true">🏆 Final Scores</a>
+
+</div>
+
+
+
+
+
+<script>
+// Register the datalabels plugin
+Chart.register(ChartDataLabels);
+
+/* ======================
+   SETTINGS
+====================== */
+
+
+const SHEET_ID =
+"1zfoi-RiQ2_djE64bg3DMQXD7KBaz0j8ko54tPrQ9nf8";
+
+
+
+const EVENT_LOGO =
+"https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png";
+
+
+const LEFT_IMAGE =
+"https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image7.png";
+
+
+const RIGHT_IMAGE =
+"https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/image9.png";
+
+
+
+document.getElementById("logo").src =
+EVENT_LOGO;
+
+
+
+document.getElementById("leftImage").src =
+LEFT_IMAGE;
+
+
+
+document.getElementById("rightImage").src =
+RIGHT_IMAGE;
+
+
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+
+
+const isFinal =
+params.get("final")==="true";
+const currentTeam =
+params.get("team");
+const isHome = !currentTeam && !isFinal;
+
+// Show/hide appropriate views
+if (isHome) {
+    document.getElementById('homeView').style.display = 'flex';
+    document.getElementById('normalView').style.display = 'none';
+    document.getElementById('finalView').style.display = 'none';
+    document.getElementById('totalArea').style.display = 'none';
+    document.getElementById('teamName').innerHTML = '🏠';
+    document.querySelector('.live').style.display = 'none';
+} else if (isFinal) {
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('normalView').style.display = 'none';
+    document.getElementById('finalView').style.display = 'block';
+    document.getElementById('totalArea').style.display = 'none';
+    document.querySelector('.live').style.display = 'block';
+} else {
+    document.getElementById('homeView').style.display = 'none';
+    document.getElementById('normalView').style.display = 'flex';
+    document.getElementById('finalView').style.display = 'none';
+    document.getElementById('totalArea').style.display = 'block';
+    document.querySelector('.live').style.display = 'block';
+}
+
+// Highlight active link in footer
+window.addEventListener("load",()=>{
+
+document.querySelectorAll(".footer a")
+.forEach(link=>{
+
+const href = link.getAttribute("href");
+
+if(
+(currentTeam==="1" && href.includes("team=1")) ||
+(currentTeam==="2" && href.includes("team=2")) ||
+(currentTeam==="3" && href.includes("team=3")) ||
+(isFinal && href.includes("final=true")) ||
+(isHome && href === "?")
+){
+link.style.color="#fbbf24";
+link.style.fontWeight="800";
+}
+});
+
+});
+
+
+const selectedTeam =
+params.get("team") || "1";
+
+
+
+let chart;
+let sparkleInterval = null;
+
+
+
+/* ======================
+ TEAM VIEW
+====================== */
+
+
+async function loadTeam(){
+
+
+const sheetName =
+"Team " + selectedTeam;
+
+
+
+const url =
+
+`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+
+
+
+try{
+
+const response =
+await fetch(
+url+"&t="+Date.now()
+);
+
+
+
+const csv =
+await response.text();
+
+
+
+const rows =
+csv.trim()
+.split("\n")
+.map(r=>
+r.split(",")
+.map(c=>c.replace(/"/g,"").trim())
+);
+
+console.log(`Data for ${sheetName}:`, rows);
+
+const labels = [];
+const scores = [];
+
+let startRow = -1;
+for(let i = 0; i < rows.length; i++){
+    if(rows[i] && rows[i].length > 11){
+        const colL = rows[i][11] ? rows[i][11].toLowerCase() : '';
+        if(colL.includes('pillar') || colL.includes('category') || colL.includes('parameter') || colL.includes('criteria')){
+            startRow = i + 1;
+            break;
+        }
+    }
+}
+
+if(startRow === -1){
+    startRow = 10;
+}
+
+for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
+    if(rows[i] && rows[i].length > 12){
+        const label = rows[i][11] ? rows[i][11].trim() : '';
+        const score = Number(rows[i][12]);
+        
+        if(label && label !== '' && !isNaN(score) && score >= 0){
+            labels.push(label);
+            scores.push(score);
+        }
+    }
+}
+
+if(labels.length === 0){
+    console.log('No data found with header method, scanning all rows...');
+    for(let i = 0; i < rows.length; i++){
+        if(rows[i] && rows[i].length > 12){
+            const label = rows[i][11] ? rows[i][11].trim() : '';
+            const score = Number(rows[i][12]);
+            
+            if(label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50){
+                if(!label.toLowerCase().includes('total') && 
+                   !label.toLowerCase().includes('sum') &&
+                   !label.toLowerCase().includes('average')){
+                    labels.push(label);
+                    scores.push(score);
+                    if(labels.length >= 5) break;
+                }
+            }
+        }
+    }
+}
+
+if(labels.length === 0){
+    console.log('No data found, using fallback');
+    const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
+    for(let i = 0; i < 5; i++){
+        labels.push(fallbackLabels[i]);
+        scores.push(0);
+    }
+}
+
+while(labels.length < 5){
+    labels.push(`Item ${labels.length + 1}`);
+    scores.push(0);
+}
+
+const finalLabels = labels.slice(0, 5);
+const finalScores = scores.slice(0, 5);
+
+const total = finalScores.reduce((a,b)=>a+b,0);
+
+document.getElementById("teamName")
+.innerHTML =
+"TEAM "+selectedTeam;
+
+document.getElementById("totalScore")
+.innerHTML =
+total;
+
+drawChart(finalLabels, finalScores);
+
+}
+catch(err){
+    console.error("Error loading team data:", err);
+    document.getElementById("teamName").innerHTML = "TEAM "+selectedTeam;
+    document.getElementById("totalScore").innerHTML = "0";
+    
+    const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
+    drawChart(fallbackLabels, [0,0,0,0,0]);
+}
+
+
+
+
+}
+
+
+
+
+function drawChart(labels,scores){
+
+
+if(chart)
+chart.destroy();
+
+
+
+chart =
+new Chart(
+document.getElementById("chart"),
+{
+
+type:"bar",
+
+data:{
+
+
+labels,
+
+
+datasets:[{
+
+data:scores,
+
+
+backgroundColor:[
+
+"#8b5cf6",
+"#38bdf8",
+"#f472b6",
+"#34d399",
+"#fbbf24"
+
+],
+
+
+borderRadius:18
+
+}]
+
+},
+
+
+
+options:{
+
+
+responsive:true,
+
+maintainAspectRatio:false,
+
+
+plugins:{
+
+
+legend:{
+display:false
+},
+
+// THIS IS THE KEY PART - Data Labels Plugin Configuration
+datalabels: {
+    color: '#ffffff',
+    anchor: 'end',
+    align: 'end',
+    font: {
+        weight: 'bold',
+        size: 18
+    },
+    formatter: function(value) {
+        return value + '';
+    },
+    offset: 2
+},
+
+tooltip:{
+    callbacks: {
+        label: function(context) {
+            return context.parsed.y + ' points';
+        }
+    }
+}
+
+},
+
+
+scales:{
+
+
+x:{
+
+
+ticks:{
+color:"#fff",
+font:{
+size:15
+}
+},
+
+grid:{
+display:false
+}
+
+
+},
+
+
+y:{
+
+
+beginAtZero:true,
+
+max:Math.max(100, ...scores) + 15,
+
+
+ticks:{
+color:"#fff"
+}
+
+
+}
+
+
+}
+
+
+}
+
+
+});
+
+// Update the chart to render labels
+chart.update();
+
+}
+
+
+
+/* ======================
+ FINAL PAGE - SUBTLE SPARKLES ON CHAMPION ONLY
+====================== */
+
+
+function addSparklesToChampion() {
+    // Remove any existing sparkle containers
+    const existingContainers = document.querySelectorAll('.sparkle-container');
+    existingContainers.forEach(container => container.remove());
+    
+    const championCard = document.querySelector('.first');
+    if (!championCard) return;
+    
+    // Add glow pulse class
+    championCard.classList.add('glow-pulse');
+    
+    // Create sparkle container
+    const sparkleContainer = document.createElement('div');
+    sparkleContainer.className = 'sparkle-container';
+    championCard.appendChild(sparkleContainer);
+    
+    // Create exactly 15 sparkles
+    const colors = ['#ffffff', '#fbbf24', '#ffd700', '#fff5e6', '#ffe4b5'];
+    for (let i = 0; i < 15; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle-particle';
+        sparkle.style.left = (10 + Math.random() * 80) + '%';
+        sparkle.style.top = (10 + Math.random() * 80) + '%';
+        sparkle.style.animationDelay = (Math.random() * 5) + 's';
+        sparkle.style.animationDuration = (4 + Math.random() * 3) + 's';
+        sparkle.style.width = (3 + Math.random() * 5) + 'px';
+        sparkle.style.height = sparkle.style.width;
+        sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        sparkle.style.boxShadow = `0 0 6px ${sparkle.style.background}`;
+        sparkleContainer.appendChild(sparkle);
+    }
+}
+
+function removeSparkles() {
+    const existingContainers = document.querySelectorAll('.sparkle-container');
+    existingContainers.forEach(container => container.remove());
+    
+    const championCard = document.querySelector('.first');
+    if (championCard) {
+        championCard.classList.remove('glow-pulse');
+    }
+}
+
+async function showFinal(){
+
+document.getElementById('homeView').style.display = 'none';
+document.getElementById("normalView")
+.style.display="none";
+
+document.getElementById("totalArea")
+.style.display="none";
+
+document.getElementById("finalView")
+.style.display="block";
+
+document.getElementById("teamName")
+.innerHTML =
+"🏆 FINAL LEADERBOARD";
+
+document.querySelector('.live').style.display = 'block';
+
+// Hide side images on final page
+const sideElements = document.querySelectorAll(".side");
+sideElements.forEach(el => el.style.display = "none");
+
+const teams = [
+"Team 1",
+"Team 2",
+"Team 3"
+];
+
+const results = [];
+
+for(const teamName of teams){
+
+try{
+
+const url =
+`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(teamName)}`;
+
+const response =
+await fetch(url + "&t=" + Date.now());
+
+const csv =
+await response.text();
+
+const rows =
+csv.trim()
+.split("\n")
+.map(r =>
+r.split(",")
+.map(c =>
+c.replace(/"/g,"").trim()
+)
+);
+
+const scores = [];
+let startRow = -1;
+for(let i = 0; i < rows.length; i++){
+    if(rows[i] && rows[i].length > 11){
+        const colL = rows[i][11] ? rows[i][11].toLowerCase() : '';
+        if(colL.includes('pillar') || colL.includes('category') || colL.includes('parameter') || colL.includes('criteria')){
+            startRow = i + 1;
+            break;
+        }
+    }
+}
+
+if(startRow === -1){
+    startRow = 10;
+}
+
+for(let i = startRow; i < Math.min(startRow + 5, rows.length); i++){
+    if(rows[i] && rows[i].length > 12){
+        const score = Number(rows[i][12]);
+        if(!isNaN(score) && score >= 0){
+            scores.push(score);
+        }
+    }
+}
+
+if(scores.length === 0){
+    for(let i = 0; i < rows.length; i++){
+        if(rows[i] && rows[i].length > 12){
+            const label = rows[i][11] ? rows[i][11].trim() : '';
+            const score = Number(rows[i][12]);
+            if(label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50){
+                if(!label.toLowerCase().includes('total') && 
+                   !label.toLowerCase().includes('sum') &&
+                   !label.toLowerCase().includes('average')){
+                    scores.push(score);
+                    if(scores.length >= 5) break;
+                }
+            }
+        }
+    }
+}
+
+while(scores.length < 5){
+    scores.push(0);
+}
+
+const total = scores.slice(0,5).reduce((a,b)=>a+b,0);
+
+results.push({
+team:teamName,
+score:total
+});
+
+}
+catch(err){
+
+console.error(
+teamName,
+err
+);
+results.push({
+team:teamName,
+score:0
+});
+
+}
+
+}
+
+results.sort(
+(a,b)=>b.score-a.score
+);
+
+while(results.length < 3){
+    results.push({
+        team: `Team ${results.length + 1}`,
+        score: 0
+    });
+}
+
+document.getElementById("leaderboard")
+.innerHTML =
+
+`
+
+<div class="winner-card first">
+
+<div class="position">
+🏆 CHAMPION
+</div>
+
+<div class="team-name-final">
+${results[0].team}
+</div>
+
+<div class="team-score-final">
+${results[0].score}
+</div>
+
+</div>
+
+<div class="podium-row">
+
+<div class="winner-card second">
+
+<div class="position">
+🥈 SECOND PLACE
+</div>
+
+<div class="team-name-final">
+${results[1].team}
+</div>
+
+<div class="team-score-final">
+${results[1].score}
+</div>
+
+</div>
+
+<div class="winner-card third">
+
+<div class="position">
+🥉 THIRD PLACE
+</div>
+
+<div class="team-name-final">
+${results[2].team}
+</div>
+
+<div class="team-score-final">
+${results[2].score}
+</div>
+
+</div>
+
+</div>
+
+`;
+
+// Add sparkles to champion card
+setTimeout(() => {
+    addSparklesToChampion();
+}, 100);
+
+}
+
+
+
+
+// Main execution
+if (isHome) {
+    // Home page - remove any sparkles
+    removeSparkles();
+} else if(isFinal){
+
+showFinal();
+
+setInterval(
+showFinal,
+5000
+);
+
+} else {
+
+loadTeam();
+
+setInterval(
+loadTeam,
+2000
+);
+
+}
+
+
+
+</script>
+
+</body>
+
+</html>
