@@ -9,7 +9,6 @@
 <title>HR Conclave 2026 Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Add Chart.js Data Labels Plugin -->
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 
 <style>
@@ -28,22 +27,10 @@ overflow:hidden;
 
 font-family:'Segoe UI',sans-serif;
 
-background:
-
-radial-gradient(circle at top left,
-rgba(139,92,246,.25),
-transparent 35%),
-
-radial-gradient(circle at bottom right,
-rgba(56,189,248,.20),
-transparent 35%),
-
-linear-gradient(
-135deg,
-#12081f,
-#251341,
-#102442
-);
+background: 
+radial-gradient(circle at top left, rgba(107, 63, 160, 0.3), transparent 40%),
+radial-gradient(circle at bottom right, rgba(0, 180, 216, 0.25), transparent 40%),
+linear-gradient(135deg, #1a0a2e, #2d1b4e, #0a2a3a);
 
 color:white;
 
@@ -83,6 +70,10 @@ letter-spacing:3px;
 
 margin-top:5px;
 
+background: linear-gradient(135deg, #a78bfa, #00b4d8);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+
 }
 
 
@@ -94,12 +85,14 @@ font-weight:700;
 
 margin-top:10px;
 
+color: #e0d7f5;
+
 }
 
 
 .live{
 
-color:#4ade80;
+color:#00d4aa;
 
 margin-top:8px;
 
@@ -113,7 +106,7 @@ font-size:14px;
 height:10px;
 width:10px;
 
-background:#4ade80;
+background:#00d4aa;
 
 display:inline-block;
 
@@ -121,6 +114,14 @@ border-radius:50%;
 
 margin-right:8px;
 
+animation: pulse 2s infinite;
+
+}
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
 }
 
 
@@ -141,6 +142,8 @@ opacity:.7;
 
 font-size:14px;
 
+color: #c4b5fd;
+
 }
 
 
@@ -150,7 +153,7 @@ font-size:42px;
 
 font-weight:700;
 
-color:#fbbf24;
+color: #00d4aa;
 
 }
 
@@ -210,7 +213,9 @@ border-radius:25px;
 padding:25px;
 
 border:
-1px solid rgba(255,255,255,.1);
+1px solid rgba(167, 139, 250, 0.2);
+
+backdrop-filter: blur(10px);
 
 }
 
@@ -237,7 +242,7 @@ margin:20px auto;
 background:
 linear-gradient(135deg, #a78bfa, #6B3FA0);
 
-color:#111;
+color:white;
 
 padding:40px;
 
@@ -246,6 +251,7 @@ margin-bottom:25px;
 border-radius:30px;
 position: relative;
 overflow: hidden;
+box-shadow: 0 0 40px rgba(167, 139, 250, 0.3);
 }
 
 .podium-row{
@@ -257,11 +263,7 @@ gap:25px;
 flex:1;
 
 background:
-linear-gradient(
-135deg,
-#cbd5e1,
-#94a3b8
-);
+linear-gradient(135deg, #7dd3fc, #0ea5e9);
 
 color:#111;
 
@@ -272,11 +274,9 @@ border-radius:30px;
 flex:1;
 
 background:
-linear-gradient(
-135deg,
-#d97706,
-#92400e
-);
+linear-gradient(135deg, #fcd34d, #f59e0b);
+
+color:#111;
 
 border-radius:30px;
 }
@@ -317,7 +317,7 @@ margin-top:15px;
 .home-title {
     font-size: 72px;
     font-weight: 900;
-    background: linear-gradient(135deg, #fbbf24, #8b5cf6, #38bdf8);
+    background: linear-gradient(135deg, #a78bfa, #00b4d8, #7dd3fc);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 20px;
@@ -334,7 +334,7 @@ margin-top:15px;
 .home-phase {
     font-size: 32px;
     font-weight: 600;
-    color: #fbbf24;
+    color: #00d4aa;
     margin-bottom: 40px;
     opacity: 0.9;
 }
@@ -349,8 +349,8 @@ margin-top:15px;
     padding: 20px 50px;
     font-size: 28px;
     font-weight: 700;
-    background: rgba(255,255,255,.1);
-    border: 2px solid rgba(255,255,255,.2);
+    background: rgba(167, 139, 250, 0.15);
+    border: 2px solid rgba(167, 139, 250, 0.3);
     border-radius: 20px;
     color: white;
     cursor: pointer;
@@ -360,35 +360,35 @@ margin-top:15px;
 }
 
 .home-team-btn:hover {
-    background: rgba(255,255,255,.2);
+    background: rgba(167, 139, 250, 0.3);
     transform: scale(1.05);
-    border-color: #fbbf24;
-    box-shadow: 0 0 30px rgba(251,191,36,.2);
+    border-color: #a78bfa;
+    box-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
 }
 
 .home-team-btn.team1:hover {
-    border-color: #8b5cf6;
-    box-shadow: 0 0 30px rgba(139,92,246,.3);
+    border-color: #a78bfa;
+    box-shadow: 0 0 30px rgba(167, 139, 250, 0.4);
 }
 
 .home-team-btn.team2:hover {
-    border-color: #38bdf8;
-    box-shadow: 0 0 30px rgba(56,189,248,.3);
+    border-color: #00b4d8;
+    box-shadow: 0 0 30px rgba(0, 180, 216, 0.4);
 }
 
 .home-team-btn.team3:hover {
-    border-color: #f472b6;
-    box-shadow: 0 0 30px rgba(244,114,182,.3);
+    border-color: #7dd3fc;
+    box-shadow: 0 0 30px rgba(125, 211, 252, 0.4);
 }
 
 .home-final-btn {
     padding: 20px 50px;
     font-size: 28px;
     font-weight: 700;
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, #a78bfa, #6B3FA0);
     border: none;
     border-radius: 20px;
-    color: #111;
+    color: white;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
@@ -398,7 +398,7 @@ margin-top:15px;
 
 .home-final-btn:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 40px rgba(251,191,36,.4);
+    box-shadow: 0 0 40px rgba(167, 139, 250, 0.5);
 }
 
 .home-buttons {
@@ -441,15 +441,15 @@ transition:.2s;
 
 .footer a:hover{
 
-color:#ffffff;
+color:#a78bfa;
 
 text-shadow:
-0 0 10px rgba(255,255,255,.6);
+0 0 10px rgba(167, 139, 250, 0.5);
 
 }
 
 .footer .separator {
-    color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.2);
 }
 
 /* Floating Sparkles - Only on Champion Card */
@@ -497,8 +497,8 @@ text-shadow:
 
 /* Pulse glow for champion */
 @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 30px rgba(251,191,36,0.3); }
-    50% { box-shadow: 0 0 60px rgba(251,191,36,0.7), 0 0 100px rgba(251,191,36,0.2); }
+    0%, 100% { box-shadow: 0 0 30px rgba(167, 139, 250, 0.3); }
+    50% { box-shadow: 0 0 60px rgba(167, 139, 250, 0.6), 0 0 100px rgba(167, 139, 250, 0.2); }
 }
 
 .first.glow-pulse {
@@ -670,27 +670,17 @@ const EVENT_LOGO =
 "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png";
 
 
-const LEFT_IMAGE =
-"https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT1.png";
-
-
-const RIGHT_IMAGE =
-"https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT1.png";
+// Team-specific images
+const TEAM_IMAGES = {
+    "1": "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT1.png",
+    "2": "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT2.png",
+    "3": "https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRCT1.png"
+};
 
 
 
 document.getElementById("logo").src =
 EVENT_LOGO;
-
-
-
-document.getElementById("leftImage").src =
-LEFT_IMAGE;
-
-
-
-document.getElementById("rightImage").src =
-RIGHT_IMAGE;
 
 
 
@@ -727,6 +717,11 @@ if (isHome) {
     document.getElementById('finalView').style.display = 'none';
     document.getElementById('totalArea').style.display = 'block';
     document.querySelector('.live').style.display = 'block';
+    
+    // Set team-specific images
+    const teamImages = TEAM_IMAGES[currentTeam] || TEAM_IMAGES["1"];
+    document.getElementById("leftImage").src = teamImages;
+    document.getElementById("rightImage").src = teamImages;
 }
 
 // Highlight active link in footer
@@ -744,7 +739,7 @@ if(
 (isFinal && href.includes("final=true")) ||
 (isHome && href === "?")
 ){
-link.style.color="#fbbf24";
+link.style.color="#a78bfa";
 link.style.fontWeight="800";
 }
 });
@@ -930,11 +925,11 @@ data:scores,
 
 backgroundColor:[
 
-"#8b5cf6",
-"#38bdf8",
-"#f472b6",
-"#34d399",
-"#fbbf24"
+"#a78bfa",
+"#00b4d8",
+"#7dd3fc",
+"#00d4aa",
+"#c084fc"
 
 ],
 
@@ -962,7 +957,6 @@ legend:{
 display:false
 },
 
-// THIS IS THE KEY PART - Data Labels Plugin Configuration
 datalabels: {
     color: '#ffffff',
     anchor: 'end',
@@ -995,7 +989,7 @@ x:{
 
 
 ticks:{
-color:"#fff",
+color:"#e0d7f5",
 font:{
 size:15
 }
@@ -1018,7 +1012,7 @@ max:Math.max(100, ...scores) + 15,
 
 
 ticks:{
-color:"#fff"
+color:"#e0d7f5"
 }
 
 
@@ -1033,7 +1027,6 @@ color:"#fff"
 
 });
 
-// Update the chart to render labels
 chart.update();
 
 }
@@ -1046,23 +1039,19 @@ chart.update();
 
 
 function addSparklesToChampion() {
-    // Remove any existing sparkle containers
     const existingContainers = document.querySelectorAll('.sparkle-container');
     existingContainers.forEach(container => container.remove());
     
     const championCard = document.querySelector('.first');
     if (!championCard) return;
     
-    // Add glow pulse class
     championCard.classList.add('glow-pulse');
     
-    // Create sparkle container
     const sparkleContainer = document.createElement('div');
     sparkleContainer.className = 'sparkle-container';
     championCard.appendChild(sparkleContainer);
     
-    // Create exactly 15 sparkles
-    const colors = ['#ffffff', '#fbbf24', '#ffd700', '#fff5e6', '#ffe4b5'];
+    const colors = ['#ffffff', '#a78bfa', '#00b4d8', '#7dd3fc', '#c084fc'];
     for (let i = 0; i < 15; i++) {
         const sparkle = document.createElement('div');
         sparkle.className = 'sparkle-particle';
@@ -1102,11 +1091,10 @@ document.getElementById("finalView")
 
 document.getElementById("teamName")
 .innerHTML =
-"🏆 FINAL SCORES";
+"🏆 FINAL LEADERBOARD";
 
 document.querySelector('.live').style.display = 'block';
 
-// Hide side images on final page
 const sideElements = document.querySelectorAll(".side");
 sideElements.forEach(el => el.style.display = "none");
 
@@ -1280,7 +1268,6 @@ ${results[2].score}
 
 `;
 
-// Add sparkles to champion card
 setTimeout(() => {
     addSparklesToChampion();
 }, 100);
@@ -1292,7 +1279,6 @@ setTimeout(() => {
 
 // Main execution
 if (isHome) {
-    // Home page - remove any sparkles
     removeSparkles();
 } else if(isFinal){
 
