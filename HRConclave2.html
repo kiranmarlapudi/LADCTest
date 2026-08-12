@@ -664,7 +664,7 @@ Chart.register(ChartDataLabels);
    SETTINGS
 ====================== */
 
-// Sheet ID from your link
+// New Sheet ID from your link
 const SHEET_ID = "1B92Jqb0V-RUXtcwnLwqEAvEp_LmvUnM-77frByI4-Ek";
 
 // Sheet names mapping
@@ -672,21 +672,6 @@ const SHEET_NAMES = {
     "1": "Presenter 1",
     "2": "Presenter 2", 
     "3": "Presenter 3"
-};
-
-// Team-specific data ranges for charts (L=column 11, M=column 12 in 0-indexed)
-const TEAM_DATA_RANGES = {
-    "1": { startRow: 12, endRow: 16 }, // L13:M17 (0-indexed: 12-16)
-    "2": { startRow: 11, endRow: 15 }, // L12:M16 (0-indexed: 11-15)
-    "3": { startRow: 10, endRow: 14 }  // L11:M15 (0-indexed: 10-14)
-};
-
-// Final scores range - O19:P21 (O=column 14, P=column 15 in 0-indexed)
-const FINAL_SCORES_RANGE = { 
-    startRow: 18,  // O19 (0-indexed: 18)
-    endRow: 20,    // O21 (0-indexed: 20)
-    labelCol: 14,  // O column (0-indexed: 14)
-    scoreCol: 15   // P column (0-indexed: 15)
 };
 
 // Team-specific images
@@ -699,11 +684,6 @@ const TEAM_IMAGES = {
 let currentPage = 'home';
 let chartInstances = {};
 let currentTeam = '1';
-
-// Google Sheets API key - You need to create one at https://console.cloud.google.com/
-// For now, we'll use a proxy approach
-const USE_PROXY = true;
-const PROXY_URL = 'https://api.allorigins.win/raw?url=';
 
 /* ======================
    PAGE NAVIGATION
@@ -790,177 +770,60 @@ function showPage(pageId) {
 }
 
 /* ======================
-   FETCH FUNCTION WITH PROXY
-====================== */
-
-async function fetchSheetData(sheetName) {
-    // Try multiple URL formats
-    const urls = [
-        // Primary: Using export URL
-        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0&sheet=${encodeURIComponent(sheetName)}`,
-        // Alternative: Using gviz API
-        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`,
-        // Using published version (if published)
-        `https://docs.google.com/spreadsheets/d/${SHEET_ID}/pub?output=csv&sheet=${encodeURIComponent(sheetName)}`
-    ];
-    
-    // Try with proxy first
-    if (USE_PROXY) {
-        for (const url of urls) {
-            try {
-                const proxyUrl = `${PROXY_URL}${encodeURIComponent(url)}`;
-                console.log(`Trying proxy URL: ${proxyUrl}`);
-                
-                const response = await fetch(proxyUrl + "&t=" + Date.now(), {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'text/csv',
-                    }
-                });
-                
-                if (response.ok) {
-                    const text = await response.text();
-                    if (text && text.trim().length > 0 && !text.includes('<!DOCTYPE')) {
-                        console.log(`Successfully fetched data for ${sheetName} using proxy`);
-                        return text;
-                    }
-                }
-            } catch (e) {
-                console.log(`Proxy attempt failed for ${sheetName}:`, e.message);
-            }
-        }
-    }
-    
-    // Try direct fetch (may fail due to CORS)
-    for (const url of urls) {
-        try {
-            console.log(`Trying direct URL: ${url}`);
-            const response = await fetch(url + "&t=" + Date.now(), {
-                method: 'GET',
-                headers: {
-                    'Accept': 'text/csv',
-                }
-            });
-            
-            if (response.ok) {
-                const text = await response.text();
-                if (text && text.trim().length > 0 && !text.includes('<!DOCTYPE')) {
-                    console.log(`Successfully fetched data for ${sheetName} directly`);
-                    return text;
-                }
-            }
-        } catch (e) {
-            console.log(`Direct attempt failed for ${sheetName}:`, e.message);
-        }
-    }
-    
-    throw new Error(`Unable to fetch data for ${sheetName}`);
-}
-
-/* ======================
-   TEAM VIEW - WITH SPECIFIC RANGES
+   TEAM VIEW - FIXED FOR GOOGLE SHEETS
 ====================== */
 
 async function loadTeam(teamNum) {
     const sheetName = SHEET_NAMES[teamNum];
-    const range = TEAM_DATA_RANGES[teamNum];
+    
+    // Using a different approach - fetch as JSONP or use the public export URL
+    // First try the standard export URL
+    let url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
     
     try {
         console.log(`Fetching data for ${sheetName}...`);
-        console.log(`Using range: rows ${range.startRow+1} to ${range.endRow+1} (0-indexed: ${range.startRow} to ${range.endRow})`);
+        console.log(`URL: ${url}`);
         
-        const csv = await fetchSheetData(sheetName);
-        console.log(`CSV data for ${sheetName}:`, csv.substring(0, 300) + '...');
-        
-        // Parse CSV
-        const rows = parseCSV(csv);
-        
-        if (rows.length === 0) {
-            throw new Error("No data found in sheet");
-        }
-        
-        console.log(`Total rows: ${rows.length}`);
-        console.log(`First 5 rows:`, rows.slice(0, 5));
-        
-        // Extract data from the specific range
-        const labels = [];
-        const scores = [];
-        
-        for (let i = range.startRow; i <= range.endRow && i < rows.length; i++) {
-            if (rows[i] && rows[i].length > 12) {
-                const label = rows[i][11] ? rows[i][11].trim() : `Pillar ${i - range.startRow + 1}`;
-                const score = parseFloat(rows[i][12]);
-                
-                console.log(`Row ${i+1}: Label="${label}", Score=${score}`);
-                
-                if (label && label !== '' && !isNaN(score) && score >= 0) {
-                    labels.push(label);
-                    scores.push(score);
-                } else if (label && label !== '') {
-                    // If score is invalid but label exists, treat as 0
-                    labels.push(label);
-                    scores.push(0);
-                }
+        const response = await fetch(url + "&t=" + Date.now(), {
+            method: 'GET',
+            headers: {
+                'Accept': 'text/csv',
             }
-        }
+        });
         
-        // If no data found in the specific range, try scanning
-        if (labels.length === 0) {
-            console.log('No data found in specific range, scanning all rows...');
-            for (let i = 0; i < Math.min(rows.length, 30); i++) {
-                if (rows[i] && rows[i].length > 12) {
-                    const label = rows[i][11] ? rows[i][11].trim() : '';
-                    const score = parseFloat(rows[i][12]);
-                    if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
-                        if (!label.toLowerCase().includes('total') && 
-                            !label.toLowerCase().includes('sum') &&
-                            !label.toLowerCase().includes('average')) {
-                            labels.push(label);
-                            scores.push(score);
-                            if (labels.length >= 5) break;
-                        }
-                    }
-                }
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status}`);
+            // Try alternative URL format
+            url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0&sheet=${encodeURIComponent(sheetName)}`;
+            console.log(`Trying alternative URL: ${url}`);
+            const response2 = await fetch(url + "&t=" + Date.now());
+            if (!response2.ok) {
+                throw new Error(`Both fetch attempts failed. Status: ${response2.status}`);
             }
+            const csv = await response2.text();
+            processTeamData(csv, teamNum, sheetName);
+            return;
         }
         
-        // If still no data, use sample data
-        if (labels.length === 0) {
-            console.log('Using sample data for testing');
-            const sampleLabels = ["Innovation", "Strategy", "Execution", "Impact", "Sustainability"];
-            const sampleScores = [85, 72, 90, 78, 88];
-            for (let i = 0; i < 5; i++) {
-                labels.push(sampleLabels[i]);
-                scores.push(sampleScores[i]);
-            }
-        }
-        
-        // Ensure we have 5 items
-        while (labels.length < 5) {
-            labels.push(`Pillar ${labels.length + 1}`);
-            scores.push(0);
-        }
-        
-        const finalLabels = labels.slice(0, 5);
-        const finalScores = scores.slice(0, 5);
-        const total = finalScores.reduce((a, b) => a + b, 0);
-        
-        console.log(`Final data for ${sheetName}:`, { labels: finalLabels, scores: finalScores, total });
-        
-        document.getElementById('totalScore').innerHTML = total;
-        drawChart(teamNum, finalLabels, finalScores);
-        
+        const csv = await response.text();
+        processTeamData(csv, teamNum, sheetName);
+
     } catch (err) {
         console.error("Error loading team data:", err);
+        // Show fallback data
         document.getElementById('totalScore').innerHTML = "0";
         const fallbackLabels = ["Pillar 1", "Pillar 2", "Pillar 3", "Pillar 4", "Pillar 5"];
         drawChart(teamNum, fallbackLabels, [0, 0, 0, 0, 0]);
     }
 }
 
-function parseCSV(csv) {
+function processTeamData(csv, teamNum, sheetName) {
+    console.log(`CSV data for ${sheetName}:`, csv.substring(0, 300) + '...');
+    
+    // Parse CSV - handle potential issues with quotes and commas
     const lines = csv.trim().split("\n");
-    return lines.map(line => {
+    const rows = lines.map(line => {
+        // Handle quoted fields
         const fields = [];
         let current = '';
         let inQuotes = false;
@@ -978,6 +841,99 @@ function parseCSV(csv) {
         fields.push(current.trim());
         return fields.map(f => f.replace(/^"|"$/g, '').trim());
     });
+
+    if (rows.length === 0) {
+        console.error("No data found in sheet");
+        return;
+    }
+
+    console.log(`First 10 rows of ${sheetName}:`, rows.slice(0, 10));
+
+    // Extract data from L12:M16 (rows 11-15 in 0-indexed, columns L=11, M=12)
+    const labels = [];
+    const scores = [];
+    
+    // Try to find the data by searching for rows with content in column L
+    let foundData = false;
+    for (let i = 0; i < Math.min(rows.length, 20); i++) {
+        if (rows[i] && rows[i].length > 12) {
+            const label = rows[i][11] ? rows[i][11].trim() : '';
+            const scoreStr = rows[i][12] ? rows[i][12].trim() : '';
+            const score = parseFloat(scoreStr);
+            
+            // Check if this looks like a data row (has a label and a valid number)
+            if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
+                // Avoid picking up header rows or summary rows
+                if (!label.toLowerCase().includes('total') && 
+                    !label.toLowerCase().includes('sum') &&
+                    !label.toLowerCase().includes('average') &&
+                    !label.toLowerCase().includes('pillar')) {
+                    labels.push(label);
+                    scores.push(score);
+                    foundData = true;
+                    console.log(`Found data at row ${i+1}: Label="${label}", Score=${score}`);
+                    if (labels.length >= 5) break;
+                }
+            }
+        }
+    }
+
+    // If no data found, try a more aggressive scan
+    if (!foundData || labels.length === 0) {
+        console.log('No data found in expected format, scanning all rows...');
+        for (let i = 0; i < Math.min(rows.length, 30); i++) {
+            if (rows[i] && rows[i].length > 12) {
+                const label = rows[i][11] ? rows[i][11].trim() : '';
+                // Try columns 10, 11, 12 for labels
+                let foundLabel = label;
+                if (!foundLabel && rows[i][10]) foundLabel = rows[i][10].trim();
+                if (!foundLabel && rows[i][9]) foundLabel = rows[i][9].trim();
+                
+                // Try columns 12, 13, 14 for scores
+                let scoreVal = parseFloat(rows[i][12]);
+                if (isNaN(scoreVal) && rows[i][13]) scoreVal = parseFloat(rows[i][13]);
+                if (isNaN(scoreVal) && rows[i][14]) scoreVal = parseFloat(rows[i][14]);
+                
+                if (foundLabel && foundLabel !== '' && !isNaN(scoreVal) && scoreVal >= 0 && foundLabel.length < 50) {
+                    if (!foundLabel.toLowerCase().includes('total') && 
+                        !foundLabel.toLowerCase().includes('sum') &&
+                        !foundLabel.toLowerCase().includes('average') &&
+                        !foundLabel.toLowerCase().includes('pillar')) {
+                        labels.push(foundLabel);
+                        scores.push(scoreVal);
+                        console.log(`Found data at row ${i+1}: Label="${foundLabel}", Score=${scoreVal}`);
+                        if (labels.length >= 5) break;
+                    }
+                }
+            }
+        }
+    }
+
+    // If still no data, use sample data for testing
+    if (labels.length === 0) {
+        console.log('No data found, using sample data for testing');
+        const sampleLabels = ["Innovation", "Strategy", "Execution", "Impact", "Sustainability"];
+        const sampleScores = [85, 72, 90, 78, 88];
+        for (let i = 0; i < 5; i++) {
+            labels.push(sampleLabels[i]);
+            scores.push(sampleScores[i]);
+        }
+    }
+
+    // Ensure we have exactly 5 items
+    while (labels.length < 5) {
+        labels.push(`Pillar ${labels.length + 1}`);
+        scores.push(0);
+    }
+
+    const finalLabels = labels.slice(0, 5);
+    const finalScores = scores.slice(0, 5);
+    const total = finalScores.reduce((a, b) => a + b, 0);
+
+    console.log(`Final data for ${sheetName}:`, { labels: finalLabels, scores: finalScores, total });
+
+    document.getElementById('totalScore').innerHTML = total;
+    drawChart(teamNum, finalLabels, finalScores);
 }
 
 function drawChart(teamNum, labels, scores) {
@@ -1050,7 +1006,7 @@ function drawChart(teamNum, labels, scores) {
 }
 
 /* ======================
-   FINAL SCORES - EXTRACTED FROM O19:P21
+   FINAL SCORES - FIXED
 ====================== */
 
 function addSparklesToChampion() {
@@ -1092,47 +1048,92 @@ async function showFinal() {
 
     for (const team of teams) {
         try {
+            const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0&sheet=${encodeURIComponent(team.name)}`;
             console.log(`Fetching final scores for ${team.name}...`);
             
-            const csv = await fetchSheetData(team.name);
-            const rows = parseCSV(csv);
+            const response = await fetch(url + "&t=" + Date.now());
+            if (!response.ok) {
+                console.error(`HTTP error! status: ${response.status}`);
+                results.push({ team: team.display, score: 0 });
+                continue;
+            }
             
-            console.log(`Rows in ${team.name}:`, rows.length);
-            
-            // Extract scores from O19:P21
-            let totalScore = 0;
-            let foundData = false;
-            
-            for (let i = FINAL_SCORES_RANGE.startRow; i <= FINAL_SCORES_RANGE.endRow && i < rows.length; i++) {
-                if (rows[i] && rows[i].length > 15) {
-                    const label = rows[i][FINAL_SCORES_RANGE.labelCol] ? rows[i][FINAL_SCORES_RANGE.labelCol].trim() : '';
-                    const score = parseFloat(rows[i][FINAL_SCORES_RANGE.scoreCol]);
-                    
-                    console.log(`Row ${i+1}: Label="${label}", Score=${score}`);
-                    
-                    if (!isNaN(score) && score >= 0) {
-                        totalScore += score;
-                        foundData = true;
+            const csv = await response.text();
+            const lines = csv.trim().split("\n");
+            const rows = lines.map(line => {
+                const fields = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        fields.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                fields.push(current.trim());
+                return fields.map(f => f.replace(/^"|"$/g, '').trim());
+            });
+
+            const scores = [];
+            for (let i = 0; i < Math.min(rows.length, 30); i++) {
+                if (rows[i] && rows[i].length > 12) {
+                    const label = rows[i][11] ? rows[i][11].trim() : '';
+                    const score = parseFloat(rows[i][12]);
+                    if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
+                        if (!label.toLowerCase().includes('total') && 
+                            !label.toLowerCase().includes('sum') &&
+                            !label.toLowerCase().includes('average')) {
+                            scores.push(score);
+                            if (scores.length >= 5) break;
+                        }
                     }
                 }
             }
-            
-            // If no data found, use sample data
-            if (!foundData) {
-                console.log('No data found in O19:P21, using sample data');
-                totalScore = 75 + Math.floor(Math.random() * 40);
-                foundData = true;
+
+            // If no scores found, try other columns
+            if (scores.length === 0) {
+                for (let i = 0; i < Math.min(rows.length, 30); i++) {
+                    if (rows[i] && rows[i].length > 12) {
+                        const label = rows[i][11] ? rows[i][11].trim() : '';
+                        let score = parseFloat(rows[i][12]);
+                        if (isNaN(score) && rows[i][13]) score = parseFloat(rows[i][13]);
+                        if (isNaN(score) && rows[i][14]) score = parseFloat(rows[i][14]);
+                        
+                        if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
+                            if (!label.toLowerCase().includes('total') && 
+                                !label.toLowerCase().includes('sum') &&
+                                !label.toLowerCase().includes('average')) {
+                                scores.push(score);
+                                if (scores.length >= 5) break;
+                            }
+                        }
+                    }
+                }
             }
-            
-            results.push({ team: team.display, score: foundData ? totalScore : 0 });
-            
+
+            // Use sample data if still no scores
+            if (scores.length === 0) {
+                const sampleScores = [85, 72, 90, 78, 88];
+                for (let i = 0; i < 5; i++) {
+                    scores.push(sampleScores[i] + Math.floor(Math.random() * 10));
+                }
+            }
+
+            while (scores.length < 5) scores.push(0);
+            const total = scores.slice(0, 5).reduce((a, b) => a + b, 0);
+            results.push({ team: team.display, score: total });
+
         } catch (err) {
             console.error(team.name, err);
             results.push({ team: team.display, score: 0 });
         }
     }
 
-    // Sort and display
     results.sort((a, b) => b.score - a.score);
     while (results.length < 3) {
         results.push({ team: `Team ${results.length + 1}`, score: 0 });
@@ -1168,13 +1169,13 @@ async function showFinal() {
 // Show home page by default
 showPage('home');
 
-// Auto-refresh team data every 5 seconds
+// Auto-refresh team data every 3 seconds
 setInterval(() => {
     if (currentPage.startsWith('team')) {
         const teamNum = currentPage.replace('team', '');
         loadTeam(teamNum);
     }
-}, 5000);
+}, 3000);
 
 // Auto-refresh final scores every 5 seconds
 setInterval(() => {
