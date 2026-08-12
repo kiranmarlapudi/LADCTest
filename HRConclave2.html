@@ -83,8 +83,18 @@ body, html {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 40px;
-    gap: 20px;
+    padding: 15px 30px;
+    gap: 15px;
+    width: 100%;
+}
+
+/* Final scores header */
+.header-banner.final-header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    gap: 15px;
     width: 100%;
 }
 
@@ -99,9 +109,17 @@ body, html {
     width: 400px;
 }
 
-/* Team page logo - smaller on right */
+/* Team page logo - same size as HRFSH */
 .header-banner.team-header .header-top-logo {
-    width: 160px;
+    width: 22%;
+    max-width: 280px;
+    flex-shrink: 0;
+}
+
+/* Final scores logo - same as team pages */
+.header-banner.final-header .header-top-logo {
+    width: 22%;
+    max-width: 280px;
     flex-shrink: 0;
 }
 
@@ -119,11 +137,19 @@ body, html {
     max-width: 900px;
 }
 
-/* Team page HRFSH - smaller on left */
+/* Team page HRFSH - on left */
 .header-banner.team-header .header-main-banner {
     width: 22%;
     max-width: 280px;
     flex-shrink: 0;
+}
+
+/* Final scores HRFSH - centered above text */
+.header-banner.final-header .header-main-banner {
+    width: 30%;
+    max-width: 350px;
+    flex-shrink: 0;
+    order: 0;
 }
 
 /* Page Title Section */
@@ -143,12 +169,24 @@ body, html {
 /* Team page title section - centered */
 .header-banner.team-header .page-title-section {
     flex: 1;
-    min-width: 200px;
+    min-width: 150px;
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+/* Final scores page title section - centered */
+.header-banner.final-header .page-title-section {
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    order: 1;
 }
 
 .main-title {
@@ -164,6 +202,11 @@ body, html {
 
 /* Team page main title - smaller */
 .header-banner.team-header .main-title {
+    font-size: 2.2rem;
+}
+
+/* Final scores page main title */
+.header-banner.final-header .main-title {
     font-size: 2.2rem;
 }
 
@@ -234,8 +277,8 @@ body, html {
 .page-content {
     position: relative;
     z-index: 2;
-    width: 90%;
-    max-width: 1200px;
+    width: 95%;
+    max-width: 1400px;
     flex-grow: 1;
     display: none;
     flex-direction: column;
@@ -253,20 +296,20 @@ body, html {
     min-height: 300px;
 }
 
-/* Team Pages Layout - 3 column structure */
+/* Team Pages Layout - 3 column structure with more spacing */
 .team-layout {
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     align-items: stretch;
     width: 100%;
     height: 100%;
-    gap: 20px;
+    gap: 30px;
     margin-top: 10px;
 }
 
 .team-left-col, .team-right-col {
-    flex: 1;
+    flex: 0 0 22%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -306,7 +349,7 @@ body, html {
 }
 
 .team-center-col {
-    flex: 1.5;
+    flex: 0 0 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -325,25 +368,18 @@ body, html {
 }
 
 /* FINAL SCORES */
-.final-header {
+.final-header-text {
     text-align: center;
     margin-bottom: 30px;
 }
 
-.final-header-text {
-    color: #FFD700;
+.final-header-text .main-title {
     font-size: 3rem;
-    font-weight: 800;
-    text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
-    letter-spacing: 3px;
+    text-transform: none;
 }
 
-.final-subtitle {
-    color: #c4b5fd;
+.final-header-text .round-title {
     font-size: 2.2rem;
-    font-weight: 600;
-    margin-top: 5px;
-    text-shadow: 0px 4px 10px rgba(0,0,0,0.5);
 }
 
 .leaderboard {
@@ -491,6 +527,15 @@ body, html {
 }
 
 /* Responsive */
+@media (max-width: 1024px) {
+    .team-left-col, .team-right-col {
+        flex: 0 0 25%;
+    }
+    .team-center-col {
+        flex: 0 0 45%;
+    }
+}
+
 @media (max-width: 768px) {
     .main-title { font-size: 2.2rem; }
     .round-title { font-size: 1.8rem; }
@@ -499,8 +544,6 @@ body, html {
     .header-main-banner { width: 95%; }
     .team-name-display { font-size: 2rem; }
     .team-score-final { font-size: 48px; }
-    .final-header-text { font-size: 2rem; }
-    .final-subtitle { font-size: 1.5rem; }
     
     .header-banner.home-header {
         padding: 15px 0;
@@ -519,12 +562,13 @@ body, html {
     }
     
     .header-banner.team-header .header-top-logo {
-        width: 120px;
+        width: 40%;
+        max-width: 150px;
     }
     
     .header-banner.team-header .header-main-banner {
-        width: 60%;
-        max-width: 200px;
+        width: 40%;
+        max-width: 150px;
     }
     
     .header-banner.team-header .page-title-section {
@@ -535,13 +579,32 @@ body, html {
         font-size: 1.8rem;
     }
     
+    .header-banner.final-header {
+        flex-direction: column;
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .header-banner.final-header .header-top-logo {
+        width: 40%;
+        max-width: 150px;
+    }
+    
+    .header-banner.final-header .header-main-banner {
+        width: 50%;
+        max-width: 200px;
+    }
+    
     .team-layout { 
         flex-direction: column; 
+        align-items: center;
+        gap: 20px;
     }
     .team-left-col, .team-right-col, .team-center-col { 
         flex: auto; 
         width: 100%;
         min-height: 200px;
+        max-width: 100%;
     }
 }
 
@@ -636,9 +699,9 @@ body, html {
 
     <!-- FINAL SCORES PAGE -->
     <div id="final-scores" class="page-content">
-        <div class="final-header">
-            <div class="final-header-text">HR Innovation Challenge</div>
-            <div class="final-subtitle">Final Scores</div>
+        <div class="final-header-text">
+            <div id="finalMainTitle" class="main-title">HR Innovation Challenge</div>
+            <div id="finalSubTitle" class="round-title">Final Scores</div>
         </div>
         <div class="leaderboard" id="leaderboard"></div>
     </div>
@@ -728,13 +791,17 @@ function showPage(pageId) {
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
     } else if (pageId === 'final-scores') {
-        // Final scores page - team header layout with both images on sides
-        headerBanner.className = 'header-banner team-header';
+        // Final scores page - HRFSH centered, TAPMI on right
+        headerBanner.className = 'header-banner final-header';
         headerBanner.innerHTML = `
             <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
                  alt="HR Conclave Banner" 
                  class="header-main-banner">
-         
+            
+            <div class="page-title-section">
+                <div id="mainTitle" class="main-title">HR Innovation Challenge</div>
+                <div id="roundTitle" class="round-title">Final Scores</div>
+            </div>
             
             <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/tapmi-bengaluru-2024-logo.png" 
                  alt="TAPMI Logo" 
@@ -745,7 +812,7 @@ function showPage(pageId) {
         // Call showFinal immediately
         showFinal();
     } else {
-        // Team pages - left and right header layout with smaller images
+        // Team pages - left and right header layout with equal sized images
         headerBanner.className = 'header-banner team-header';
         headerBanner.innerHTML = `
             <img src="https://raw.githubusercontent.com/kiranmarlapudi/LADCTest/main/HRFSH.png" 
