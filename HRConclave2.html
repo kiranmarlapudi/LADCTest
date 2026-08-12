@@ -1244,31 +1244,27 @@ async function showFinal() {
     }
 }
 
-    function displayLeaderboard(results) {
-    const maxScore = Math.max(...results.map(r => r.score));
-    const medalEmojis = ['🥇', '🥈', '🥉'];
-    const barClasses = ['gold', 'silver', 'bronze'];
-    
+function displayLeaderboard(results) {
     document.getElementById("leaderboard").innerHTML = `
-        <div class="leaderboard-bars">
-            ${results.map((result, index) => {
-                const percentage = maxScore > 0 ? (result.score / maxScore) * 100 : 0;
-                return `
-                    <div class="bar-item">
-                        <div class="bar-header">
-                            <span>${medalEmojis[index] || ''} ${result.team}</span>
-                            <span>${result.score}</span>
-                        </div>
-                        <div class="bar-track">
-                            <div class="bar-fill ${barClasses[index] || 'default'}" style="width: ${percentage}%">
-                                ${percentage > 20 ? `${Math.round(percentage)}%` : ''}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('')}
+        <div class="winner-card first">
+            <div class="position">🏆 CHAMPION</div>
+            <div class="team-name-final">${results[0].team}</div>
+            <div class="team-score-final">${results[0].score}</div>
+        </div>
+        <div class="podium-row">
+            <div class="winner-card second">
+                <div class="position">🥈 SECOND PLACE</div>
+                <div class="team-name-final">${results[1].team}</div>
+                <div class="team-score-final">${results[1].score}</div>
+            </div>
+            <div class="winner-card third">
+                <div class="position">🥉 THIRD PLACE</div>
+                <div class="team-name-final">${results[2].team}</div>
+                <div class="team-score-final">${results[2].score}</div>
+            </div>
         </div>
     `;
+
     setTimeout(() => addSparklesToChampion(), 100);
 }
 
