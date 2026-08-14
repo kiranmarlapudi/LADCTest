@@ -1108,7 +1108,7 @@ let currentPage = 'home';
 let chartInstances = {};
 let currentTeam = '1';
 
-/* Final podium presentation state */
+/* Final podium presentation state - live-safe */
 let podiumRevealInProgress = false;
 let podiumRevealCompleted = false;
 let latestPodiumResults = null;
@@ -1173,7 +1173,8 @@ function showPage(pageId) {
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
 
-        // Replay the podium ceremony every time Final Scores is opened.
+        // Replay the podium ceremony each time Final Scores is opened.
+        // Do not clear the leaderboard here; wait until fresh score data is ready.
         resetPodiumReveal();
 
         // Call showFinal immediately
@@ -1653,56 +1654,71 @@ function resetPodiumReveal() {
     podiumRevealCompleted = false;
     latestPodiumResults = null;
 
-    if (podiumRevealTimer) {
+    if (podiumRevealTimer !== null) {
         clearTimeout(podiumRevealTimer);
         podiumRevealTimer = null;
     }
+}
 
-    const leaderboard = document.getElementById("leaderboard");
-    if (leaderboard) leaderboard.innerHTML = "";
+function copyPodiumResults(results) {
+    return [
+        { team: results[0].team, score: results[0].score },
+        { team: results[1].team, score: results[1].score },
+        { team: results[2].team, score: results[2].score }
+    ];
 }
 
 function updateStablePodium(results) {
     const leaderboard = document.getElementById("leaderboard");
-    if (!leaderboard) return;
+    if (!leaderboard || !results || results.length < 3) return;
 
-    const values = {
-        first: results[0],
-        second: results[1],
-        third: results[2]
-    };
+    const firstTeam = leaderboard.querySelector('[data-podium-team="first"]');
+    const firstScore = leaderboard.querySelector('[data-podium-score="first"]');
+    const secondTeam = leaderboard.querySelector('[data-podium-team="second"]');
+    const secondScore = leaderboard.querySelector('[data-podium-score="second"]');
+    const thirdTeam = leaderboard.querySelector('[data-podium-team="third"]');
+    const thirdScore = leaderboard.querySelector('[data-podium-score="third"]');
 
-    Object.keys(values).forEach(place => {
-        const team = leaderboard.querySelector(`[data-podium-team="${place}"]`);
-        const score = leaderboard.querySelector(`[data-podium-score="${place}"]`);
-
-        if (team) team.textContent = values[place].team;
-        if (score) score.textContent = values[place].score;
-    });
+    if (firstTeam) firstTeam.textContent = results[0].team;
+    if (firstScore) firstScore.textContent = results[0].score;
+    if (secondTeam) secondTeam.textContent = results[1].team;
+    if (secondScore) secondScore.textContent = results[1].score;
+    if (thirdTeam) thirdTeam.textContent = results[2].team;
+    if (thirdScore) thirdScore.textContent = results[2].score;
 }
 
 function displayLeaderboard(results) {
-    // Store the newest fetched scores.
-    latestPodiumResults = results.map(result => ({ ...result }));
+    if (!results || results.length < 3) return;
 
-    // Do not rebuild the podium while the reveal is running.
-    // This prevents the 5-second refresh from restarting the animation.
+    // Keep a simple copy of the latest values for live refreshes.
+    latestPodiumResults = copyPodiumResults(results);
+
+    /*
+       While the reveal is running, the existing 5-second score refresh may
+       fetch newer data. Store it above, but DO NOT rebuild the podium.
+    */
     if (podiumRevealInProgress) {
         return;
     }
 
-    // After reveal, update values only. Keep the existing podium DOM stable.
+    /*
+       Once the ceremony is complete, update only text values.
+       This keeps the podium stable and prevents entrance animations replaying.
+    */
     if (podiumRevealCompleted) {
         updateStablePodium(latestPodiumResults);
         return;
     }
 
-    // First render each time Final Scores is opened.
+    const leaderboard = document.getElementById("leaderboard");
+    if (!leaderboard) return;
+
     podiumRevealInProgress = true;
 
-    document.getElementById("leaderboard").innerHTML = `
+    leaderboard.innerHTML = `
         <div class="classic-podium">
 
+            <!-- CHAMPION SPOTLIGHT - APPEARS WITH FIRST PLACE -->
             <div class="champion-spotlight"></div>
 
             <div class="podium-stage">
@@ -1714,6 +1730,7 @@ function displayLeaderboard(results) {
                     <div class="podium-score">
                         <span data-podium-score="second">${results[1].score}</span><span>PTS</span>
                     </div>
+
                     <div class="podium-block podium-block-second">
                         <div class="podium-place-number">2</div>
                         <div class="podium-place-label">SECOND PLACE</div>
@@ -1725,12 +1742,14 @@ function displayLeaderboard(results) {
                     <div class="champion-rays">
                         <div class="champion-ray-center"></div>
                     </div>
+
                     <div class="champion-ribbon">CHAMPION</div>
                     <div class="podium-award-icon">🏆</div>
                     <div class="podium-team-name" data-podium-team="first">${results[0].team}</div>
                     <div class="podium-score">
                         <span data-podium-score="first">${results[0].score}</span><span>PTS</span>
                     </div>
+
                     <div class="podium-block podium-block-first">
                         <div class="podium-place-number">1</div>
                         <div class="podium-place-label">WINNER</div>
@@ -1744,6 +1763,7 @@ function displayLeaderboard(results) {
                     <div class="podium-score">
                         <span data-podium-score="third">${results[2].score}</span><span>PTS</span>
                     </div>
+
                     <div class="podium-block podium-block-third">
                         <div class="podium-place-number">3</div>
                         <div class="podium-place-label">THIRD PLACE</div>
@@ -1756,13 +1776,19 @@ function displayLeaderboard(results) {
         </div>
     `;
 
-    // Reveal completes after 3rd -> 2nd -> champion.
-    podiumRevealTimer = setTimeout(() => {
+    /*
+       Sequence timing:
+       3rd starts at 0.35s
+       2nd starts at 2.0s
+       Champion starts at 4.05s
+       Spotlight continues indefinitely.
+    */
+    podiumRevealTimer = setTimeout(function() {
         podiumRevealInProgress = false;
         podiumRevealCompleted = true;
         podiumRevealTimer = null;
 
-        // Apply any fresher scores fetched during the reveal without rebuilding.
+        // Apply any newer scores fetched while the animation was running.
         if (latestPodiumResults) {
             updateStablePodium(latestPodiumResults);
         }
