@@ -760,38 +760,6 @@ body, html {
     }
 }
 
-/* Keep all podium places stable after the first reveal */
-.classic-podium.reveal-complete .podium-third,
-.classic-podium.reveal-complete .podium-second,
-.classic-podium.reveal-complete .podium-first {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: translateY(0) scale(1) !important;
-}
-
-.classic-podium.reveal-complete .podium-first .podium-award-icon {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: scale(1) translateY(0) !important;
-}
-
-.classic-podium.reveal-complete .champion-rays {
-    animation: none !important;
-    opacity: 0.82 !important;
-    transform: translateX(-50%) scale(1) !important;
-}
-
-.classic-podium.reveal-complete .podium-base {
-    animation: none !important;
-    opacity: 0.75 !important;
-    transform: scaleX(1) !important;
-}
-
-.classic-podium.reveal-complete .champion-spotlight {
-    animation: spotlightBeam 3s ease-in-out infinite !important;
-    opacity: 1 !important;
-}
-
 @media (max-width: 768px) {
     .final-header-text {
         margin-bottom: 0;
@@ -1140,6 +1108,12 @@ let currentPage = 'home';
 let chartInstances = {};
 let currentTeam = '1';
 
+/* Final podium presentation state */
+let podiumRevealInProgress = false;
+let podiumRevealCompleted = false;
+let latestPodiumResults = null;
+let podiumRevealTimer = null;
+
 /* ======================
    PAGE NAVIGATION
 ====================== */
@@ -1198,6 +1172,10 @@ function showPage(pageId) {
         `;
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
+
+        // Replay the podium ceremony every time Final Scores is opened.
+        resetPodiumReveal();
+
         // Call showFinal immediately
         showFinal();
     } else {
@@ -1464,97 +1442,6 @@ function drawChart(teamNum, labels, scores) {
    FINAL SCORES - FIXED TO READ L13:M15 CORRECTLY
 ====================== */
 
-let podiumRevealCompleted = false;
-let initialRenderDone = false;
-let lastResultsData = '';
-
-function displayLeaderboard(results) {
-    const revealClass = podiumRevealCompleted ? 'reveal-complete' : '';
-
-    document.getElementById("leaderboard").innerHTML = `
-        <div class="classic-podium ${revealClass}">
-
-            <!-- CHAMPION SPOTLIGHT - APPEARS WITH FIRST PLACE -->
-            <div class="champion-spotlight"></div>
-
-            <div class="podium-stage">
-
-                <!-- SECOND PLACE - REVEALED SECOND -->
-                <div class="podium-contestant podium-second">
-                    <div class="podium-award-icon">🥈</div>
-                    <div class="podium-team-name">${results[1].team}</div>
-                    <div class="podium-score">
-                        ${results[1].score}<span>PTS</span>
-                    </div>
-
-                    <div class="podium-block podium-block-second">
-                        <div class="podium-place-number">2</div>
-                        <div class="podium-place-label">SECOND PLACE</div>
-                    </div>
-                </div>
-
-                <!-- FIRST PLACE - REVEALED LAST -->
-                <div class="podium-contestant podium-first">
-                    <div class="champion-rays">
-                        <div class="champion-ray-center"></div>
-                    </div>
-
-                    <div class="champion-ribbon">CHAMPION</div>
-                    <div class="podium-award-icon">🏆</div>
-                    <div class="podium-team-name">${results[0].team}</div>
-                    <div class="podium-score">
-                        ${results[0].score}<span>PTS</span>
-                    </div>
-
-                    <div class="podium-block podium-block-first">
-                        <div class="podium-place-number">1</div>
-                        <div class="podium-place-label">WINNER</div>
-                    </div>
-                </div>
-
-                <!-- THIRD PLACE - REVEALED FIRST -->
-                <div class="podium-contestant podium-third">
-                    <div class="podium-award-icon">🥉</div>
-                    <div class="podium-team-name">${results[2].team}</div>
-                    <div class="podium-score">
-                        ${results[2].score}<span>PTS</span>
-                    </div>
-
-                    <div class="podium-block podium-block-third">
-                        <div class="podium-place-number">3</div>
-                        <div class="podium-place-label">THIRD PLACE</div>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="podium-base"></div>
-        </div>
-    `;
-
-    // Only set the completion flag on the initial render
-    if (!podiumRevealCompleted && !initialRenderDone) {
-        initialRenderDone = true;
-        setTimeout(() => {
-            podiumRevealCompleted = true;
-            // Re-render with the reveal-complete class to lock the animation
-            displayLeaderboard(results);
-        }, 5500);
-    }
-}
-
-function showFallbackLeaderboard() {
-    const fallbackResults = [
-        { team: "Team 1", score: 0 },
-        { team: "Team 2", score: 0 },
-        { team: "Team 3", score: 0 }
-    ];
-    // Reset flags for fallback
-    podiumRevealCompleted = false;
-    initialRenderDone = false;
-    displayLeaderboard(fallbackResults);
-}
-
 async function showFinal() {
     try {
         console.log('Fetching final scores from Scoring sheet...');
@@ -1578,6 +1465,7 @@ async function showFinal() {
                 
                 if (response.ok) {
                     const text = await response.text();
+                    // Check if we got valid CSV data (not an error page)
                     if (text && text.trim().length > 0 && 
                         !text.includes('<!DOCTYPE') && 
                         !text.includes('Login') &&
@@ -1675,11 +1563,13 @@ async function showFinal() {
         console.log('First 15 rows:', rows.slice(0, 15));
 
         // EXACTLY extract data from L13:M15
+        // Row 13 = index 12, Row 14 = index 13, Row 15 = index 14
+        // Column L = index 11, Column M = index 12
         const results = [];
-        const startRow = 12;
-        const endRow = 14;
-        const teamCol = 11;
-        const scoreCol = 12;
+        const startRow = 12; // Row 13 in Excel (0-indexed)
+        const endRow = 14;   // Row 15 in Excel (0-indexed)
+        const teamCol = 11;  // Column L
+        const scoreCol = 12; // Column M
         
         console.log(`Looking for data in rows ${startRow+1} to ${endRow+1} (L13:M15)...`);
         console.log(`Using column L (index ${teamCol}) for team names and column M (index ${scoreCol}) for scores`);
@@ -1692,9 +1582,11 @@ async function showFinal() {
                 
                 console.log(`Row ${i+1}: Team Name (L)="${teamName}", Score (M)="${scoreStr}" -> ${score}`);
                 
+                // Only add if we have a valid team name and score
                 if (teamName && teamName !== '' && !isNaN(score) && score >= 0) {
                     results.push({ team: teamName, score: score });
                 } else if (teamName && teamName !== '') {
+                    // If team name exists but score is invalid, log warning
                     console.warn(`Row ${i+1}: Team name "${teamName}" but invalid score: "${scoreStr}"`);
                 }
             } else {
@@ -1702,7 +1594,7 @@ async function showFinal() {
             }
         }
 
-        // If no data found in L13:M15, try scanning other rows
+        // If no data found in L13:M15, try scanning other rows but with the same column logic
         if (results.length === 0) {
             console.log('No data found in L13:M15, scanning all rows for data in columns L and M...');
             
@@ -1711,6 +1603,7 @@ async function showFinal() {
                     const teamName = rows[i][teamCol] ? rows[i][teamCol].trim() : '';
                     const score = parseFloat(rows[i][scoreCol]);
                     
+                    // Check if this looks like a team row (contains "Team" or "Presenter")
                     const isTeamRow = teamName.toLowerCase().includes('team') || 
                                     teamName.toLowerCase().includes('presenter') ||
                                     teamName.toLowerCase().includes('group') ||
@@ -1719,7 +1612,9 @@ async function showFinal() {
                                     teamName.toLowerCase().includes('team 3');
                     
                     if (teamName && teamName !== '' && !isNaN(score) && score >= 0 && teamName.length < 50) {
+                        // Only add if it looks like a team or if we have no results yet
                         if (isTeamRow || results.length === 0) {
+                            // Avoid duplicates
                             const exists = results.some(r => r.team === teamName);
                             if (!exists) {
                                 results.push({ team: teamName, score: score });
@@ -1738,25 +1633,149 @@ async function showFinal() {
             return;
         }
 
+        // If we have more than 3, sort and take top 3
         results.sort((a, b) => b.score - a.score);
         while (results.length < 3) {
             results.push({ team: `Team ${results.length + 1}`, score: 0 });
         }
 
         console.log('Final results:', results);
-        
-        // Only re-render if the data has changed or it's the first render
-        const newDataString = JSON.stringify(results);
-        
-        if (lastResultsData !== newDataString || !initialRenderDone) {
-            lastResultsData = newDataString;
-            displayLeaderboard(results);
-        }
+        displayLeaderboard(results);
 
     } catch (err) {
         console.error('Error fetching final scores:', err);
         showFallbackLeaderboard();
     }
+}
+
+function resetPodiumReveal() {
+    podiumRevealInProgress = false;
+    podiumRevealCompleted = false;
+    latestPodiumResults = null;
+
+    if (podiumRevealTimer) {
+        clearTimeout(podiumRevealTimer);
+        podiumRevealTimer = null;
+    }
+
+    const leaderboard = document.getElementById("leaderboard");
+    if (leaderboard) leaderboard.innerHTML = "";
+}
+
+function updateStablePodium(results) {
+    const leaderboard = document.getElementById("leaderboard");
+    if (!leaderboard) return;
+
+    const values = {
+        first: results[0],
+        second: results[1],
+        third: results[2]
+    };
+
+    Object.keys(values).forEach(place => {
+        const team = leaderboard.querySelector(`[data-podium-team="${place}"]`);
+        const score = leaderboard.querySelector(`[data-podium-score="${place}"]`);
+
+        if (team) team.textContent = values[place].team;
+        if (score) score.textContent = values[place].score;
+    });
+}
+
+function displayLeaderboard(results) {
+    // Store the newest fetched scores.
+    latestPodiumResults = results.map(result => ({ ...result }));
+
+    // Do not rebuild the podium while the reveal is running.
+    // This prevents the 5-second refresh from restarting the animation.
+    if (podiumRevealInProgress) {
+        return;
+    }
+
+    // After reveal, update values only. Keep the existing podium DOM stable.
+    if (podiumRevealCompleted) {
+        updateStablePodium(latestPodiumResults);
+        return;
+    }
+
+    // First render each time Final Scores is opened.
+    podiumRevealInProgress = true;
+
+    document.getElementById("leaderboard").innerHTML = `
+        <div class="classic-podium">
+
+            <div class="champion-spotlight"></div>
+
+            <div class="podium-stage">
+
+                <!-- SECOND PLACE - REVEALED SECOND -->
+                <div class="podium-contestant podium-second">
+                    <div class="podium-award-icon">🥈</div>
+                    <div class="podium-team-name" data-podium-team="second">${results[1].team}</div>
+                    <div class="podium-score">
+                        <span data-podium-score="second">${results[1].score}</span><span>PTS</span>
+                    </div>
+                    <div class="podium-block podium-block-second">
+                        <div class="podium-place-number">2</div>
+                        <div class="podium-place-label">SECOND PLACE</div>
+                    </div>
+                </div>
+
+                <!-- FIRST PLACE - REVEALED LAST -->
+                <div class="podium-contestant podium-first">
+                    <div class="champion-rays">
+                        <div class="champion-ray-center"></div>
+                    </div>
+                    <div class="champion-ribbon">CHAMPION</div>
+                    <div class="podium-award-icon">🏆</div>
+                    <div class="podium-team-name" data-podium-team="first">${results[0].team}</div>
+                    <div class="podium-score">
+                        <span data-podium-score="first">${results[0].score}</span><span>PTS</span>
+                    </div>
+                    <div class="podium-block podium-block-first">
+                        <div class="podium-place-number">1</div>
+                        <div class="podium-place-label">WINNER</div>
+                    </div>
+                </div>
+
+                <!-- THIRD PLACE - REVEALED FIRST -->
+                <div class="podium-contestant podium-third">
+                    <div class="podium-award-icon">🥉</div>
+                    <div class="podium-team-name" data-podium-team="third">${results[2].team}</div>
+                    <div class="podium-score">
+                        <span data-podium-score="third">${results[2].score}</span><span>PTS</span>
+                    </div>
+                    <div class="podium-block podium-block-third">
+                        <div class="podium-place-number">3</div>
+                        <div class="podium-place-label">THIRD PLACE</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="podium-base"></div>
+        </div>
+    `;
+
+    // Reveal completes after 3rd -> 2nd -> champion.
+    podiumRevealTimer = setTimeout(() => {
+        podiumRevealInProgress = false;
+        podiumRevealCompleted = true;
+        podiumRevealTimer = null;
+
+        // Apply any fresher scores fetched during the reveal without rebuilding.
+        if (latestPodiumResults) {
+            updateStablePodium(latestPodiumResults);
+        }
+    }, 5500);
+}
+
+function showFallbackLeaderboard() {
+    const fallbackResults = [
+        { team: "Team 1", score: 0 },
+        { team: "Team 2", score: 0 },
+        { team: "Team 3", score: 0 }
+    ];
+    displayLeaderboard(fallbackResults);
 }
 
 /* ======================
