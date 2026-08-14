@@ -1009,7 +1009,7 @@ body, html {
     <!-- TEAM NAME & LIVE INDICATOR -->
     <div id="teamNameDisplay" class="team-name-display" style="display:none;">
         <span class="dot"></span>
-        <span id="teamNameText">PRESENTING TEAM 1</span>
+        <span id="teamNameText">Presenting Team 1</span>
     </div>
 
     <!-- TOTAL SCORE -->
@@ -1025,8 +1025,8 @@ body, html {
         <!-- Home page is empty below the global title -->
     </div>
 
-    <!—Presenting TEAM 1 PAGE -->
-    <div id="Presentingteam1" class="page-content">
+    <!-- TEAM 1 PAGE -->
+    <div id="team1" class="page-content">
         <div class="team-layout">
             <div class="team-left-col">
                 <div class="vote-text vote-text-top">Scan the code to vote</div>
@@ -1044,8 +1044,8 @@ body, html {
         </div>
     </div>
 
-    <!—Presenting TEAM 2 PAGE -->
-    <div id="Presentingteam2" class="page-content">
+    <!-- TEAM 2 PAGE -->
+    <div id="team2" class="page-content">
         <div class="team-layout">
             <div class="team-left-col">
                 <div class="vote-text vote-text-top">Scan the code to vote</div>
@@ -1063,8 +1063,8 @@ body, html {
         </div>
     </div>
 
-    <!—Presenting TEAM 3 PAGE -->
-    <div id="Presentingteam3" class="page-content">
+    <!-- TEAM 3 PAGE -->
+    <div id="team3" class="page-content">
         <div class="team-layout">
             <div class="team-left-col">
                 <div class="vote-text vote-text-top">Scan the code to vote</div>
@@ -1095,11 +1095,11 @@ body, html {
     <nav class="bottom-nav">
         <a href="#" onclick="showPage('home')" data-page="home">Home</a>
         <span class="separator">|</span>
-        <a href="#" onclick="showPage('Presentingteam1')" data-page="Presentingteam1">Presenting Team 1</a>
+        <a href="#" onclick="showPage('team1')" data-page="team1">Presenting Team 1</a>
         <span class="separator">|</span>
-        <a href="#" onclick="showPage('Presentingteam2')" data-page="Presentingteam2"> Presenting Team 2</a>
+        <a href="#" onclick="showPage('team2')" data-page="team2">Presenting Team 2</a>
         <span class="separator">|</span>
-        <a href="#" onclick="showPage('Presentingteam3')" data-page="Presentingteam3"> Presenting Team 3</a>
+        <a href="#" onclick="showPage('team3')" data-page="team3">Presenting Team 3</a>
         <span class="separator">|</span>
         <a href="#" onclick="showPage('final-scores')" data-page="final-scores">🏆 Final Scores</a>
     </nav>
@@ -1207,7 +1207,7 @@ function showPage(pageId) {
         const teamNum = pageId.replace('team', '');
         currentTeam = teamNum;
         document.getElementById('teamNameDisplay').style.display = 'flex';
-        document.getElementById('teamNameText').textContent = `TEAM ${teamNum}`;
+        document.getElementById('teamNameText').textContent = `Presenting Team ${teamNum}`;
         document.getElementById('totalScoreContainer').style.display = 'block';
         
         // Set team images
@@ -1624,9 +1624,9 @@ async function showFinal() {
                     const isTeamRow = teamName.toLowerCase().includes('team') || 
                                     teamName.toLowerCase().includes('presenter') ||
                                     teamName.toLowerCase().includes('group') ||
-                                    teamName.toLowerCase().includes('Presentingteam 1') ||
-                                    teamName.toLowerCase().includes('Presentingteam 2') ||
-                                    teamName.toLowerCase().includes('Presentingteam 3');
+                                    teamName.toLowerCase().includes('team 1') ||
+                                    teamName.toLowerCase().includes('team 2') ||
+                                    teamName.toLowerCase().includes('team 3');
                     
                     if (teamName && teamName !== '' && !isNaN(score) && score >= 0 && teamName.length < 50) {
                         // Only add if it looks like a team or if we have no results yet
