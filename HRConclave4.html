@@ -1193,8 +1193,8 @@ function showPage(pageId) {
         `;
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
-        // Call showFinal immediately
-        showFinal();
+        // Call showFinal immediately and replay the podium animation
+        showFinal(true);
     } else {
         // Team pages - HRFSH centered only
         headerBanner.className = 'header-banner team-header';
@@ -1459,7 +1459,7 @@ function drawChart(teamNum, labels, scores) {
    FINAL SCORES - FIXED TO READ L13:M15 CORRECTLY
 ====================== */
 
-async function showFinal() {
+async function showFinal(animateReveal = false) {
     try {
         console.log('Fetching final scores from Scoring sheet...');
         
@@ -1657,7 +1657,7 @@ async function showFinal() {
         }
 
         console.log('Final results:', results);
-        displayLeaderboard(results);
+        displayLeaderboard(results, animateReveal);
 
     } catch (err) {
         console.error('Error fetching final scores:', err);
@@ -1665,10 +1665,8 @@ async function showFinal() {
     }
 }
 
-let podiumRevealCompleted = false;
-
-function displayLeaderboard(results) {
-    const revealClass = podiumRevealCompleted ? 'reveal-complete' : '';
+function displayLeaderboard(results, animateReveal = false) {
+    const revealClass = animateReveal ? '' : 'reveal-complete';
 
     document.getElementById("leaderboard").innerHTML = `
         <div class="classic-podium ${revealClass}">
@@ -1731,11 +1729,6 @@ function displayLeaderboard(results) {
         </div>
     `;
 
-    if (!podiumRevealCompleted) {
-        setTimeout(() => {
-            podiumRevealCompleted = true;
-        }, 5500);
-    }
 }
 
 function showFallbackLeaderboard() {
@@ -1744,7 +1737,7 @@ function showFallbackLeaderboard() {
         { team: "Presenting Team 2", score: 0 },
         { team: "Presenting Team 3", score: 0 }
     ];
-    displayLeaderboard(fallbackResults);
+    displayLeaderboard(fallbackResults, true);
 }
 
 /* ======================
@@ -1765,7 +1758,7 @@ setInterval(() => {
 // Auto-refresh final scores every 5 seconds
 setInterval(() => {
     if (currentPage === 'final-scores') {
-        showFinal();
+        showFinal(false);
     }
 }, 5000);
 
