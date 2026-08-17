@@ -1193,6 +1193,11 @@ function showPage(pageId) {
         `;
         document.getElementById('teamNameDisplay').style.display = 'none';
         document.getElementById('totalScoreContainer').style.display = 'none';
+
+        // Clear the previously loaded podium immediately when Final Scores
+        // is opened, so the old full podium cannot flash before the replay.
+        document.getElementById('leaderboard').innerHTML = '';
+
         // Call showFinal immediately and replay the podium animation
         showFinal(true);
     } else {
