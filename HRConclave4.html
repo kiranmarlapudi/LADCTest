@@ -1464,6 +1464,20 @@ function drawChart(teamNum, labels, scores) {
    FINAL SCORES - FIXED TO READ L13:M15 CORRECTLY
 ====================== */
 
+function normalizeTeamName(name) {
+    if (!name) return name;
+
+    const cleaned = String(name).trim();
+
+    // Keep names that already use the desired wording unchanged.
+    if (/^presenting\s+team\b/i.test(cleaned)) {
+        return cleaned;
+    }
+
+    // Convert Team / Team 1 / TEAM 2 etc. to Presenting Team / Presenting Team 1 / ...
+    return cleaned.replace(/^team\b/i, 'Presenting Team');
+}
+
 async function showFinal(animateReveal = false) {
     try {
         console.log('Fetching final scores from Scoring sheet...');
@@ -1606,7 +1620,7 @@ async function showFinal(animateReveal = false) {
                 
                 // Only add if we have a valid team name and score
                 if (teamName && teamName !== '' && !isNaN(score) && score >= 0) {
-                    results.push({ team: teamName, score: score });
+                    results.push({ team: normalizeTeamName(teamName), score: score });
                 } else if (teamName && teamName !== '') {
                     // If team name exists but score is invalid, log warning
                     console.warn(`Row ${i+1}: Team name "${teamName}" but invalid score: "${scoreStr}"`);
@@ -1639,7 +1653,7 @@ async function showFinal(animateReveal = false) {
                             // Avoid duplicates
                             const exists = results.some(r => r.team === teamName);
                             if (!exists) {
-                                results.push({ team: teamName, score: score });
+                                results.push({ team: normalizeTeamName(teamName), score: score });
                                 console.log(`Found data at row ${i+1}: Team="${teamName}", Score=${score}`);
                             }
                         }
@@ -1658,7 +1672,7 @@ async function showFinal(animateReveal = false) {
         // If we have more than 3, sort and take top 3
         results.sort((a, b) => b.score - a.score);
         while (results.length < 3) {
-            results.push({ team: `Team ${results.length + 1}`, score: 0 });
+            results.push({ team: `Presenting Team ${results.length + 1}`, score: 0 });
         }
 
         console.log('Final results:', results);
