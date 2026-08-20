@@ -1407,7 +1407,7 @@
             }
         }
 
-        async function processTeamData(csv, teamNum, sheetName) {
+        function processTeamData(csv, teamNum, sheetName) {
             console.log(`CSV data for ${sheetName}:`, csv.substring(0, 300) + '...');
 
             const lines = csv.trim().split("\n");
@@ -1437,44 +1437,29 @@
 
             console.log(`First 10 rows of ${sheetName}:`, rows.slice(0, 10));
 
-            // --- Extract vote count directly from cell P21 of the current team's sheet ---
-            // Do not rely on the full-sheet CSV having all 16 columns populated.
+            // --- Extract vote count by looking for a numeric value anywhere in column P ---
+            // This avoids relying on a fixed row, so the five criteria rows remain untouched.
             let voteCount = 0;
-            try {
-                const voteUrl =
-                    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}&range=P21:P21`;
-
-                const voteResponse = await fetch(voteUrl + "&t=" + Date.now(), {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'text/csv'
-                    }
-                });
-
-                if (voteResponse.ok) {
-                    const voteCsv = (await voteResponse.text()).trim();
-                    const voteStr = voteCsv
-                        .replace(/^"|"$/g, '')
-                        .trim();
-
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i] && rows[i].length > 15) {
+                    const voteStr = rows[i][15] ? rows[i][15].trim() : '';
                     const parsedVote = parseFloat(voteStr);
 
-                    if (!isNaN(parsedVote) && parsedVote >= 0) {
+                    if (voteStr !== '' && !isNaN(parsedVote) && parsedVote >= 0) {
                         voteCount = parsedVote;
-                        console.log(`Vote count from ${sheetName}!P21: ${voteCount}`);
-                    } else {
-                        console.log(`${sheetName}!P21 value "${voteStr}" is not a valid number, using 0`);
+                        console.log(`Vote count found in column P at row ${i + 1}: ${voteCount}`);
+                        break;
                     }
-                } else {
-                    console.log(`Could not fetch ${sheetName}!P21. Status: ${voteResponse.status}`);
                 }
-            } catch (voteError) {
-                console.error(`Error fetching ${sheetName}!P21:`, voteError);
+            }
+
+            if (voteCount === 0) {
+                console.log(`No numeric vote count found in column P for ${sheetName}, using 0`);
             }
 
             // Store vote count and update display
             voteCounts[teamNum] = voteCount;
-            document.getElementById('voteCount').textContent = voteCount;
+            document.getElementById('voteCount').innerHTML = voteCount;
 
             // --- Extract chart data from L12:M16 ---
             const labels = [];
@@ -1490,7 +1475,8 @@
                     if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
                         if (!label.toLowerCase().includes('total') &&
                             !label.toLowerCase().includes('sum') &&
-                            !label.toLowerCase().includes('average')) {
+                            !label.toLowerCase().includes('average') &&
+                            !label.toLowerCase().includes('pillar')) {
                             labels.push(label);
                             scores.push(score);
                             foundData = true;
@@ -1518,7 +1504,8 @@
                             50) {
                             if (!foundLabel.toLowerCase().includes('total') &&
                                 !foundLabel.toLowerCase().includes('sum') &&
-                                !foundLabel.toLowerCase().includes('average')) {
+                                !foundLabel.toLowerCase().includes('average') &&
+                                !foundLabel.toLowerCase().includes('pillar')) {
                                 labels.push(foundLabel);
                                 scores.push(scoreVal);
                                 console.log(`Found data at row ${i+1}: Label="${foundLabel}", Score=${scoreVal}`);
