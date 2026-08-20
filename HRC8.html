@@ -1450,9 +1450,9 @@ function processTeamData(csv, teamNum, sheetName) {
     // Use the exact ranges instead of scanning the first 20 rows.
     // This is important because Presenter_1's criteria start at row 26.
     const criterionRanges = {
-        "1": { startRow: 26, endRow: 30 },
-        "2": { startRow: 19, endRow: 23 },
-        "3": { startRow: 18, endRow: 22 }
+        "1": { startRow: 1, endRow: 40 },
+        "2": { startRow: 1, endRow: 40 },
+        "3": { startRow: 1, endRow: 40 }
     };
 
     const range = criterionRanges[String(teamNum)];
