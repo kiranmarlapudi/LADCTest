@@ -219,48 +219,44 @@
             }
         }
 
-        /* VOTE COUNT DISPLAY - replaces total score */
-        .vote-count-container {
+        /* VOTE COUNT & TIMER - SIDE BY SIDE */
+        .stats-row {
             position: relative;
             z-index: 2;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
             margin: 5px 0 15px 0;
+            flex-wrap: wrap;
         }
 
-        .vote-label {
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
             opacity: .7;
             font-size: 14px;
             color: #c4b5fd;
+            letter-spacing: 1px;
         }
 
-        .vote-count {
+        .stat-value {
             font-size: 42px;
             font-weight: 700;
-            color: #FFD700;
-        }
-
-        /* TIMER DISPLAY */
-        .timer-container {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            margin: 5px 0 15px 0;
-        }
-
-        .timer-label {
-            opacity: .7;
-            font-size: 14px;
-            color: #c4b5fd;
-        }
-
-        .timer-display {
-            font-size: 42px;
-            font-weight: 700;
-            color: #ff6b6b;
             font-variant-numeric: tabular-nums;
         }
 
-        .timer-display.warning {
+        .stat-value.votes {
+            color: #FFD700;
+        }
+
+        .stat-value.timer {
+            color: #ff6b6b;
+        }
+
+        .stat-value.timer.warning {
             color: #ff4757;
             animation: timerPulse 1s ease-in-out infinite;
         }
@@ -936,6 +932,14 @@
                 font-size: 6px;
                 letter-spacing: 1.3px;
             }
+
+            .stats-row {
+                gap: 30px;
+            }
+
+            .stat-value {
+                font-size: 32px;
+            }
         }
 
         /* Navigation - Always Visible at Bottom */
@@ -1005,12 +1009,6 @@
             .team-name-display {
                 font-size: 2rem;
             }
-            .vote-count {
-                font-size: 32px;
-            }
-            .timer-display {
-                font-size: 32px;
-            }
 
             .header-banner.home-header {
                 padding: 15px 0;
@@ -1075,16 +1073,16 @@
             <span id="teamNameText">Presenting Team 1</span>
         </div>
 
-        <!-- VOTE COUNT -->
-        <div id="voteCountContainer" class="vote-count-container" style="display:none;">
-            <div class="vote-label">VOTES</div>
-            <div id="voteCount" class="vote-count">0</div>
-        </div>
-
-        <!-- TIMER -->
-        <div id="timerContainer" class="timer-container" style="display:none;">
-            <div class="timer-label">⏱ TIME REMAINING</div>
-            <div id="timerDisplay" class="timer-display">02:30</div>
+        <!-- VOTE COUNT & TIMER - SIDE BY SIDE -->
+        <div id="statsRow" class="stats-row" style="display:none;">
+            <div class="stat-item">
+                <div class="stat-label">🗳 VOTES</div>
+                <div id="voteCount" class="stat-value votes">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">⏱ TIME REMAINING</div>
+                <div id="timerDisplay" class="stat-value timer">02:30</div>
+            </div>
         </div>
 
         <!-- MAIN PAGES -->
@@ -1290,8 +1288,7 @@
 
             // Get elements
             const headerBanner = document.getElementById('headerBanner');
-            const voteContainer = document.getElementById('voteCountContainer');
-            const timerContainer = document.getElementById('timerContainer');
+            const statsRow = document.getElementById('statsRow');
 
             // Handle page-specific logic
             if (pageId === 'home') {
@@ -1312,8 +1309,7 @@
                          class="header-main-banner">
                 `;
                 document.getElementById('teamNameDisplay').style.display = 'none';
-                voteContainer.style.display = 'none';
-                timerContainer.style.display = 'none';
+                statsRow.style.display = 'none';
                 // Reset timer when going home
                 resetTimer();
             } else if (pageId === 'final-scores') {
@@ -1325,8 +1321,7 @@
                          class="header-main-banner">
                 `;
                 document.getElementById('teamNameDisplay').style.display = 'none';
-                voteContainer.style.display = 'none';
-                timerContainer.style.display = 'none';
+                statsRow.style.display = 'none';
                 // Stop timer on final scores
                 if (timerInterval) {
                     clearInterval(timerInterval);
@@ -1349,9 +1344,8 @@
                 document.getElementById('teamNameDisplay').style.display = 'flex';
                 document.getElementById('teamNameText').textContent = `Presenting Team ${teamNum}`;
 
-                // Show vote count and timer
-                voteContainer.style.display = 'block';
-                timerContainer.style.display = 'block';
+                // Show vote count and timer side by side
+                statsRow.style.display = 'flex';
 
                 // Set team images
                 const imgUrl = TEAM_IMAGES[teamNum];
@@ -1458,7 +1452,7 @@
                 console.log("Row 21 (P21) not found or not enough columns, using 0");
             }
 
-            // Store vote count
+            // Store vote count and update display
             voteCounts[teamNum] = voteCount;
             document.getElementById('voteCount').innerHTML = voteCount;
 
