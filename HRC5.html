@@ -1490,8 +1490,7 @@
                     if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
                         if (!label.toLowerCase().includes('total') &&
                             !label.toLowerCase().includes('sum') &&
-                            !label.toLowerCase().includes('average') &&
-                            !label.toLowerCase().includes('pillar')) {
+                            !label.toLowerCase().includes('average')) {
                             labels.push(label);
                             scores.push(score);
                             foundData = true;
@@ -1519,8 +1518,7 @@
                             50) {
                             if (!foundLabel.toLowerCase().includes('total') &&
                                 !foundLabel.toLowerCase().includes('sum') &&
-                                !foundLabel.toLowerCase().includes('average') &&
-                                !foundLabel.toLowerCase().includes('pillar')) {
+                                !foundLabel.toLowerCase().includes('average')) {
                                 labels.push(foundLabel);
                                 scores.push(scoreVal);
                                 console.log(`Found data at row ${i+1}: Label="${foundLabel}", Score=${scoreVal}`);
