@@ -1461,83 +1461,92 @@
             voteCounts[teamNum] = voteCount;
             document.getElementById('voteCount').innerHTML = voteCount;
 
-            // --- Extract chart data from L12:M16 ---
-            const labels = [];
-            const scores = [];
-
-            let foundData = false;
-            for (let i = 0; i < Math.min(rows.length, 20); i++) {
-                if (rows[i] && rows[i].length > 12) {
-                    const label = rows[i][11] ? rows[i][11].trim() : '';
-                    const scoreStr = rows[i][12] ? rows[i][12].trim() : '';
-                    const score = parseFloat(scoreStr);
-
-                    if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
-                        if (!label.toLowerCase().includes('total') &&
-                            !label.toLowerCase().includes('sum') &&
-                            !label.toLowerCase().includes('average') &&
-                            !label.toLowerCase().includes('pillar')) {
-                            labels.push(label);
-                            scores.push(score);
-                            foundData = true;
-                            console.log(`Found data at row ${i+1}: Label="${label}", Score=${score}`);
-                            if (labels.length >= 5) break;
-                        }
-                    }
+   // Extract data from L12:M16 (rows 11-15 in 0-indexed, columns L=11, M=12)
+    const labels = [];
+    const scores = [];
+    
+    // Try to find the data by searching for rows with content in column L
+    let foundData = false;
+    for (let i = 0; i < Math.min(rows.length, 20); i++) {
+        if (rows[i] && rows[i].length > 12) {
+            const label = rows[i][11] ? rows[i][11].trim() : '';
+            const scoreStr = rows[i][12] ? rows[i][12].trim() : '';
+            const score = parseFloat(scoreStr);
+            
+            // Check if this looks like a data row (has a label and a valid number)
+            if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
+                // Avoid picking up header rows or summary rows
+                if (!label.toLowerCase().includes('total') && 
+                    !label.toLowerCase().includes('sum') &&
+                    !label.toLowerCase().includes('average') &&
+                    !label.toLowerCase().includes('pillar')) {
+                    labels.push(label);
+                    scores.push(score);
+                    foundData = true;
+                    console.log(`Found data at row ${i+1}: Label="${label}", Score=${score}`);
+                    if (labels.length >= 5) break;
                 }
             }
-
-            if (!foundData || labels.length === 0) {
-                console.log('No data found in expected format, scanning all rows...');
-                for (let i = 0; i < Math.min(rows.length, 30); i++) {
-                    if (rows[i] && rows[i].length > 12) {
-                        const label = rows[i][11] ? rows[i][11].trim() : '';
-                        let foundLabel = label;
-                        if (!foundLabel && rows[i][10]) foundLabel = rows[i][10].trim();
-                        if (!foundLabel && rows[i][9]) foundLabel = rows[i][9].trim();
-
-                        let scoreVal = parseFloat(rows[i][12]);
-                        if (isNaN(scoreVal) && rows[i][13]) scoreVal = parseFloat(rows[i][13]);
-                        if (isNaN(scoreVal) && rows[i][14]) scoreVal = parseFloat(rows[i][14]);
-
-                        if (foundLabel && foundLabel !== '' && !isNaN(scoreVal) && scoreVal >= 0 && foundLabel.length <
-                            50) {
-                            if (!foundLabel.toLowerCase().includes('total') &&
-                                !foundLabel.toLowerCase().includes('sum') &&
-                                !foundLabel.toLowerCase().includes('average') &&
-                                !foundLabel.toLowerCase().includes('pillar')) {
-                                labels.push(foundLabel);
-                                scores.push(scoreVal);
-                                console.log(`Found data at row ${i+1}: Label="${foundLabel}", Score=${scoreVal}`);
-                                if (labels.length >= 5) break;
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (labels.length === 0) {
-                console.log('No data found, using sample data for testing');
-                const sampleLabels = ["Innovation", "Strategy", "Execution", "Impact", "Sustainability"];
-                const sampleScores = [85, 72, 90, 78, 88];
-                for (let i = 0; i < 5; i++) {
-                    labels.push(sampleLabels[i]);
-                    scores.push(sampleScores[i]);
-                }
-            }
-
-            while (labels.length < 5) {
-                labels.push(`Pillar ${labels.length + 1}`);
-                scores.push(0);
-            }
-
-            const finalLabels = labels.slice(0, 5);
-            const finalScores = scores.slice(0, 5);
-
-            console.log(`Final data for ${sheetName}:`, { labels: finalLabels, scores: finalScores, votes: voteCount });
-
-            drawChart(teamNum, finalLabels, finalScores);
         }
+    }
+
+    // If no data found, try a more aggressive scan
+    if (!foundData || labels.length === 0) {
+        console.log('No data found in expected format, scanning all rows...');
+        for (let i = 0; i < Math.min(rows.length, 30); i++) {
+            if (rows[i] && rows[i].length > 12) {
+                const label = rows[i][11] ? rows[i][11].trim() : '';
+                // Try columns 10, 11, 12 for labels
+                let foundLabel = label;
+                if (!foundLabel && rows[i][10]) foundLabel = rows[i][10].trim();
+                if (!foundLabel && rows[i][9]) foundLabel = rows[i][9].trim();
+                
+                // Try columns 12, 13, 14 for scores
+                let scoreVal = parseFloat(rows[i][12]);
+                if (isNaN(scoreVal) && rows[i][13]) scoreVal = parseFloat(rows[i][13]);
+                if (isNaN(scoreVal) && rows[i][14]) scoreVal = parseFloat(rows[i][14]);
+                
+                if (foundLabel && foundLabel !== '' && !isNaN(scoreVal) && scoreVal >= 0 && foundLabel.length < 50) {
+                    if (!foundLabel.toLowerCase().includes('total') && 
+                        !foundLabel.toLowerCase().includes('sum') &&
+                        !foundLabel.toLowerCase().includes('average') &&
+                        !foundLabel.toLowerCase().includes('pillar')) {
+                        labels.push(foundLabel);
+                        scores.push(scoreVal);
+                        console.log(`Found data at row ${i+1}: Label="${foundLabel}", Score=${scoreVal}`);
+                        if (labels.length >= 5) break;
+                    }
+                }
+            }
+        }
+    }
+
+    // If still no data, use sample data for testing
+    if (labels.length === 0) {
+        console.log('No data found, using sample data for testing');
+        const sampleLabels = ["Innovation", "Strategy", "Execution", "Impact", "Sustainability"];
+        const sampleScores = [85, 72, 90, 78, 88];
+        for (let i = 0; i < 5; i++) {
+            labels.push(sampleLabels[i]);
+            scores.push(sampleScores[i]);
+        }
+    }
+
+    // Ensure we have exactly 5 items
+    while (labels.length < 5) {
+        labels.push(`Pillar ${labels.length + 1}`);
+        scores.push(0);
+    }
+
+    const finalLabels = labels.slice(0, 5);
+    const finalScores = scores.slice(0, 5);
+    const total = finalScores.reduce((a, b) => a + b, 0);
+
+    console.log(`Final data for ${sheetName}:`, { labels: finalLabels, scores: finalScores, total });
+
+    document.getElementById('totalScore').innerHTML = total;
+    drawChart(teamNum, finalLabels, finalScores);
+}
 
         function drawChart(teamNum, labels, scores) {
             const canvasId = `chart${teamNum}`;
