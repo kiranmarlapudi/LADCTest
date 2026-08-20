@@ -1334,7 +1334,7 @@
         }
 
         /* ======================
-           TEAM VIEW - Loads criteria (L12:M16) and vote count (P32)
+           TEAM VIEW - Loads criteria from any row (L & M) and vote from P32
         ====================== */
 
         function parseCSV(csv) {
@@ -1403,7 +1403,7 @@
                 return;
             }
 
-            console.log(`First 10 rows of ${sheetNameForLog(teamNum)}:`, rows.slice(0, 10));
+            console.log(`Total rows: ${rows.length}`);
 
             // --- Extract vote count from P32 (row index 31, column index 15) ---
             let voteCount = 0;
@@ -1422,97 +1422,63 @@
 
             document.getElementById('voteCount').innerHTML = voteCount;
 
-            // --- Extract criteria from L12:M16 (rows 11-15, columns L=11, M=12) ---
+            // --- Extract criteria: scan ALL rows for column L (label) and M (score) ---
             const labels = [];
             const scores = [];
-            let foundData = false;
 
-            // First try the exact range L12:M16
-            for (let i = 11; i <= 15 && i < rows.length; i++) {
+            // We'll collect all valid pairs, then take the first 5 that are not empty.
+            // We'll skip rows that contain "total", "sum", "average", "pillar" (case-insensitive)
+            // and also skip rows where label is empty or score is not a number.
+            for (let i = 0; i < rows.length; i++) {
                 if (rows[i] && rows[i].length > 12) {
                     const label = rows[i][11] ? rows[i][11].trim() : '';
                     const scoreStr = rows[i][12] ? rows[i][12].trim() : '';
                     const score = parseFloat(scoreStr);
 
-                    if (label && label !== '' && !isNaN(score) && score >= 0 && label.length < 50) {
-                        // Avoid header/summary rows
-                        if (!label.toLowerCase().includes('total') &&
-                            !label.toLowerCase().includes('sum') &&
-                            !label.toLowerCase().includes('average') &&
-                            !label.toLowerCase().includes('pillar')) {
-                            labels.push(label);
-                            scores.push(score);
-                            foundData = true;
-                            console.log(`Found data at row ${i+1}: Label="${label}", Score=${score}`);
-                            if (labels.length >= 5) break;
-                        }
+                    // Skip if label is empty
+                    if (!label) continue;
+                    // Skip if label contains common header words
+                    const lowerLabel = label.toLowerCase();
+                    if (lowerLabel.includes('total') ||
+                        lowerLabel.includes('sum') ||
+                        lowerLabel.includes('average') ||
+                        lowerLabel.includes('pillar') ||
+                        lowerLabel.includes('criteria') ||
+                        lowerLabel.includes('score') ||
+                        lowerLabel.includes('name')) {
+                        continue;
+                    }
+                    // Skip if score is not a valid number or negative
+                    if (isNaN(score) || score < 0) continue;
+
+                    // Avoid duplicates (by label)
+                    const exists = labels.some(l => l === label);
+                    if (!exists) {
+                        labels.push(label);
+                        scores.push(score);
+                        console.log(`Found criterion at row ${i+1}: Label="${label}", Score=${score}`);
+                        if (labels.length >= 5) break;
                     }
                 }
             }
 
-            // If no data in L12:M16, scan rows 0-19 more aggressively
-            if (!foundData || labels.length === 0) {
-                console.log('No data in L12:M16, scanning rows 0-19...');
-                for (let i = 0; i < Math.min(rows.length, 20); i++) {
-                    if (rows[i] && rows[i].length > 12) {
-                        let label = rows[i][11] ? rows[i][11].trim() : '';
-                        // Try columns 9, 10, 11 for labels if L is empty
-                        if (!label && rows[i][10]) label = rows[i][10].trim();
-                        if (!label && rows[i][9]) label = rows[i][9].trim();
-
-                        let scoreVal = parseFloat(rows[i][12]);
-                        if (isNaN(scoreVal) && rows[i][13]) scoreVal = parseFloat(rows[i][13]);
-                        if (isNaN(scoreVal) && rows[i][14]) scoreVal = parseFloat(rows[i][14]);
-
-                        if (label && label !== '' && !isNaN(scoreVal) && scoreVal >= 0 && label.length < 50) {
-                            if (!label.toLowerCase().includes('total') &&
-                                !label.toLowerCase().includes('sum') &&
-                                !label.toLowerCase().includes('average') &&
-                                !label.toLowerCase().includes('pillar')) {
-                                // Avoid duplicates
-                                const exists = labels.some(l => l === label);
-                                if (!exists) {
-                                    labels.push(label);
-                                    scores.push(scoreVal);
-                                    console.log(`Found data at row ${i+1}: Label="${label}", Score=${scoreVal}`);
-                                    if (labels.length >= 5) break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Fallback sample data
-            if (labels.length === 0) {
-                console.log('No criteria data found, using sample data');
-                const sampleLabels = ["Innovation", "Strategy", "Execution", "Impact", "Sustainability"];
-                const sampleScores = [85, 72, 90, 78, 88];
-                for (let i = 0; i < 5; i++) {
-                    labels.push(sampleLabels[i]);
-                    scores.push(sampleScores[i]);
-                }
-            }
-
+            // If we still have less than 5, fill with placeholders
             while (labels.length < 5) {
                 labels.push(`Pillar ${labels.length + 1}`);
                 scores.push(0);
             }
 
+            // Ensure we only take 5
             const finalLabels = labels.slice(0, 5);
             const finalScores = scores.slice(0, 5);
 
-            console.log(`Final data for ${sheetNameForLog(teamNum)}:`, {
+            console.log(`Final data for ${SHEET_NAMES[teamNum]}:`, {
                 labels: finalLabels,
                 scores: finalScores,
                 votes: voteCount
             });
 
             drawChart(teamNum, finalLabels, finalScores);
-        }
-
-        function sheetNameForLog(teamNum) {
-            return SHEET_NAMES[teamNum] || `Team ${teamNum}`;
         }
 
         function drawChart(teamNum, labels, scores) {
@@ -1806,7 +1772,6 @@
                 </div>
             `;
 
-            // Mark reveal complete after animation finishes so subsequent refreshes stay stable
             if (animateReveal) {
                 setTimeout(() => {
                     podiumRevealCompleted = true;
