@@ -1407,7 +1407,7 @@
             }
         }
 
-        function processTeamData(csv, teamNum, sheetName) {
+        async function processTeamData(csv, teamNum, sheetName) {
             console.log(`CSV data for ${sheetName}:`, csv.substring(0, 300) + '...');
 
             const lines = csv.trim().split("\n");
@@ -1437,24 +1437,44 @@
 
             console.log(`First 10 rows of ${sheetName}:`, rows.slice(0, 10));
 
-            // --- Extract vote count from cell P21 (row 20, column 15) ---
+            // --- Extract vote count directly from cell P21 of the current team's sheet ---
+            // Do not rely on the full-sheet CSV having all 16 columns populated.
             let voteCount = 0;
-            if (rows.length > 20 && rows[20] && rows[20].length > 15) {
-                const voteStr = rows[20][15] ? rows[20][15].trim() : '';
-                const parsedVote = parseFloat(voteStr);
-                if (!isNaN(parsedVote) && parsedVote >= 0) {
-                    voteCount = parsedVote;
-                    console.log(`Vote count from P21: ${voteCount}`);
+            try {
+                const voteUrl =
+                    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}&range=P21:P21`;
+
+                const voteResponse = await fetch(voteUrl + "&t=" + Date.now(), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'text/csv'
+                    }
+                });
+
+                if (voteResponse.ok) {
+                    const voteCsv = (await voteResponse.text()).trim();
+                    const voteStr = voteCsv
+                        .replace(/^"|"$/g, '')
+                        .trim();
+
+                    const parsedVote = parseFloat(voteStr);
+
+                    if (!isNaN(parsedVote) && parsedVote >= 0) {
+                        voteCount = parsedVote;
+                        console.log(`Vote count from ${sheetName}!P21: ${voteCount}`);
+                    } else {
+                        console.log(`${sheetName}!P21 value "${voteStr}" is not a valid number, using 0`);
+                    }
                 } else {
-                    console.log(`P21 value "${voteStr}" not a valid number, using 0`);
+                    console.log(`Could not fetch ${sheetName}!P21. Status: ${voteResponse.status}`);
                 }
-            } else {
-                console.log("Row 21 (P21) not found or not enough columns, using 0");
+            } catch (voteError) {
+                console.error(`Error fetching ${sheetName}!P21:`, voteError);
             }
 
             // Store vote count and update display
             voteCounts[teamNum] = voteCount;
-            document.getElementById('voteCount').innerHTML = voteCount;
+            document.getElementById('voteCount').textContent = voteCount;
 
             // --- Extract chart data from L12:M16 ---
             const labels = [];
