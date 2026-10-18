@@ -5,12 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Campaign</title>
 <style>
-/* ---------------- Base ---------------- */
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
 body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 [hidden] { display: none !important; }
 
-/* ---------------- Home / Landing ---------------- */
 .brand { text-align: center; margin-top: 2rem; }
 .brand .logo { width: 90px; height: 90px; object-fit: contain; margin-bottom: 1rem; }
 .brand h1 { font-size: 2rem; letter-spacing: .5px; }
@@ -34,7 +32,6 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 .role-card h2 { font-size: 1.6rem; margin-bottom: .5rem; }
 .role-card p  { color: #556; font-size: .9rem; }
 
-/* ---------------- Login ---------------- */
 .login-box {
   max-width: 420px; margin: 6rem auto; background: #fff;
   padding: 2.5rem; border-radius: 20px;
@@ -54,12 +51,11 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 .login-box button:hover:not(:disabled) { background: #2c46b0; }
 .login-box button:disabled { opacity: .6; cursor: wait; }
 .err { color: #d23; text-align: center; margin-top: 1rem; font-size: .9rem; line-height: 1.4; }
-.err small { display: block; margin-top: .35rem; color: #888; font-size: .75rem; word-break: break-all; }
+.err small { display: block; margin-top: .35rem; color: #888; font-size: .72rem; word-break: break-all; text-align: left; }
 .back { text-align: center; margin-top: 1.5rem; font-size: .85rem; }
 .back a { color: #556; text-decoration: none; }
 .back a:hover { color: #3b5bdb; }
 
-/* ---------------- Dashboard ---------------- */
 .dash { max-width: 780px; margin: 3rem auto; }
 .dash h1 { text-align: center; margin-bottom: 2rem; }
 .assessment-row {
@@ -78,15 +74,12 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 </head>
 <body>
 
-<!-- ===================== HOME ===================== -->
 <section id="view-home" class="view">
   <header class="brand">
-    <img src="assets/logo.png" alt="Logo" class="logo"
-         onerror="this.style.display='none'">
+    <img src="assets/logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
     <h1>Campaign Name Here</h1>
     <p class="institute">Institute Name</p>
   </header>
-
   <section class="roles">
     <a href="#login?role=Taker"   class="role-card"><h2>Taker</h2><p>Enrollment-based access</p></a>
     <a href="#login?role=Advisor" class="role-card"><h2>Advisor</h2><p>Advisor portal</p></a>
@@ -94,7 +87,6 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
   </section>
 </section>
 
-<!-- ===================== LOGIN ===================== -->
 <section id="view-login" class="view" hidden>
   <div class="login-box">
     <h2 id="roleTitle">Login</h2>
@@ -110,7 +102,6 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
   </div>
 </section>
 
-<!-- ===================== DASHBOARD ===================== -->
 <section id="view-dashboard" class="view" hidden>
   <div class="dash">
     <h1 id="welcome">Assessments</h1>
@@ -121,25 +112,48 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 
 <script>
 /* ================================================================
-   CONFIG — inline, no external file needed
+   CONFIG
    ================================================================ */
-const CONFIG = {
-  CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbkuVps39gV9cxjaDC4PM13Mg2DUjYEF3-j_Xt0JtLLF-LV9DB3OUirNR-oyzmQ0eoaA7nUAI17cYd/pub?output=csv",
+const SHEET_ID = "1KqzqcuHq9p0YLYayOxitjWWKMLIJ7qhxsxIWJyfWMks";
+const SHEET_NAMES = ["Master Student Data"];   // tabs to try, in order
 
-  // Fallback proxies tried if direct fetch is CORS-blocked.
-  CSV_PROXIES: [
-    "https://api.allorigins.win/raw?url="
-  ],
+// The published token from your "Publish to web" dialog. Keep this as-is.
+const PUBLISHED_TOKEN = "2PACX-1vRbkuVps39gV9cxjaDC4PM13Mg2DUjYEF3-j_Xt0JtLLF-LV9DB3OUirNR-oyzmQ0eoaA7nUAI17cYd";
 
-  // Column indexes (0-based): A=0, B=1, C=2, D=3, E=4
-  COL_ENROLLMENT: 2,
-  COL_PASSCODE:   3,
+const COL_ENROLLMENT = 2;   // C
+const COL_PASSCODE   = 3;   // D
+const SKIP_ROWS      = 1;   // 1 = header row only
+const ASSESSMENT_COUNT = 7;
 
-  // Skip top rows before checking (1 = just the header row)
-  SKIP_ROWS: 1,
+// Free, keyless CORS proxy used as a fallback
+const PROXY = "https://api.allorigins.win/raw?url=";
 
-  ASSESSMENT_COUNT: 7
-};
+/* Build a list of candidate URLs to try, in order.
+   We try every combination of {endpoint type} × {direct, proxy}. */
+function candidateUrls() {
+  const urls = [];
+
+  // Style 1: pub?output=csv (works for whichever tab was published)
+  urls.push(`https://docs.google.com/spreadsheets/d/e/${PUBLISHED_TOKEN}/pub?output=csv`);
+
+  // Style 2: gviz per named tab (works if the sheet is shared as Viewer)
+  for (const name of SHEET_NAMES) {
+    const enc = encodeURIComponent(name);
+    urls.push(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${enc}`);
+  }
+
+  // Style 3: pub with a sheet= query (only works if published per-tab)
+  for (const name of SHEET_NAMES) {
+    const enc = encodeURIComponent(name);
+    urls.push(`https://docs.google.com/spreadsheets/d/e/${PUBLISHED_TOKEN}/pub?output=csv&sheet=${enc}`);
+  }
+
+  // Return with proxy clones appended so they get tried if direct fails
+  const withProxies = [];
+  urls.forEach(u => withProxies.push({ label: "direct", url: u }));
+  urls.forEach(u => withProxies.push({ label: "proxy",  url: PROXY + encodeURIComponent(u) }));
+  return withProxies;
+}
 
 /* ================================================================
    CSV parsing
@@ -166,28 +180,29 @@ function parseCSV(text) {
 }
 
 /* ================================================================
-   Fetch with fallback chain
+   Multi-source fetch
    ================================================================ */
-async function loadCSVWithFallbacks() {
-  const attempts = [{ label: "direct", url: CONFIG.CSV_URL }];
-  (CONFIG.CSV_PROXIES || []).forEach((proxy, i) => {
-    attempts.push({ label: "proxy" + (i + 1), url: proxy + encodeURIComponent(CONFIG.CSV_URL) });
-  });
-
+async function loadCSV() {
+  const attempts = candidateUrls();
   const errors = [];
-  for (const a of attempts) {
+
+  for (let i = 0; i < attempts.length; i++) {
+    const a = attempts[i];
+    const shortUrl = a.url.length > 90 ? a.url.slice(0, 87) + "..." : a.url;
     try {
       const res = await fetch(a.url, { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const text = await res.text();
       if (!text.includes(",") || text.length < 10) throw new Error("Non-CSV response");
+      console.info(`[sheet] ✔ succeeded via ${a.label} #${i + 1}: ${shortUrl}`);
       return text;
     } catch (e) {
-      console.warn(`[sheet] ${a.label} failed:`, e.message || e);
-      errors.push(`${a.label}: ${e.message || e}`);
+      const m = e.message || String(e);
+      console.warn(`[sheet] ✘ ${a.label} #${i + 1} (${shortUrl}): ${m}`);
+      errors.push(`#${i + 1} ${a.label}: ${m}`);
     }
   }
-  throw new Error("All sources failed — " + errors.join(" | "));
+  throw new Error("All sources failed:\n" + errors.join("\n"));
 }
 
 /* ================================================================
@@ -218,7 +233,6 @@ function clearError() { $("#errMsg").hidden = true; }
 function session() {
   return { role: sessionStorage.getItem("role"), enroll: sessionStorage.getItem("enroll") };
 }
-function clearSession() { sessionStorage.clear(); }
 
 /* ================================================================
    Login
@@ -236,7 +250,7 @@ $("#loginForm").addEventListener("submit", async (e) => {
 
   let rows;
   try {
-    const csv = await loadCSVWithFallbacks();
+    const csv = await loadCSV();
     rows = parseCSV(csv);
   } catch (err) {
     console.error(err);
@@ -245,16 +259,14 @@ $("#loginForm").addEventListener("submit", async (e) => {
     return;
   }
 
-  const data = rows.slice(CONFIG.SKIP_ROWS);
-
-  // Debug — shows parsed rows so column indexes can be verified
-  console.group("[sheet] first 3 data rows:");
+  const data = rows.slice(SKIP_ROWS);
+  console.group("[sheet] first 3 data rows (0-based columns):");
   data.slice(0, 3).forEach((r, i) => console.log(i, r));
   console.groupEnd();
 
   const match = data.find(r =>
-    (r[CONFIG.COL_ENROLLMENT] || "").trim() === enroll &&
-    (r[CONFIG.COL_PASSCODE]   || "").trim() === code
+    (r[COL_ENROLLMENT] || "").trim() === enroll &&
+    (r[COL_PASSCODE]   || "").trim() === code
   );
 
   if (!match) {
@@ -287,15 +299,14 @@ function renderDashboard() {
   list.innerHTML = "";
 
   const progress = JSON.parse(localStorage.getItem(`progress_${enroll}`) || "[]");
-  for (let i = 1; i <= CONFIG.ASSESSMENT_COUNT; i++) {
-    const id   = "A" + i;
+  for (let i = 1; i <= ASSESSMENT_COUNT; i++) {
+    const id = "A" + i;
     const done = progress.includes(id);
     const row = document.createElement("a");
     row.className = "assessment-row" + (done ? " done" : "");
     row.href = "javascript:void(0)";
-    row.innerHTML = `
-      <span>Assessment ${i}</span>
-      <span class="status">${done ? "Completed ✓" : "Pending"}</span>`;
+    row.innerHTML = `<span>Assessment ${i}</span>
+                     <span class="status">${done ? "Completed ✓" : "Pending"}</span>`;
     list.appendChild(row);
   }
   show("view-dashboard");
@@ -319,7 +330,7 @@ function route() {
   } else if (view === "#dashboard") {
     renderDashboard();
   } else if (view === "#logout") {
-    clearSession();
+    sessionStorage.clear();
     location.hash = "#home";
   } else {
     show("view-home");
