@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campaign</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ===================== HOME ===================== -->
+<section id="view-home" class="view">
+  <header class="brand">
+    <img src="assets/logo.png" alt="Logo" class="logo"
+         onerror="this.style.display='none'">
+    <h1>Campaign Name Here</h1>
+    <p class="institute">Institute Name</p>
+  </header>
+
+  <section class="roles">
+    <a href="#login?role=Taker"   class="role-card"><h2>Taker</h2><p>Enrollment-based access</p></a>
+    <a href="#login?role=Advisor" class="role-card"><h2>Advisor</h2><p>Advisor portal</p></a>
+    <a href="#login?role=Admin"   class="role-card"><h2>Admin</h2><p>Administrator access</p></a>
+  </section>
+</section>
+
+<!-- ===================== LOGIN ===================== -->
+<section id="view-login" class="view" hidden>
+  <div class="login-box">
+    <h2 id="roleTitle">Login</h2>
+    <form id="loginForm" autocomplete="off">
+      <label for="enroll">Enrollment Number</label>
+      <input id="enroll" required autocapitalize="characters">
+      <label for="code">Passcode</label>
+      <input id="code" type="password" required>
+      <button type="submit" id="submitBtn">Login</button>
+    </form>
+    <p class="err" id="errMsg" hidden></p>
+    <p class="back"><a href="#home">← Back to home</a></p>
+  </div>
+</section>
+
+<!-- ===================== DASHBOARD ===================== -->
+<section id="view-dashboard" class="view" hidden>
+  <div class="dash">
+    <h1 id="welcome">Assessments</h1>
+    <div id="list"></div>
+    <p class="back"><a href="#logout">Log out</a></p>
+  </div>
+</section>
+
+<script src="js/config.js"></script>
+<script>
+/* ---------- CSV parse ---------- */
+function parseCSV(text) {
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"' && text[i+1] === '"') { field += '"'; i++; }
+      else if (c === '"') inQuotes = false;
+      else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ',') { row.push(field); field = ""; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ""; }
+      else if (c === '\r') { /* skip */ }
+      else field += c;
+    }
+  }
+  if (field.length || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
+
+async function loadRows() {
+  const res = await fetch(CONFIG.CSV_URL, { cache: "no-store" });
+  if (!res.ok) throw new Error("Sheet fetch failed: " + res.status);
+  const csv = await res.text();
+  return parseCSV(csv);
+}
+
+/* ---------- Helpers ---------- */
+const $ = (s) => document.querySelector(s);
+function show(id) {
+  document.querySelectorAll(".view").forEach(v => v.hidden = true);
+  document.getElementById(id).hidden = false;
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Session ---------- */
+function session() {
+  return {
+    role:   sessionStorage.getItem("role"),
+    enroll: sessionStorage.getItem("enroll")
+  };
+}
+function clearSession() { sessionStorage.clear(); }
+
+/* ---------- Login handler ---------- */
+$("#loginForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = $("#errMsg"), btn = $("#submitBtn");
+  err.hidden = true;
+  btn.disabled = true; btn.textContent = "Checking…";
+
+  const role   = new URLSearchParams(location.hash.split("?")[1] || "").get("role") || "Taker";
+  const enroll = $("#enroll").value.trim();
+  const code   = $("#code").value.trim();
+
+  try {
+    const rows  = await loadRows();
+    const data  = rows.slice(CONFIG.SKIP_ROWS);
+    const match = data.find(r =>
+      (r[CONFIG.COL_ENROLLMENT] || "").trim() === enroll &&
+      (r[CONFIG.COL_PASSCODE]   || "").trim() === code
+    );
+
+    if (!match) {
+      err.textContent = "Incorrect combination. Please try again.";
+      err.hidden = false;
+      btn.disabled = false; btn.textContent = "Login";
+      return;
+    }
+
+    sessionStorage.setItem("role", role);
+    sessionStorage.setItem("enroll", enroll);
+
+    if (role === "Taker") {
+      renderDashboard();
+      location.hash = "#dashboard";
+    } else {
+      alert(role + " dashboard coming soon.");
+      location.hash = "#home";
+    }
+  } catch (e) {
+    console.error(e);
+    err.textContent = "Network error. Please try again.";
+    err.hidden = false;
+    btn.disabled = false; btn.textContent = "Login";
+  }
+});
+
+/* ---------- Dashboard renderer ---------- */
+function renderDashboard() {
+  const { enroll, role } = session();
+  if (!enroll || role !== "Taker") { location.hash = "#login?role=Taker"; return; }
+
+  $("#welcome").textContent = `Welcome, ${enroll}`;
+  const list = $("#list");
+  list.innerHTML = "";
+
+  const progress = JSON.parse(localStorage.getItem(`progress_${enroll}`) || "[]");
+
+  for (let i = 1; i <= CONFIG.ASSESSMENT_COUNT; i++) {
+    const id   = "A" + i;
+    const done = progress.includes(id);
+    const row = document.createElement("a");
+    row.className = "assessment-row" + (done ? " done" : "");
+    row.href = "javascript:void(0)";        // assessment.html not built yet
+    row.innerHTML = `
+      <span>Assessment ${i}</span>
+      <span class="status">${done ? "Completed ✓" : "Pending"}</span>`;
+    list.appendChild(row);
+  }
+
+  show("view-dashboard");
+}
+
+/* ---------- Router ---------- */
+function route() {
+  const hash  = location.hash || "#home";
+  const view  = hash.split("?")[0];
+  const role  = new URLSearchParams(hash.split("?")[1] || "").get("role");
+
+  if (view === "#login") {
+    $("#roleTitle").textContent = (role || "Taker") + " Login";
+    $("#errMsg").hidden = true;
+    $("#submitBtn").disabled = false;
+    $("#submitBtn").textContent = "Login";
+    $("#loginForm").reset();
+    show("view-login");
+  } else if (view === "#dashboard") {
+    renderDashboard();
+  } else if (view === "#logout") {
+    clearSession();
+    location.hash = "#home";
+  } else {
+    show("view-home");
+  }
+}
+
+window.addEventListener("hashchange", route);
+window.addEventListener("DOMContentLoaded", route);
+</script>
+</body>
+</html>
