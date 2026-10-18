@@ -54,7 +54,7 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 .login-box button:hover:not(:disabled) { background: #2c46b0; }
 .login-box button:disabled { opacity: .6; cursor: wait; }
 .err { color: #d23; text-align: center; margin-top: 1rem; font-size: .9rem; line-height: 1.4; }
-.err small { display: block; margin-top: .35rem; color: #888; font-size: .75rem; }
+.err small { display: block; margin-top: .35rem; color: #888; font-size: .75rem; word-break: break-all; }
 .back { text-align: center; margin-top: 1.5rem; font-size: .85rem; }
 .back a { color: #556; text-decoration: none; }
 .back a:hover { color: #3b5bdb; }
@@ -119,8 +119,28 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
   </div>
 </section>
 
-<script src="js/config.js"></script>
 <script>
+/* ================================================================
+   CONFIG — inline, no external file needed
+   ================================================================ */
+const CONFIG = {
+  CSV_URL: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbkuVps39gV9cxjaDC4PM13Mg2DUjYEF3-j_Xt0JtLLF-LV9DB3OUirNR-oyzmQ0eoaA7nUAI17cYd/pub?output=csv",
+
+  // Fallback proxies tried if direct fetch is CORS-blocked.
+  CSV_PROXIES: [
+    "https://api.allorigins.win/raw?url="
+  ],
+
+  // Column indexes (0-based): A=0, B=1, C=2, D=3, E=4
+  COL_ENROLLMENT: 2,
+  COL_PASSCODE:   3,
+
+  // Skip top rows before checking (1 = just the header row)
+  SKIP_ROWS: 1,
+
+  ASSESSMENT_COUNT: 7
+};
+
 /* ================================================================
    CSV parsing
    ================================================================ */
@@ -145,22 +165,13 @@ function parseCSV(text) {
   return rows;
 }
 
-/* ----------------------------------------------------------------
-   Try the direct URL, then each proxy. Throws with a useful
-   error message if everything fails.
-   ---------------------------------------------------------------- */
+/* ================================================================
+   Fetch with fallback chain
+   ================================================================ */
 async function loadCSVWithFallbacks() {
-  const attempts = [];
-
-  // 1) Direct (works if the sheet is published and CORS-friendly)
-  attempts.push({ label: "direct", url: CONFIG.CSV_URL });
-
-  // 2) Proxies
+  const attempts = [{ label: "direct", url: CONFIG.CSV_URL }];
   (CONFIG.CSV_PROXIES || []).forEach((proxy, i) => {
-    attempts.push({
-      label: "proxy" + (i + 1),
-      url: proxy + encodeURIComponent(CONFIG.CSV_URL)
-    });
+    attempts.push({ label: "proxy" + (i + 1), url: proxy + encodeURIComponent(CONFIG.CSV_URL) });
   });
 
   const errors = [];
@@ -169,21 +180,18 @@ async function loadCSVWithFallbacks() {
       const res = await fetch(a.url, { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const text = await res.text();
-      // sanity check — should contain a comma or newline (i.e. real CSV)
-      if (!text.includes(",") || text.length < 10) {
-        throw new Error("Empty or non-CSV response");
-      }
+      if (!text.includes(",") || text.length < 10) throw new Error("Non-CSV response");
       return text;
     } catch (e) {
-      console.warn(`[sheet] attempt "${a.label}" failed:`, e.message || e);
+      console.warn(`[sheet] ${a.label} failed:`, e.message || e);
       errors.push(`${a.label}: ${e.message || e}`);
     }
   }
-  throw new Error("All sheet sources failed — " + errors.join(" | "));
+  throw new Error("All sources failed — " + errors.join(" | "));
 }
 
 /* ================================================================
-   View helpers
+   Helpers
    ================================================================ */
 const $ = (s) => document.querySelector(s);
 function show(id) {
@@ -208,10 +216,7 @@ function clearError() { $("#errMsg").hidden = true; }
    Session
    ================================================================ */
 function session() {
-  return {
-    role:   sessionStorage.getItem("role"),
-    enroll: sessionStorage.getItem("enroll")
-  };
+  return { role: sessionStorage.getItem("role"), enroll: sessionStorage.getItem("enroll") };
 }
 function clearSession() { sessionStorage.clear(); }
 
@@ -235,19 +240,15 @@ $("#loginForm").addEventListener("submit", async (e) => {
     rows = parseCSV(csv);
   } catch (err) {
     console.error(err);
-    setError(
-      "Could not load the spreadsheet. Check your internet and try again.",
-      err.message
-    );
+    setError("Could not load the spreadsheet. Check your internet and try again.", err.message);
     btn.disabled = false; btn.textContent = "Login";
     return;
   }
 
   const data = rows.slice(CONFIG.SKIP_ROWS);
 
-  // Debug: show first 3 parsed data rows in console so you can
-  // verify column indexes are correct.
-  console.group("[sheet] first 3 data rows (0-based columns):");
+  // Debug — shows parsed rows so column indexes can be verified
+  console.group("[sheet] first 3 data rows:");
   data.slice(0, 3).forEach((r, i) => console.log(i, r));
   console.groupEnd();
 
@@ -286,13 +287,12 @@ function renderDashboard() {
   list.innerHTML = "";
 
   const progress = JSON.parse(localStorage.getItem(`progress_${enroll}`) || "[]");
-
   for (let i = 1; i <= CONFIG.ASSESSMENT_COUNT; i++) {
     const id   = "A" + i;
     const done = progress.includes(id);
     const row = document.createElement("a");
     row.className = "assessment-row" + (done ? " done" : "");
-    row.href = "javascript:void(0)";          // assessment page comes next
+    row.href = "javascript:void(0)";
     row.innerHTML = `
       <span>Assessment ${i}</span>
       <span class="status">${done ? "Completed ✓" : "Pending"}</span>`;
