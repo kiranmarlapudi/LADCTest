@@ -4,7 +4,77 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Campaign</title>
-<link rel="stylesheet" href="css/style.css">
+<style>
+/* ---------------- Base ---------------- */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
+[hidden] { display: none !important; }
+
+/* ---------------- Home / Landing ---------------- */
+.brand { text-align: center; margin-top: 2rem; }
+.brand .logo { width: 90px; height: 90px; object-fit: contain; margin-bottom: 1rem; }
+.brand h1 { font-size: 2rem; letter-spacing: .5px; }
+.brand .institute { font-size: .9rem; color: #666; margin-top: .25rem; }
+
+.roles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 2rem; max-width: 900px;
+  margin: 4rem auto 0; padding: 0 1rem;
+}
+.role-card {
+  background: linear-gradient(145deg, #ffffff, #e6ecff);
+  border-radius: 24px; padding: 3rem 1.5rem;
+  text-align: center; text-decoration: none; color: inherit;
+  box-shadow: 0 10px 25px rgba(50,80,180,.15);
+  border: 1px solid #dbe4ff;
+  transition: transform .2s, box-shadow .2s;
+}
+.role-card:hover { transform: translateY(-6px); box-shadow: 0 18px 35px rgba(50,80,180,.25); }
+.role-card h2 { font-size: 1.6rem; margin-bottom: .5rem; }
+.role-card p  { color: #556; font-size: .9rem; }
+
+/* ---------------- Login ---------------- */
+.login-box {
+  max-width: 420px; margin: 6rem auto; background: #fff;
+  padding: 2.5rem; border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(50,80,180,.12);
+}
+.login-box h2 { text-align: center; margin-bottom: 1.5rem; }
+.login-box label { display: block; font-size: .85rem; color: #556; margin-bottom: .35rem; }
+.login-box input {
+  width: 100%; padding: .8rem 1rem; margin-bottom: 1.2rem;
+  border-radius: 10px; border: 1px solid #ccd; font-size: 1rem;
+}
+.login-box input:focus { outline: 2px solid #3b5bdb; outline-offset: 1px; }
+.login-box button {
+  width: 100%; padding: .9rem; border: none; border-radius: 10px;
+  background: #3b5bdb; color: #fff; font-size: 1rem; cursor: pointer;
+}
+.login-box button:hover:not(:disabled) { background: #2c46b0; }
+.login-box button:disabled { opacity: .6; cursor: wait; }
+.err { color: #d23; text-align: center; margin-top: 1rem; font-size: .9rem; line-height: 1.4; }
+.err small { display: block; margin-top: .35rem; color: #888; font-size: .75rem; }
+.back { text-align: center; margin-top: 1.5rem; font-size: .85rem; }
+.back a { color: #556; text-decoration: none; }
+.back a:hover { color: #3b5bdb; }
+
+/* ---------------- Dashboard ---------------- */
+.dash { max-width: 780px; margin: 3rem auto; }
+.dash h1 { text-align: center; margin-bottom: 2rem; }
+.assessment-row {
+  background: #fff; border-radius: 16px; padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem; display: flex; justify-content: space-between;
+  align-items: center; box-shadow: 0 6px 18px rgba(50,80,180,.08);
+  text-decoration: none; color: inherit;
+  transition: transform .15s, box-shadow .15s;
+}
+.assessment-row:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(50,80,180,.14); }
+.assessment-row.done { background: #e7f8ec; cursor: default; }
+.assessment-row.done:hover { transform: none; }
+.assessment-row .status { color: #3b5bdb; font-weight: 600; font-size: .9rem; }
+.assessment-row.done .status { color: #2a9d54; }
+</style>
 </head>
 <body>
 
@@ -51,7 +121,9 @@
 
 <script src="js/config.js"></script>
 <script>
-/* ---------- CSV parse ---------- */
+/* ================================================================
+   CSV parsing
+   ================================================================ */
 function parseCSV(text) {
   const rows = [];
   let row = [], field = "", inQuotes = false;
@@ -73,22 +145,68 @@ function parseCSV(text) {
   return rows;
 }
 
-async function loadRows() {
-  const res = await fetch(CONFIG.CSV_URL, { cache: "no-store" });
-  if (!res.ok) throw new Error("Sheet fetch failed: " + res.status);
-  const csv = await res.text();
-  return parseCSV(csv);
+/* ----------------------------------------------------------------
+   Try the direct URL, then each proxy. Throws with a useful
+   error message if everything fails.
+   ---------------------------------------------------------------- */
+async function loadCSVWithFallbacks() {
+  const attempts = [];
+
+  // 1) Direct (works if the sheet is published and CORS-friendly)
+  attempts.push({ label: "direct", url: CONFIG.CSV_URL });
+
+  // 2) Proxies
+  (CONFIG.CSV_PROXIES || []).forEach((proxy, i) => {
+    attempts.push({
+      label: "proxy" + (i + 1),
+      url: proxy + encodeURIComponent(CONFIG.CSV_URL)
+    });
+  });
+
+  const errors = [];
+  for (const a of attempts) {
+    try {
+      const res = await fetch(a.url, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const text = await res.text();
+      // sanity check — should contain a comma or newline (i.e. real CSV)
+      if (!text.includes(",") || text.length < 10) {
+        throw new Error("Empty or non-CSV response");
+      }
+      return text;
+    } catch (e) {
+      console.warn(`[sheet] attempt "${a.label}" failed:`, e.message || e);
+      errors.push(`${a.label}: ${e.message || e}`);
+    }
+  }
+  throw new Error("All sheet sources failed — " + errors.join(" | "));
 }
 
-/* ---------- Helpers ---------- */
+/* ================================================================
+   View helpers
+   ================================================================ */
 const $ = (s) => document.querySelector(s);
 function show(id) {
   document.querySelectorAll(".view").forEach(v => v.hidden = true);
   document.getElementById(id).hidden = false;
   window.scrollTo(0, 0);
 }
+function setError(msg, detail) {
+  const err = $("#errMsg");
+  err.innerHTML = "";
+  err.appendChild(document.createTextNode(msg));
+  if (detail) {
+    const d = document.createElement("small");
+    d.textContent = detail;
+    err.appendChild(d);
+  }
+  err.hidden = false;
+}
+function clearError() { $("#errMsg").hidden = true; }
 
-/* ---------- Session ---------- */
+/* ================================================================
+   Session
+   ================================================================ */
 function session() {
   return {
     role:   sessionStorage.getItem("role"),
@@ -97,51 +215,68 @@ function session() {
 }
 function clearSession() { sessionStorage.clear(); }
 
-/* ---------- Login handler ---------- */
+/* ================================================================
+   Login
+   ================================================================ */
 $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const err = $("#errMsg"), btn = $("#submitBtn");
-  err.hidden = true;
-  btn.disabled = true; btn.textContent = "Checking…";
+  const btn = $("#submitBtn");
+  clearError();
+  btn.disabled = true;
+  btn.textContent = "Checking…";
 
   const role   = new URLSearchParams(location.hash.split("?")[1] || "").get("role") || "Taker";
   const enroll = $("#enroll").value.trim();
   const code   = $("#code").value.trim();
 
+  let rows;
   try {
-    const rows  = await loadRows();
-    const data  = rows.slice(CONFIG.SKIP_ROWS);
-    const match = data.find(r =>
-      (r[CONFIG.COL_ENROLLMENT] || "").trim() === enroll &&
-      (r[CONFIG.COL_PASSCODE]   || "").trim() === code
+    const csv = await loadCSVWithFallbacks();
+    rows = parseCSV(csv);
+  } catch (err) {
+    console.error(err);
+    setError(
+      "Could not load the spreadsheet. Check your internet and try again.",
+      err.message
     );
-
-    if (!match) {
-      err.textContent = "Incorrect combination. Please try again.";
-      err.hidden = false;
-      btn.disabled = false; btn.textContent = "Login";
-      return;
-    }
-
-    sessionStorage.setItem("role", role);
-    sessionStorage.setItem("enroll", enroll);
-
-    if (role === "Taker") {
-      renderDashboard();
-      location.hash = "#dashboard";
-    } else {
-      alert(role + " dashboard coming soon.");
-      location.hash = "#home";
-    }
-  } catch (e) {
-    console.error(e);
-    err.textContent = "Network error. Please try again.";
-    err.hidden = false;
     btn.disabled = false; btn.textContent = "Login";
+    return;
+  }
+
+  const data = rows.slice(CONFIG.SKIP_ROWS);
+
+  // Debug: show first 3 parsed data rows in console so you can
+  // verify column indexes are correct.
+  console.group("[sheet] first 3 data rows (0-based columns):");
+  data.slice(0, 3).forEach((r, i) => console.log(i, r));
+  console.groupEnd();
+
+  const match = data.find(r =>
+    (r[CONFIG.COL_ENROLLMENT] || "").trim() === enroll &&
+    (r[CONFIG.COL_PASSCODE]   || "").trim() === code
+  );
+
+  if (!match) {
+    setError("Incorrect combination. Please try again.");
+    btn.disabled = false; btn.textContent = "Login";
+    return;
+  }
+
+  sessionStorage.setItem("role", role);
+  sessionStorage.setItem("enroll", enroll);
+
+  if (role === "Taker") {
+    renderDashboard();
+    location.hash = "#dashboard";
+  } else {
+    alert(role + " dashboard coming soon.");
+    location.hash = "#home";
   }
 });
 
-/* ---------- Dashboard renderer ---------- */
+/* ================================================================
+   Dashboard
+   ================================================================ */
 function renderDashboard() {
   const { enroll, role } = session();
   if (!enroll || role !== "Taker") { location.hash = "#login?role=Taker"; return; }
@@ -157,25 +292,26 @@ function renderDashboard() {
     const done = progress.includes(id);
     const row = document.createElement("a");
     row.className = "assessment-row" + (done ? " done" : "");
-    row.href = "javascript:void(0)";        // assessment.html not built yet
+    row.href = "javascript:void(0)";          // assessment page comes next
     row.innerHTML = `
       <span>Assessment ${i}</span>
       <span class="status">${done ? "Completed ✓" : "Pending"}</span>`;
     list.appendChild(row);
   }
-
   show("view-dashboard");
 }
 
-/* ---------- Router ---------- */
+/* ================================================================
+   Router
+   ================================================================ */
 function route() {
-  const hash  = location.hash || "#home";
-  const view  = hash.split("?")[0];
-  const role  = new URLSearchParams(hash.split("?")[1] || "").get("role");
+  const hash = location.hash || "#home";
+  const view = hash.split("?")[0];
+  const role = new URLSearchParams(hash.split("?")[1] || "").get("role");
 
   if (view === "#login") {
     $("#roleTitle").textContent = (role || "Taker") + " Login";
-    $("#errMsg").hidden = true;
+    clearError();
     $("#submitBtn").disabled = false;
     $("#submitBtn").textContent = "Login";
     $("#loginForm").reset();
@@ -189,7 +325,6 @@ function route() {
     show("view-home");
   }
 }
-
 window.addEventListener("hashchange", route);
 window.addEventListener("DOMContentLoaded", route);
 </script>
