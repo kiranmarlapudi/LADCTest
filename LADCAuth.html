@@ -115,40 +115,31 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
    CONFIG
    ================================================================ */
 const SHEET_ID = "1KqzqcuHq9p0YLYayOxitjWWKMLIJ7qhxsxIWJyfWMks";
-const SHEET_NAMES = ["Master Student Data"];   // tabs to try, in order
-
-// The published token from your "Publish to web" dialog. Keep this as-is.
+const SHEET_NAMES = ["Master Student Data"];
 const PUBLISHED_TOKEN = "2PACX-1vRbkuVps39gV9cxjaDC4PM13Mg2DUjYEF3-j_Xt0JtLLF-LV9DB3OUirNR-oyzmQ0eoaA7nUAI17cYd";
 
+const COL_NAME       = 1;   // B — display name
 const COL_ENROLLMENT = 2;   // C
 const COL_PASSCODE   = 3;   // D
-const SKIP_ROWS      = 1;   // 1 = header row only
+const SKIP_ROWS      = 1;   // header row only
 const ASSESSMENT_COUNT = 7;
 
-// Free, keyless CORS proxy used as a fallback
 const PROXY = "https://api.allorigins.win/raw?url=";
 
-/* Build a list of candidate URLs to try, in order.
-   We try every combination of {endpoint type} × {direct, proxy}. */
+/* ================================================================
+   Candidate URLs
+   ================================================================ */
 function candidateUrls() {
   const urls = [];
-
-  // Style 1: pub?output=csv (works for whichever tab was published)
   urls.push(`https://docs.google.com/spreadsheets/d/e/${PUBLISHED_TOKEN}/pub?output=csv`);
-
-  // Style 2: gviz per named tab (works if the sheet is shared as Viewer)
   for (const name of SHEET_NAMES) {
     const enc = encodeURIComponent(name);
     urls.push(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${enc}`);
   }
-
-  // Style 3: pub with a sheet= query (only works if published per-tab)
   for (const name of SHEET_NAMES) {
     const enc = encodeURIComponent(name);
     urls.push(`https://docs.google.com/spreadsheets/d/e/${PUBLISHED_TOKEN}/pub?output=csv&sheet=${enc}`);
   }
-
-  // Return with proxy clones appended so they get tried if direct fails
   const withProxies = [];
   urls.forEach(u => withProxies.push({ label: "direct", url: u }));
   urls.forEach(u => withProxies.push({ label: "proxy",  url: PROXY + encodeURIComponent(u) }));
@@ -185,21 +176,16 @@ function parseCSV(text) {
 async function loadCSV() {
   const attempts = candidateUrls();
   const errors = [];
-
   for (let i = 0; i < attempts.length; i++) {
     const a = attempts[i];
-    const shortUrl = a.url.length > 90 ? a.url.slice(0, 87) + "..." : a.url;
     try {
       const res = await fetch(a.url, { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const text = await res.text();
       if (!text.includes(",") || text.length < 10) throw new Error("Non-CSV response");
-      console.info(`[sheet] ✔ succeeded via ${a.label} #${i + 1}: ${shortUrl}`);
       return text;
     } catch (e) {
-      const m = e.message || String(e);
-      console.warn(`[sheet] ✘ ${a.label} #${i + 1} (${shortUrl}): ${m}`);
-      errors.push(`#${i + 1} ${a.label}: ${m}`);
+      errors.push(`#${i + 1} ${a.label}: ${e.message || e}`);
     }
   }
   throw new Error("All sources failed:\n" + errors.join("\n"));
@@ -231,7 +217,11 @@ function clearError() { $("#errMsg").hidden = true; }
    Session
    ================================================================ */
 function session() {
-  return { role: sessionStorage.getItem("role"), enroll: sessionStorage.getItem("enroll") };
+  return {
+    role:   sessionStorage.getItem("role"),
+    enroll: sessionStorage.getItem("enroll"),
+    name:   sessionStorage.getItem("name")
+  };
 }
 
 /* ================================================================
@@ -260,9 +250,6 @@ $("#loginForm").addEventListener("submit", async (e) => {
   }
 
   const data = rows.slice(SKIP_ROWS);
-  console.group("[sheet] first 3 data rows (0-based columns):");
-  data.slice(0, 3).forEach((r, i) => console.log(i, r));
-  console.groupEnd();
 
   const match = data.find(r =>
     (r[COL_ENROLLMENT] || "").trim() === enroll &&
@@ -270,13 +257,16 @@ $("#loginForm").addEventListener("submit", async (e) => {
   );
 
   if (!match) {
-    setError("Incorrect combination. Please try again.");
+    setError("Please check your enrollment ID and password and try again. Else contact the LADC team.");
     btn.disabled = false; btn.textContent = "Login";
     return;
   }
 
-  sessionStorage.setItem("role", role);
+  const displayName = (match[COL_NAME] || "").trim() || enroll;
+
+  sessionStorage.setItem("role",   role);
   sessionStorage.setItem("enroll", enroll);
+  sessionStorage.setItem("name",   displayName);
 
   if (role === "Taker") {
     renderDashboard();
@@ -291,10 +281,10 @@ $("#loginForm").addEventListener("submit", async (e) => {
    Dashboard
    ================================================================ */
 function renderDashboard() {
-  const { enroll, role } = session();
+  const { enroll, role, name } = session();
   if (!enroll || role !== "Taker") { location.hash = "#login?role=Taker"; return; }
 
-  $("#welcome").textContent = `Welcome, ${enroll}`;
+  $("#welcome").textContent = `Welcome, ${name || enroll}`;
   const list = $("#list");
   list.innerHTML = "";
 
