@@ -15,10 +15,8 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 .brand .institute { font-size: .9rem; color: #666; margin-top: .25rem; }
 
 .roles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 2rem; max-width: 900px;
-  margin: 4rem auto 0; padding: 0 1rem;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 2rem; max-width: 900px; margin: 4rem auto 0; padding: 0 1rem;
 }
 .role-card {
   background: linear-gradient(145deg, #ffffff, #e6ecff);
@@ -77,8 +75,8 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 <section id="view-home" class="view">
   <header class="brand">
     <img src="assets/logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
-    <h1>Leadership Assessment & Development Center (LADC)</h1>
-    <p class="institute">TAPMI BLR</p>
+    <h1>Campaign Name Here</h1>
+    <p class="institute">Institute Name</p>
   </header>
   <section class="roles">
     <a href="#login?role=Taker"   class="role-card"><h2>Taker</h2><p>Enrollment-based access</p></a>
@@ -111,84 +109,13 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 </section>
 
 <script>
-/* ================================================================
-   CONFIG
-   ================================================================ */
-// Remove SHEET_ID, PUBLISHED_TOKEN, and all candidateUrls
-async function loadCSV() {
-  const res = await fetch("https://broken-term-9f64.kmarlapudi.workers.dev/?sheet=Master%20Student%20Data");
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  return await res.text();
-}
+/* ============================================================
+   The ONLY thing the browser knows about the backend:
+   ============================================================ */
+const API_BASE = "https://broken-term-9f64.kmarlapudi.workers.dev";
+const ASSESSMENT_COUNT = 7;
 
-/* ================================================================
-   Candidate URLs
-   ================================================================ */
-function candidateUrls() {
-  const urls = [];
-  urls.push(`https://docs.google.com/spreadsheets/d/e/${PUBLISHED_TOKEN}/pub?output=csv`);
-  for (const name of SHEET_NAMES) {
-    const enc = encodeURIComponent(name);
-    urls.push(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${enc}`);
-  }
-  for (const name of SHEET_NAMES) {
-    const enc = encodeURIComponent(name);
-    urls.push(`https://docs.google.com/spreadsheets/d/e/${PUBLISHED_TOKEN}/pub?output=csv&sheet=${enc}`);
-  }
-  const withProxies = [];
-  urls.forEach(u => withProxies.push({ label: "direct", url: u }));
-  urls.forEach(u => withProxies.push({ label: "proxy",  url: PROXY + encodeURIComponent(u) }));
-  return withProxies;
-}
-
-/* ================================================================
-   CSV parsing
-   ================================================================ */
-function parseCSV(text) {
-  const rows = [];
-  let row = [], field = "", inQuotes = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (inQuotes) {
-      if (c === '"' && text[i+1] === '"') { field += '"'; i++; }
-      else if (c === '"') inQuotes = false;
-      else field += c;
-    } else {
-      if (c === '"') inQuotes = true;
-      else if (c === ',') { row.push(field); field = ""; }
-      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ""; }
-      else if (c === '\r') { /* skip */ }
-      else field += c;
-    }
-  }
-  if (field.length || row.length) { row.push(field); rows.push(row); }
-  return rows;
-}
-
-/* ================================================================
-   Multi-source fetch
-   ================================================================ */
-async function loadCSV() {
-  const attempts = candidateUrls();
-  const errors = [];
-  for (let i = 0; i < attempts.length; i++) {
-    const a = attempts[i];
-    try {
-      const res = await fetch(a.url, { cache: "no-store" });
-      if (!res.ok) throw new Error("HTTP " + res.status);
-      const text = await res.text();
-      if (!text.includes(",") || text.length < 10) throw new Error("Non-CSV response");
-      return text;
-    } catch (e) {
-      errors.push(`#${i + 1} ${a.label}: ${e.message || e}`);
-    }
-  }
-  throw new Error("All sources failed:\n" + errors.join("\n"));
-}
-
-/* ================================================================
-   Helpers
-   ================================================================ */
+/* ---------------- helpers ---------------- */
 const $ = (s) => document.querySelector(s);
 function show(id) {
   document.querySelectorAll(".view").forEach(v => v.hidden = true);
@@ -208,86 +135,78 @@ function setError(msg, detail) {
 }
 function clearError() { $("#errMsg").hidden = true; }
 
-/* ================================================================
-   Session
-   ================================================================ */
-function session() {
-  return {
-    role:   sessionStorage.getItem("role"),
-    enroll: sessionStorage.getItem("enroll"),
-    name:   sessionStorage.getItem("name")
-  };
-}
-
-/* ================================================================
-   Login
-   ================================================================ */
+/* ---------------- login ---------------- */
 $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const btn = $("#submitBtn");
   clearError();
-  btn.disabled = true;
-  btn.textContent = "Checking…";
+  btn.disabled = true; btn.textContent = "Checking…";
 
   const role   = new URLSearchParams(location.hash.split("?")[1] || "").get("role") || "Taker";
   const enroll = $("#enroll").value.trim();
   const code   = $("#code").value.trim();
 
-  let rows;
   try {
-    const csv = await loadCSV();
-    rows = parseCSV(csv);
+    const res = await fetch(`${API_BASE}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ enroll, code })
+    });
+    const data = await res.json();
+
+    if (!data.ok) {
+      setError("Please check your enrollment ID and password and try again. Else contact the LADC team.");
+      btn.disabled = false; btn.textContent = "Login";
+      return;
+    }
+
+    sessionStorage.setItem("role",   role);
+    sessionStorage.setItem("enroll", enroll);
+    sessionStorage.setItem("name",   data.name);
+    sessionStorage.setItem("token",  data.token);
+
+    if (role === "Taker") {
+      await renderDashboard();
+      location.hash = "#dashboard";
+    } else {
+      alert(role + " dashboard coming soon.");
+      location.hash = "#home";
+    }
   } catch (err) {
     console.error(err);
-    setError("Could not load the spreadsheet. Check your internet and try again.", err.message);
+    setError("Could not reach the server. Check your internet and try again.", err.message);
     btn.disabled = false; btn.textContent = "Login";
-    return;
-  }
-
-  const data = rows.slice(SKIP_ROWS);
-
-  const match = data.find(r =>
-    (r[COL_ENROLLMENT] || "").trim() === enroll &&
-    (r[COL_PASSCODE]   || "").trim() === code
-  );
-
-  if (!match) {
-    setError("Please check your enrollment ID and password and try again. Else contact the LADC team.");
-    btn.disabled = false; btn.textContent = "Login";
-    return;
-  }
-
-  const displayName = (match[COL_NAME] || "").trim() || enroll;
-
-  sessionStorage.setItem("role",   role);
-  sessionStorage.setItem("enroll", enroll);
-  sessionStorage.setItem("name",   displayName);
-
-  if (role === "Taker") {
-    renderDashboard();
-    location.hash = "#dashboard";
-  } else {
-    alert(role + " dashboard coming soon.");
-    location.hash = "#home";
   }
 });
 
-/* ================================================================
-   Dashboard
-   ================================================================ */
-function renderDashboard() {
-  const { enroll, role, name } = session();
-  if (!enroll || role !== "Taker") { location.hash = "#login?role=Taker"; return; }
+/* ---------------- dashboard ---------------- */
+async function renderDashboard() {
+  const enroll = sessionStorage.getItem("enroll");
+  const role   = sessionStorage.getItem("role");
+  const name   = sessionStorage.getItem("name");
+  const token  = sessionStorage.getItem("token");
+  if (!enroll || role !== "Taker" || !token) { location.hash = "#login?role=Taker"; return; }
 
   $("#welcome").textContent = `Welcome, ${name || enroll}`;
   const list = $("#list");
-  list.innerHTML = "";
+  list.innerHTML = "<p style='text-align:center;color:#888'>Loading…</p>";
 
-  const progress = JSON.parse(localStorage.getItem(`progress_${enroll}`) || "[]");
+  let completed = [];
+  try {
+    const res = await fetch(`${API_BASE}/progress`, {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    const data = await res.json();
+    if (data.ok) completed = data.completed || [];
+  } catch (e) {
+    console.warn("progress fetch failed", e);
+  }
+
+  list.innerHTML = "";
   for (let i = 1; i <= ASSESSMENT_COUNT; i++) {
-    const id = "A" + i;
-    const done = progress.includes(id);
-    const row = document.createElement("a");
+    const id   = "A" + i;
+    const done = completed.includes(id);
+    const row  = document.createElement("a");
     row.className = "assessment-row" + (done ? " done" : "");
     row.href = "javascript:void(0)";
     row.innerHTML = `<span>Assessment ${i}</span>
@@ -297,9 +216,7 @@ function renderDashboard() {
   show("view-dashboard");
 }
 
-/* ================================================================
-   Router
-   ================================================================ */
+/* ---------------- router ---------------- */
 function route() {
   const hash = location.hash || "#home";
   const view = hash.split("?")[0];
