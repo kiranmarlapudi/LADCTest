@@ -117,12 +117,6 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
 .opt:has(input:checked) .lbl { color: #fff; }
 .opt input:focus-visible + .lbl { outline: 2px solid #3b5bfd; outline-offset: 4px; border-radius: 4px; }
 
-.legend {
-  font-size: 12.5px; color: #6b7280; margin: 0 0 12px;
-  background: #eef1ff; border: 1px solid #dde3ff; border-radius: 10px;
-  padding: 8px 12px; text-align: center; font-weight: 600;
-}
-
 /* ---------- Bottom bar ---------- */
 .bottom {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
@@ -145,6 +139,16 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
 .btn.ghost:hover { background: #eef1ff; opacity: 1; }
 .btn[disabled] { opacity: .55; cursor: not-allowed; }
 .btn[hidden] { display: none; }
+
+/* greyed Submit when incomplete */
+#submitBtn.incomplete {
+  background: #c9cfdc;
+  border-color: #c9cfdc;
+  color: #fff;
+  opacity: 1;
+  cursor: not-allowed;
+}
+#submitBtn.incomplete:hover { opacity: 1; }
 
 .done {
   background: #fff; border: 1px solid #e3e7ef; border-radius: 14px;
@@ -188,7 +192,7 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
       <input id="enroll" required autocapitalize="characters">
       <label for="code">Passcode</label>
       <input id="code" type="password" required>
-      <button type="submit" id="submitBtn">Login</button>
+      <button type="submit" id="submitBtnLogin">Login</button>
     </form>
     <p class="err" id="errMsg" hidden></p>
     <p class="back"><a href="#home">← Back to home</a></p>
@@ -326,7 +330,7 @@ const ASSESSMENTS = {
 const PER_PAGE = 20;
 
 let currentAssessmentId = null;
-let currentQuestions = [];       // active bank
+let currentQuestions = [];       // active bank (with stable ids)
 let totalPages = 1;
 let currentPage = 1;
 
@@ -375,6 +379,18 @@ function globalIndexOfQid(qid) {
 function pageOfQid(qid) {
   const idx = globalIndexOfQid(qid);
   return idx < 0 ? 1 : Math.floor(idx / PER_PAGE) + 1;
+}
+
+/* how many of the current assessment's questions are answered */
+function answeredCount() {
+  let n = 0;
+  currentQuestions.forEach(q => {
+    if (formEl.querySelector('input[name="' + q.id + '"]:checked')) n++;
+  });
+  return n;
+}
+function allAnswered() {
+  return currentQuestions.length > 0 && answeredCount() === currentQuestions.length;
 }
 
 /* ============================================================
@@ -431,11 +447,6 @@ function buildPage(p) {
   sec.dataset.page = p;
   if (p !== 1) sec.hidden = true;
 
-  const legend = document.createElement("div");
-  legend.className = "legend";
-  legend.textContent = "Strongly disagree  •  Neutral  •  Strongly agree";
-  sec.appendChild(legend);
-
   const startIndex = (p - 1) * PER_PAGE;
   pageQuestions(p).forEach((q, i) => sec.appendChild(buildQuestion(q, startIndex + i)));
   return sec;
@@ -450,6 +461,9 @@ function renderSurvey() {
   doneScreen.hidden = true;
   formEl.hidden = false;
   bottomBar.hidden = false;
+  submitBtn.disabled = false;
+  submitBtn.textContent = "Submit";
+  submitBtn.classList.remove("incomplete");
   updateUI();
 }
 
@@ -461,7 +475,28 @@ function updateUI() {
 
   prevBtn.hidden   = currentPage === 1;
   nextBtn.hidden   = currentPage === totalPages;
-  submitBtn.hidden = currentPage !== totalPages;
+
+  // Submit is shown ONLY on the final page of the current assessment
+  const onLastPage = currentPage === totalPages;
+  submitBtn.hidden = !onLastPage;
+
+  // On the final page, grey out Submit until every question is answered
+  if (onLastPage) {
+    if (allAnswered()) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove("incomplete");
+      submitBtn.textContent = "Submit";
+    } else {
+      submitBtn.disabled = true;
+      submitBtn.classList.add("incomplete");
+      const left = currentQuestions.length - answeredCount();
+      submitBtn.textContent = "Submit (" + left + " left)";
+    }
+  } else {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove("incomplete");
+    submitBtn.textContent = "Submit";
+  }
 }
 
 function showPage(target) {
@@ -558,6 +593,7 @@ formEl.addEventListener("change", e => {
   const card = e.target.closest(".q");
   if (card) card.classList.remove("missing");
   clearAlert();
+  updateUI();   // live-update the Submit button state
 });
 
 nextBtn.addEventListener("click", () => {
@@ -573,12 +609,15 @@ prevBtn.addEventListener("click", () => {
 });
 
 submitBtn.addEventListener("click", async () => {
-  const problems = validateAll();
-  if (problems.length) {
-    const first = problems[0];
-    const targetPage = pageOfQid(first.dataset.qid);
-    flagProblems(problems);
-    if (targetPage !== currentPage) showPage(targetPage);
+  if (!allAnswered()) {
+    // safety net — should not normally fire because the button is disabled
+    const problems = validateAll();
+    if (problems.length) {
+      const first = problems[0];
+      const targetPage = pageOfQid(first.dataset.qid);
+      flagProblems(problems);
+      if (targetPage !== currentPage) showPage(targetPage);
+    }
     return;
   }
 
@@ -606,7 +645,7 @@ submitBtn.addEventListener("click", async () => {
    ============================================================ */
 $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const btn = $("#submitBtn");
+  const btn = $("#submitBtnLogin");
   clearError();
   btn.disabled = true; btn.textContent = "Checking…";
 
@@ -733,8 +772,8 @@ function route() {
   if (view === "#login") {
     $("#roleTitle").textContent = (role || "Taker") + " Login";
     clearError();
-    $("#submitBtn").disabled = false;
-    $("#submitBtn").textContent = "Login";
+    $("#submitBtnLogin").disabled = false;
+    $("#submitBtnLogin").textContent = "Login";
     $("#loginForm").reset();
     show("view-login");
   } else if (view === "#dashboard") {
