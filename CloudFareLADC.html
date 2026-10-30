@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Campaign</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
-body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1rem 140px; }
 [hidden] { display: none !important; }
 
+/* ---------- Brand / home ---------- */
 .brand { text-align: center; margin-top: 2rem; }
 .brand .logo { width: 90px; height: 90px; object-fit: contain; margin-bottom: 1rem; }
 .brand h1 { font-size: 2rem; letter-spacing: .5px; }
@@ -30,6 +31,7 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 .role-card h2 { font-size: 1.6rem; margin-bottom: .5rem; }
 .role-card p  { color: #556; font-size: .9rem; }
 
+/* ---------- Login ---------- */
 .login-box {
   max-width: 420px; margin: 6rem auto; background: #fff;
   padding: 2.5rem; border-radius: 20px;
@@ -54,6 +56,7 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 .back a { color: #556; text-decoration: none; }
 .back a:hover { color: #3b5bdb; }
 
+/* ---------- Dashboard ---------- */
 .dash { max-width: 780px; margin: 3rem auto; }
 .dash h1 { text-align: center; margin-bottom: 2rem; }
 .assessment-row {
@@ -68,10 +71,101 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
 .assessment-row.done:hover { transform: none; }
 .assessment-row .status { color: #3b5bdb; font-weight: 600; font-size: .9rem; }
 .assessment-row.done .status { color: #2a9d54; }
+.assessment-row .meta { color: #889; font-size: .78rem; margin-top: 2px; }
+
+/* ---------- Assessment (survey) ---------- */
+.assess-wrap { max-width: 860px; margin: 0 auto; }
+.assess-wrap .top { margin-bottom: 20px; }
+.assess-wrap .top h1 { font-size: 24px; margin: 0 0 4px; }
+.assess-wrap .top .sub { margin: 0 0 14px; color: #6b7280; font-size: 14px; }
+.assess-wrap .progress { height: 8px; background: #e6e9f2; border-radius: 99px; overflow: hidden; }
+.assess-wrap .progress .bar { height: 100%; width: 20%; background: #3b5bfd; border-radius: 99px; transition: width .25s ease; }
+.assess-wrap .pagemeta { display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; margin-top: 6px; font-weight: 600; }
+
+.identity-card {
+  background: #fff; border: 1px solid #e3e7ef; border-radius: 14px;
+  padding: 16px; margin-bottom: 14px;
+  display: flex; gap: 16px; flex-wrap: wrap;
+}
+.identity-card .id-field { flex: 1 1 200px; }
+.identity-card .id-field span {
+  display: block; font-size: 11px; letter-spacing: .5px; text-transform: uppercase;
+  color: #6b7280; font-weight: 700; margin-bottom: 4px;
+}
+.identity-card .id-field strong { font-size: 15px; color: #1f2430; }
+
+.q {
+  background: #fff; border: 1px solid #e3e7ef; border-radius: 14px;
+  padding: 16px; margin: 0 0 12px;
+}
+.q.missing { border-color: #d64545; box-shadow: 0 0 0 3px #fdecec; }
+.qtext { margin: 0 0 12px; font-weight: 600; font-size: 15.5px; }
+.qnum { color: #3b5bfd; font-weight: 700; margin-right: 6px; }
+
+.scale { display: flex; gap: 6px; }
+.opt {
+  position: relative; flex: 1 1 0; min-width: 0;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  padding: 11px 6px; border: 1px solid #e3e7ef; border-radius: 10px;
+  background: #fbfcff; cursor: pointer; user-select: none;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.opt input { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
+.opt .lbl { font-weight: 600; font-size: 12.5px; color: #6b7280; line-height: 1.2; }
+.opt:hover { border-color: #3b5bfd; background: #eef1ff; }
+.opt:has(input:checked) { background: #3b5bfd; border-color: #3b5bfd; }
+.opt:has(input:checked) .lbl { color: #fff; }
+.opt input:focus-visible + .lbl { outline: 2px solid #3b5bfd; outline-offset: 4px; border-radius: 4px; }
+
+.legend {
+  font-size: 12.5px; color: #6b7280; margin: 0 0 12px;
+  background: #eef1ff; border: 1px solid #dde3ff; border-radius: 10px;
+  padding: 8px 12px; text-align: center; font-weight: 600;
+}
+
+/* ---------- Bottom bar ---------- */
+.bottom {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: rgba(255,255,255,.95); backdrop-filter: blur(8px);
+  border-top: 1px solid #e3e7ef;
+}
+.bottom .inner {
+  max-width: 860px; margin: 0 auto; padding: 10px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.alert { color: #d64545; font-size: 13.5px; font-weight: 700; }
+.btns { display: flex; gap: 10px; margin-left: auto; }
+.btn {
+  font: inherit; font-weight: 600; font-size: 15px;
+  padding: 11px 22px; border-radius: 10px; border: 1px solid #3b5bfd;
+  background: #3b5bfd; color: #fff; cursor: pointer; transition: opacity .15s, background .15s;
+}
+.btn:hover { opacity: .9; }
+.btn.ghost { background: #fff; color: #3b5bfd; }
+.btn.ghost:hover { background: #eef1ff; opacity: 1; }
+.btn[disabled] { opacity: .55; cursor: not-allowed; }
+.btn[hidden] { display: none; }
+
+.done {
+  background: #fff; border: 1px solid #e3e7ef; border-radius: 14px;
+  padding: 48px 24px; text-align: center; margin-top: 24px;
+}
+.done h2 { margin: 0 0 8px; font-size: 22px; }
+.done p { margin: 0; color: #6b7280; }
+
+@media (max-width: 520px) {
+  .q { padding: 14px; }
+  .scale { gap: 4px; }
+  .opt { padding: 9px 3px; border-radius: 8px; }
+  .opt .lbl { font-size: 10.5px; }
+  .btn { padding: 10px 14px; font-size: 14px; }
+  .identity-card { flex-direction: column; gap: 8px; }
+}
 </style>
 </head>
 <body>
 
+<!-- ================= HOME ================= -->
 <section id="view-home" class="view">
   <header class="brand">
     <img src="assets/logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
@@ -85,6 +179,7 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
   </section>
 </section>
 
+<!-- ================= LOGIN ================= -->
 <section id="view-login" class="view" hidden>
   <div class="login-box">
     <h2 id="roleTitle">Login</h2>
@@ -100,6 +195,7 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
   </div>
 </section>
 
+<!-- ================= DASHBOARD ================= -->
 <section id="view-dashboard" class="view" hidden>
   <div class="dash">
     <h1 id="welcome">Assessments</h1>
@@ -108,14 +204,149 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem; }
   </div>
 </section>
 
+<!-- ================= ASSESSMENT (survey) ================= -->
+<section id="view-assessment" class="view" hidden>
+  <div class="assess-wrap">
+    <header class="top">
+      <h1 id="assessTitle">Survey</h1>
+      <p class="sub">Please answer every statement on each page.</p>
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <div class="pagemeta">
+        <span id="pageLabel">Page 1 of 1</span>
+        <span id="pct">0%</span>
+      </div>
+    </header>
+
+    <!-- Identity auto-filled from login session -->
+    <div class="identity-card">
+      <div class="id-field"><span>Name</span><strong id="idName">—</strong></div>
+      <div class="id-field"><span>Enrollment No.</span><strong id="idEnroll">—</strong></div>
+    </div>
+
+    <form id="survey" novalidate></form>
+
+    <div id="done" class="done" hidden>
+      <h2>Thank you!</h2>
+      <p>Your responses have been submitted.</p>
+      <p style="margin-top:16px"><a href="#dashboard" style="color:#3b5bdb;font-weight:600;text-decoration:none">← Back to assessments</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= BOTTOM BAR ================= -->
+<div class="bottom" id="bottomBar" hidden>
+  <div class="inner">
+    <span class="alert" id="alert" role="alert" aria-live="polite"></span>
+    <div class="btns">
+      <button type="button" class="btn ghost" id="prevBtn" hidden>Back</button>
+      <button type="button" class="btn" id="nextBtn">Next</button>
+      <button type="button" class="btn" id="submitBtn" hidden>Submit</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ============================================================
-   The ONLY thing the browser knows about the backend:
+   BACKEND
    ============================================================ */
 const API_BASE = "https://broken-term-9f64.kmarlapudi.workers.dev";
 const ASSESSMENT_COUNT = 7;
 
-/* ---------------- helpers ---------------- */
+/* ============================================================
+   GOOGLE FORM CONFIG
+   ------------------------------------------------------------
+   Each assessment posts to its own Google Form. Replace:
+     - formAction : the form's /formResponse endpoint
+     - nameEntry  : entry ID for the Name field on that form
+     - enrollEntry: entry ID for the Enrollment field on that form
+     - each question's entry : the entry ID for that item
+   ============================================================ */
+const SURVEY_CONFIG = {
+  A1: { formAction: "https://docs.google.com/forms/d/e/PASTE_A1_FORM_ID/formResponse",
+        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" },
+  A2: { formAction: "https://docs.google.com/forms/d/e/PASTE_A2_FORM_ID/formResponse",
+        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" },
+  A3: { formAction: "https://docs.google.com/forms/d/e/PASTE_A3_FORM_ID/formResponse",
+        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" },
+  A4: { formAction: "https://docs.google.com/forms/d/e/PASTE_A4_FORM_ID/formResponse",
+        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" },
+  A5: { formAction: "https://docs.google.com/forms/d/e/PASTE_A5_FORM_ID/formResponse",
+        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" },
+  A6: { formAction: "https://docs.google.com/forms/d/e/PASTE_A6_FORM_ID/formResponse",
+        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" },
+  A7: { formAction: "https://docs.google.com/forms/d/e/PASTE_A7_FORM_ID/formResponse",
+        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" }
+};
+
+/* ============================================================
+   Likert options — TEXT ONLY
+   ============================================================ */
+const LIKERT = [
+  "Strongly disagree",
+  "Disagree",
+  "Somewhat disagree",
+  "Neutral",
+  "Somewhat agree",
+  "Agree",
+  "Strongly agree"
+];
+
+/* ============================================================
+   Per-assessment question banks
+   ------------------------------------------------------------
+   Each entry: { text: "Actual question", entry: "entry.XXXX" }
+   Replace the generic text + dummy entry IDs with the real ones.
+   Counts are already correct:
+     A1 = 100, A2 = 55, A3 = 45, A4 = 80, A5 = 40, A6 = 60, A7 = 50
+   ============================================================ */
+function makeGenericQuestions(prefix, count) {
+  const out = [];
+  for (let i = 1; i <= count; i++) {
+    out.push({
+      text:  prefix + " — Item " + i,
+      entry: "entry." + prefix.replace(/\D/g, "") + String(i).padStart(3, "0")
+    });
+  }
+  return out;
+}
+
+const ASSESSMENTS = {
+  A1: makeGenericQuestions("A1", 100),
+  A2: makeGenericQuestions("A2", 55),
+  A3: makeGenericQuestions("A3", 45),
+  A4: makeGenericQuestions("A4", 80),
+  A5: makeGenericQuestions("A5", 40),
+  A6: makeGenericQuestions("A6", 60),
+  A7: makeGenericQuestions("A7", 50)
+};
+
+/* ============================================================
+   SURVEY ENGINE STATE
+   ============================================================ */
+const PER_PAGE = 20;
+
+let currentAssessmentId = null;
+let currentQuestions = [];       // active bank
+let totalPages = 1;
+let currentPage = 1;
+
+const formEl     = document.getElementById("survey");
+const barEl      = document.getElementById("bar");
+const pageLabel  = document.getElementById("pageLabel");
+const pctLabel   = document.getElementById("pct");
+const prevBtn    = document.getElementById("prevBtn");
+const nextBtn    = document.getElementById("nextBtn");
+const submitBtn  = document.getElementById("submitBtn");
+const alertBox   = document.getElementById("alert");
+const bottomBar  = document.getElementById("bottomBar");
+const doneScreen = document.getElementById("done");
+const idNameEl   = document.getElementById("idName");
+const idEnrollEl = document.getElementById("idEnroll");
+const assessTitle= document.getElementById("assessTitle");
+
+/* ============================================================
+   Helpers
+   ============================================================ */
 const $ = (s) => document.querySelector(s);
 function show(id) {
   document.querySelectorAll(".view").forEach(v => v.hidden = true);
@@ -135,7 +366,244 @@ function setError(msg, detail) {
 }
 function clearError() { $("#errMsg").hidden = true; }
 
-/* ---------------- login ---------------- */
+function pageQuestions(p) {
+  return currentQuestions.slice((p - 1) * PER_PAGE, p * PER_PAGE);
+}
+function globalIndexOfQid(qid) {
+  return currentQuestions.findIndex(q => q.id === qid);
+}
+function pageOfQid(qid) {
+  const idx = globalIndexOfQid(qid);
+  return idx < 0 ? 1 : Math.floor(idx / PER_PAGE) + 1;
+}
+
+/* ============================================================
+   Build survey DOM
+   ============================================================ */
+function buildQuestion(q, index) {
+  const card = document.createElement("div");
+  card.className = "q";
+  card.dataset.qid = q.id;
+  card.setAttribute("role", "radiogroup");
+  card.setAttribute("aria-labelledby", "lbl-" + q.id);
+
+  const text = document.createElement("p");
+  text.className = "qtext";
+  text.id = "lbl-" + q.id;
+
+  const num = document.createElement("span");
+  num.className = "qnum";
+  num.textContent = (index + 1) + ".";
+  text.appendChild(num);
+  text.appendChild(document.createTextNode(q.text));
+  card.appendChild(text);
+
+  const scale = document.createElement("div");
+  scale.className = "scale";
+
+  LIKERT.forEach((label) => {
+    const opt = document.createElement("label");
+    opt.className = "opt";
+    opt.title = label;
+
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = q.id;
+    input.value = label;                       // send TEXT, not a number
+    input.setAttribute("aria-label", q.text + " — " + label);
+
+    const lbl = document.createElement("span");
+    lbl.className = "lbl";
+    lbl.textContent = label;
+
+    opt.appendChild(input);
+    opt.appendChild(lbl);
+    scale.appendChild(opt);
+  });
+
+  card.appendChild(scale);
+  return card;
+}
+
+function buildPage(p) {
+  const sec = document.createElement("section");
+  sec.className = "page";
+  sec.dataset.page = p;
+  if (p !== 1) sec.hidden = true;
+
+  const legend = document.createElement("div");
+  legend.className = "legend";
+  legend.textContent = "Strongly disagree  •  Neutral  •  Strongly agree";
+  sec.appendChild(legend);
+
+  const startIndex = (p - 1) * PER_PAGE;
+  pageQuestions(p).forEach((q, i) => sec.appendChild(buildQuestion(q, startIndex + i)));
+  return sec;
+}
+
+function renderSurvey() {
+  formEl.innerHTML = "";
+  totalPages = Math.max(1, Math.ceil(currentQuestions.length / PER_PAGE));
+  for (let p = 1; p <= totalPages; p++) formEl.appendChild(buildPage(p));
+
+  currentPage = 1;
+  doneScreen.hidden = true;
+  formEl.hidden = false;
+  bottomBar.hidden = false;
+  updateUI();
+}
+
+function updateUI() {
+  pageLabel.textContent = "Page " + currentPage + " of " + totalPages;
+  const pct = Math.round((currentPage / totalPages) * 100);
+  barEl.style.width = pct + "%";
+  pctLabel.textContent = pct + "%";
+
+  prevBtn.hidden   = currentPage === 1;
+  nextBtn.hidden   = currentPage === totalPages;
+  submitBtn.hidden = currentPage !== totalPages;
+}
+
+function showPage(target) {
+  formEl.querySelector('.page[data-page="' + currentPage + '"]').hidden = true;
+  currentPage = target;
+  formEl.querySelector('.page[data-page="' + currentPage + '"]').hidden = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  updateUI();
+}
+
+/* ============================================================
+   Validation
+   ============================================================ */
+function validatePage(p) {
+  const problems = [];
+  pageQuestions(p).forEach(q => {
+    if (!formEl.querySelector('input[name="' + q.id + '"]:checked')) {
+      problems.push(formEl.querySelector('.q[data-qid="' + q.id + '"]'));
+    }
+  });
+  return problems;
+}
+function validateAll() {
+  const problems = [];
+  currentQuestions.forEach(q => {
+    if (!formEl.querySelector('input[name="' + q.id + '"]:checked')) {
+      problems.push(formEl.querySelector('.q[data-qid="' + q.id + '"]'));
+    }
+  });
+  return problems;
+}
+function flagProblems(problems) {
+  problems.forEach(el => el && el.classList.add("missing"));
+  if (problems.length) {
+    problems[0].scrollIntoView({ behavior: "smooth", block: "center" });
+    alertBox.textContent = "Please answer all items on this page.";
+  }
+}
+function setAlert(msg) { alertBox.textContent = msg || ""; }
+function clearAlert()  { alertBox.textContent = ""; }
+
+/* ============================================================
+   Payload — name & enrollment auto-injected from session
+   ============================================================ */
+function buildPayload() {
+  const cfg    = SURVEY_CONFIG[currentAssessmentId];
+  const data   = new URLSearchParams();
+  const name   = sessionStorage.getItem("name")   || "";
+  const enroll = sessionStorage.getItem("enroll") || "";
+
+  data.append(cfg.nameEntry,   name);
+  data.append(cfg.enrollEntry, enroll);
+
+  currentQuestions.forEach(q => {
+    const checked = formEl.querySelector('input[name="' + q.id + '"]:checked');
+    data.append(q.entry, checked ? checked.value : "");
+  });
+
+  return data;
+}
+
+async function sendToGoogleForms() {
+  const cfg  = SURVEY_CONFIG[currentAssessmentId];
+  const body = buildPayload();
+  await fetch(cfg.formAction, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString()
+  });
+}
+
+async function markAssessmentComplete(assessmentId) {
+  const token = sessionStorage.getItem("token");
+  if (!token) return;
+  try {
+    await fetch(`${API_BASE}/complete`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ assessment: assessmentId })
+    });
+  } catch (e) {
+    console.warn("Could not mark assessment complete:", e);
+  }
+}
+
+/* ============================================================
+   Survey events
+   ============================================================ */
+formEl.addEventListener("change", e => {
+  const card = e.target.closest(".q");
+  if (card) card.classList.remove("missing");
+  clearAlert();
+});
+
+nextBtn.addEventListener("click", () => {
+  const problems = validatePage(currentPage);
+  if (problems.length) { flagProblems(problems); return; }
+  clearAlert();
+  showPage(currentPage + 1);
+});
+
+prevBtn.addEventListener("click", () => {
+  clearAlert();
+  showPage(currentPage - 1);
+});
+
+submitBtn.addEventListener("click", async () => {
+  const problems = validateAll();
+  if (problems.length) {
+    const first = problems[0];
+    const targetPage = pageOfQid(first.dataset.qid);
+    flagProblems(problems);
+    if (targetPage !== currentPage) showPage(targetPage);
+    return;
+  }
+
+  clearAlert();
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting…";
+
+  try {
+    await sendToGoogleForms();
+    if (currentAssessmentId) await markAssessmentComplete(currentAssessmentId);
+    formEl.hidden = true;
+    bottomBar.hidden = true;
+    doneScreen.hidden = false;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (err) {
+    console.error(err);
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
+    setAlert("Submission failed. Please check your connection and try again.");
+  }
+});
+
+/* ============================================================
+   Login
+   ============================================================ */
 $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const btn = $("#submitBtn");
@@ -179,7 +647,9 @@ $("#loginForm").addEventListener("submit", async (e) => {
   }
 });
 
-/* ---------------- dashboard ---------------- */
+/* ============================================================
+   Dashboard
+   ============================================================ */
 async function renderDashboard() {
   const enroll = sessionStorage.getItem("enroll");
   const role   = sessionStorage.getItem("role");
@@ -204,19 +674,57 @@ async function renderDashboard() {
 
   list.innerHTML = "";
   for (let i = 1; i <= ASSESSMENT_COUNT; i++) {
-    const id   = "A" + i;
-    const done = completed.includes(id);
-    const row  = document.createElement("a");
+    const id    = "A" + i;
+    const done  = completed.includes(id);
+    const count = ASSESSMENTS[id] ? ASSESSMENTS[id].length : 0;
+
+    const row = document.createElement("a");
     row.className = "assessment-row" + (done ? " done" : "");
     row.href = "javascript:void(0)";
-    row.innerHTML = `<span>Assessment ${i}</span>
-                     <span class="status">${done ? "Completed ✓" : "Pending"}</span>`;
+    row.innerHTML = `
+      <div>
+        <div>Assessment ${i}</div>
+        <div class="meta">${count} items</div>
+      </div>
+      <span class="status">${done ? "Completed ✓" : "Pending"}</span>`;
+
+    if (!done) row.addEventListener("click", () => openAssessment(id, i));
     list.appendChild(row);
   }
   show("view-dashboard");
 }
 
-/* ---------------- router ---------------- */
+/* ============================================================
+   Open an assessment
+   ============================================================ */
+function openAssessment(id, num) {
+  const name   = sessionStorage.getItem("name")   || "—";
+  const enroll = sessionStorage.getItem("enroll") || "—";
+  const bank   = ASSESSMENTS[id];
+  if (!bank || !bank.length) {
+    alert("No questions configured for " + id);
+    return;
+  }
+
+  currentAssessmentId = id;
+
+  // Tag every question with a stable per-assessment id
+  currentQuestions = bank.map((q, i) => ({
+    ...q,
+    id: id + "_q" + (i + 1)
+  }));
+
+  assessTitle.textContent = "Assessment " + num;
+  idNameEl.textContent    = name;
+  idEnrollEl.textContent  = enroll;
+
+  renderSurvey();
+  show("view-assessment");
+}
+
+/* ============================================================
+   Router
+   ============================================================ */
 function route() {
   const hash = location.hash || "#home";
   const view = hash.split("?")[0];
@@ -235,6 +743,7 @@ function route() {
     sessionStorage.clear();
     location.hash = "#home";
   } else {
+    bottomBar.hidden = true;
     show("view-home");
   }
 }
