@@ -776,7 +776,11 @@ function route() {
     $("#submitBtnLogin").textContent = "Login";
     $("#loginForm").reset();
     show("view-login");
-  } else if (view === "#dashboard") {
+    } else if (view === "#dashboard") {
+    // Reset any leftover survey state so the dashboard renders cleanly
+    formEl.hidden = false;
+    doneScreen.hidden = true;
+    bottomBar.hidden = true;
     renderDashboard();
   } else if (view === "#logout") {
     sessionStorage.clear();
