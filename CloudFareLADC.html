@@ -81,7 +81,7 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
 .assess-wrap .progress { height: 8px; background: #e6e9f2; border-radius: 99px; overflow: hidden; }
 .assess-wrap .progress .bar { height: 100%; width: 20%; background: #3b5bfd; border-radius: 99px; transition: width .25s ease; }
 .assess-wrap .pagemeta { display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; margin-top: 6px; font-weight: 600; }
-
+.assess-back-row { margin-bottom: 12px; }
 .identity-card {
   background: #fff; border: 1px solid #e3e7ef; border-radius: 14px;
   padding: 16px; margin-bottom: 14px;
@@ -210,7 +210,10 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
 
 <!-- ================= ASSESSMENT (survey) ================= -->
 <section id="view-assessment" class="view" hidden>
-  <div class="assess-wrap">
+<div class="assess-wrap">
+    <div class="assess-back-row">
+      <button type="button" class="btn ghost" id="exitAssessBtn">← Back to assessments</button>
+    </div>
     <header class="top">
       <h1 id="assessTitle">Survey</h1>
       <p class="sub">Please answer every statement on each page.</p>
@@ -652,6 +655,25 @@ submitBtn.addEventListener("click", async () => {
 /* ============================================================
    Login
    ============================================================ */
+  /* ============================================================
+   Exit assessment (go back to the list without finishing)
+   ============================================================ */
+document.getElementById("exitAssessBtn").addEventListener("click", () => {
+  const answered = answeredCount();
+  if (answered > 0 && !allAnswered()) {
+    const ok = confirm("You haven't finished this assessment. Leave anyway? Your answers won't be saved.");
+    if (!ok) return;
+  }
+  // Reset any leftover survey UI state
+  clearAlert();
+  formEl.hidden = false;
+  doneScreen.hidden = true;
+  bottomBar.hidden = true;
+
+  // Go back to the dashboard
+  renderDashboard();
+  if (location.hash !== "#dashboard") location.hash = "#dashboard";
+});
 $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const btn = $("#submitBtnLogin");
