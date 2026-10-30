@@ -232,8 +232,8 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
     <div id="done" class="done" hidden>
       <h2>Thank you!</h2>
       <p>Your responses have been submitted.</p>
-      <p style="margin-top:16px"><a href="#dashboard" style="color:#3b5bdb;font-weight:600;text-decoration:none">← Back to assessments</a></p>
-    </div>
+      <p style="margin-top:16px"><a href="javascript:void(0)" id="backToDash" style="color:#3b5bdb;font-weight:600;text-decoration:none">← Back to assessments</a></p>
+      </div>
   </div>
 </section>
 
@@ -620,6 +620,15 @@ submitBtn.addEventListener("click", async () => {
     }
     return;
   }
+
+  document.getElementById("backToDash").addEventListener("click", () => {
+  formEl.hidden = false;
+  doneScreen.hidden = true;
+  bottomBar.hidden = true;
+  renderDashboard();
+  // keep URL in sync without needing a hashchange
+  if (location.hash !== "#dashboard") location.hash = "#dashboard";
+});
 
   clearAlert();
   submitBtn.disabled = true;
