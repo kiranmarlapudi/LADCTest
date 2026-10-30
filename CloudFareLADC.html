@@ -492,10 +492,16 @@ function renderSurvey() {
 }
 
 function updateUI() {
-  pageLabel.textContent = "Page " + currentPage + " of " + totalPages;
-  const pct = Math.round((currentPage / totalPages) * 100);
+  // --- progress = answered items / total items in this assessment ---
+  const total    = currentQuestions.length || 1;
+  const answered = answeredCount();
+  const pct      = Math.round((answered / total) * 100);
+
   barEl.style.width = pct + "%";
   pctLabel.textContent = pct + "%";
+
+  // --- page label stays about pages ---
+  pageLabel.textContent = "Page " + currentPage + " of " + totalPages;
 
   prevBtn.hidden   = currentPage === 1;
   nextBtn.hidden   = currentPage === totalPages;
@@ -513,7 +519,7 @@ function updateUI() {
     } else {
       submitBtn.disabled = true;
       submitBtn.classList.add("incomplete");
-      const left = currentQuestions.length - answeredCount();
+      const left = total - answered;
       submitBtn.textContent = "Submit (" + left + " left)";
     }
   } else {
