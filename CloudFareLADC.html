@@ -75,7 +75,15 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
 
 /* ---------- Assessment (survey) ---------- */
 .assess-wrap { max-width: 860px; margin: 0 auto; }
-.assess-wrap .top { margin-bottom: 20px; }
+.assess-wrap .top {
+  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: #f4f6fb;                 /* matches page bg so text underneath doesn't bleed */
+  padding: 10px 0 12px;
+  border-bottom: 1px solid #e3e7ef;
+}
 .assess-wrap .top h1 { font-size: 24px; margin: 0 0 4px; }
 .assess-wrap .top .sub { margin: 0 0 14px; color: #6b7280; font-size: 14px; }
 .assess-wrap .progress { height: 8px; background: #e6e9f2; border-radius: 99px; overflow: hidden; }
