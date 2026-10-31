@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Assessment</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 1rem 1rem 140px; }
+[hidden] { display: none !important; }
+
+.assess-wrap { max-width: 860px; margin: 0 auto; }
+.assess-back-row { margin-bottom: 12px; }
+
+.assess-wrap .top {
+  margin-bottom: 20px;
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  background: #f4f6fb;
+  padding: 10px 0 12px;
+  border-bottom: 1px solid #e3e7ef;
+}
+.assess-wrap .top h1 { font-size: 24px; margin: 0 0 4px; }
+.assess-wrap .top .sub { margin: 0 0 14px; color: #6b7280; font-size: 14px; }
+.assess-wrap .progress { height: 8px; background: #e6e9f2; border-radius: 99px; overflow: hidden; }
+.assess-wrap .progress .bar { height: 100%; width: 0%; background: #3b5bfd; border-radius: 99px; transition: width .25s ease; }
+.assess-wrap .pagemeta { display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; margin-top: 6px; font-weight: 600; }
+
+.identity-card {
+  background: #fff; border: 1px solid #e3e7ef; border-radius: 14px;
+  padding: 16px; margin-bottom: 14px;
+  display: flex; gap: 16px; flex-wrap: wrap;
+}
+.identity-card .id-field { flex: 1 1 200px; }
+.identity-card .id-field span {
+  display: block; font-size: 11px; letter-spacing: .5px; text-transform: uppercase;
+  color: #6b7280; font-weight: 700; margin-bottom: 4px;
+}
+.identity-card .id-field strong { font-size: 15px; color: #1f2430; }
+
+.q { background: #fff; border: 1px solid #e3e7ef; border-radius: 14px; padding: 16px; margin: 0 0 12px; }
+.q.missing { border-color: #d64545; box-shadow: 0 0 0 3px #fdecec; }
+.qtext { margin: 0 0 12px; font-weight: 600; font-size: 15.5px; }
+.qnum { color: #3b5bfd; font-weight: 700; margin-right: 6px; }
+
+.scale { display: flex; gap: 6px; }
+.opt {
+  position: relative; flex: 1 1 0; min-width: 0;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  padding: 11px 6px; border: 1px solid #e3e7ef; border-radius: 10px;
+  background: #fbfcff; cursor: pointer; user-select: none;
+  transition: background .15s, border-color .15s, color .15s;
+}
+.opt input { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
+.opt .lbl { font-weight: 600; font-size: 12.5px; color: #6b7280; line-height: 1.2; }
+.opt:hover { border-color: #3b5bfd; background: #eef1ff; }
+.opt:has(input:checked) { background: #3b5bfd; border-color: #3b5bfd; }
+.opt:has(input:checked) .lbl { color: #fff; }
+
+.bottom {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: rgba(255,255,255,.95); backdrop-filter: blur(8px);
+  border-top: 1px solid #e3e7ef;
+}
+.bottom .inner { max-width: 860px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+.alert { color: #d64545; font-size: 13.5px; font-weight: 700; }
+.btns { display: flex; gap: 10px; margin-left: auto; }
+.btn {
+  font: inherit; font-weight: 600; font-size: 15px;
+  padding: 11px 22px; border-radius: 10px; border: 1px solid #3b5bfd;
+  background: #3b5bfd; color: #fff; cursor: pointer; transition: opacity .15s, background .15s;
+}
+.btn:hover { opacity: .9; }
+.btn.ghost { background: #fff; color: #3b5bfd; }
+.btn.ghost:hover { background: #eef1ff; opacity: 1; }
+.btn[disabled] { opacity: .55; cursor: not-allowed; }
+.btn[hidden] { display: none; }
+#submitBtn.incomplete { background: #c9cfdc; border-color: #c9cfdc; color: #fff; opacity: 1; cursor: not-allowed; }
+#submitBtn.incomplete:hover { opacity: 1; }
+
+.done { background: #fff; border: 1px solid #e3e7ef; border-radius: 14px; padding: 48px 24px; text-align: center; margin-top: 24px; }
+.done h2 { margin: 0 0 8px; font-size: 22px; }
+.done p { margin: 0; color: #6b7280; }
+
+@media (max-width: 520px) {
+  .q { padding: 14px; }
+  .scale { gap: 4px; }
+  .opt { padding: 9px 3px; border-radius: 8px; }
+  .opt .lbl { font-size: 10.5px; }
+  .btn { padding: 10px 14px; font-size: 14px; }
+  .identity-card { flex-direction: column; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<div class="assess-wrap">
+  <div class="assess-back-row">
+    <button type="button" class="btn ghost" id="exitAssessBtn">← Back to assessments</button>
+  </div>
+
+  <header class="top">
+    <h1 id="assessTitle">Assessment</h1>
+    <p class="sub">Please answer every statement on each page.</p>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div class="pagemeta">
+      <span id="pageLabel">Page 1 of 1</span>
+      <span id="pct">0%</span>
+    </div>
+  </header>
+
+  <div class="identity-card">
+    <div class="id-field"><span>Name</span><strong id="idName">—</strong></div>
+    <div class="id-field"><span>Enrollment No.</span><strong id="idEnroll">—</strong></div>
+  </div>
+
+  <form id="survey" novalidate></form>
+
+  <div id="done" class="done" hidden>
+    <h2>Thank you!</h2>
+    <p>Your responses have been submitted.</p>
+    <p style="margin-top:16px"><a href="javascript:void(0)" id="backToDash" style="color:#3b5bdb;font-weight:600;text-decoration:none">← Back to assessments</a></p>
+  </div>
+</div>
+
+<div class="bottom" id="bottomBar">
+  <div class="inner">
+    <span class="alert" id="alert" role="alert" aria-live="polite"></span>
+    <div class="btns">
+      <button type="button" class="btn ghost" id="prevBtn" hidden>Back</button>
+      <button type="button" class="btn" id="nextBtn">Next</button>
+      <button type="button" class="btn" id="submitBtn" hidden>Submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   ONLY THIS BLOCK CHANGES PER ASSESSMENT
+   ============================================================ */
+const API_BASE = "https://broken-term-9f64.kmarlapudi.workers.dev";
+
+const THIS_ID      = "B5";
+const MAIN_URL     = "../CloudFareLADC.html#dashboard";
+const LOGIN_URL    = "../CloudFareLADC.html#login?role=Taker";
+
+const FORM_ACTION  = "https://docs.google.com/forms/d/e/1FAIpQLSf6nZwl7bNvCjoETy4XF-ne2l0CqY67tT9gUhVWmvAo4o0Bxw/formResponse";
+const NAME_ENTRY   = "entry.1724494963";
+const ENROLL_ENTRY = "entry.320304801";
+
+const QUESTIONS = [
+  { text: "Item text 1", entry: "entry.320304801" },
+  { text: "Item text 2", entry: "entry.208352163" },
+  { text: "Item text 3", entry: "entry.44281645" }
+  // … up to this assessment's item count …
+];
+/* ============================================================ */
+
+const LIKERT = [
+  "Strongly disagree","Disagree","Somewhat disagree","Neutral",
+  "Somewhat agree","Agree","Strongly agree"
+];
+const PER_PAGE = 20;
+
+/* ---------- session ---------- */
+const NAME   = sessionStorage.getItem("name")   || "";
+const ENROLL = sessionStorage.getItem("enroll") || "";
+const TOKEN  = sessionStorage.getItem("token")  || "";
+if (!TOKEN || !ENROLL) { location.href = LOGIN_URL; }
+
+/* ---------- state ---------- */
+let currentPage = 1;
+let totalPages  = 1;
+let questions   = [];
+
+/* ---------- DOM ---------- */
+const formEl     = document.getElementById("survey");
+const barEl      = document.getElementById("bar");
+const pageLabel  = document.getElementById("pageLabel");
+const pctLabel   = document.getElementById("pct");
+const prevBtn    = document.getElementById("prevBtn");
+const nextBtn    = document.getElementById("nextBtn");
+const submitBtn  = document.getElementById("submitBtn");
+const alertBox   = document.getElementById("alert");
+const bottomBar  = document.getElementById("bottomBar");
+const doneScreen = document.getElementById("done");
+const idNameEl   = document.getElementById("idName");
+const idEnrollEl = document.getElementById("idEnroll");
+const assessTitle= document.getElementById("assessTitle");
+
+/* ---------- helpers ---------- */
+function pageQuestions(p) {
+  return questions.slice((p - 1) * PER_PAGE, p * PER_PAGE);
+}
+function answeredCount() {
+  let n = 0;
+  questions.forEach(q => {
+    if (formEl.querySelector('input[name="' + q.id + '"]:checked')) n++;
+  });
+  return n;
+}
+function allAnswered() {
+  return questions.length > 0 && answeredCount() === questions.length;
+}
+function clearAlert() { alertBox.textContent = ""; }
+
+/* ---------- build ---------- */
+function buildQuestion(q, index) {
+  const card = document.createElement("div");
+  card.className = "q";
+  card.dataset.qid = q.id;
+  card.setAttribute("role", "radiogroup");
+
+  const text = document.createElement("p");
+  text.className = "qtext";
+  const num = document.createElement("span");
+  num.className = "qnum";
+  num.textContent = (index + 1) + ".";
+  text.appendChild(num);
+  text.appendChild(document.createTextNode(q.text));
+  card.appendChild(text);
+
+  const scale = document.createElement("div");
+  scale.className = "scale";
+  LIKERT.forEach(label => {
+    const opt = document.createElement("label");
+    opt.className = "opt";
+    opt.title = label;
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = q.id;
+    input.value = label;
+    const lbl = document.createElement("span");
+    lbl.className = "lbl";
+    lbl.textContent = label;
+    opt.appendChild(input);
+    opt.appendChild(lbl);
+    scale.appendChild(opt);
+  });
+  card.appendChild(scale);
+  return card;
+}
+function buildPage(p) {
+  const sec = document.createElement("section");
+  sec.className = "page";
+  sec.dataset.page = p;
+  if (p !== 1) sec.hidden = true;
+  const start = (p - 1) * PER_PAGE;
+  pageQuestions(p).forEach((q, i) => sec.appendChild(buildQuestion(q, start + i)));
+  return sec;
+}
+function renderSurvey() {
+  formEl.innerHTML = "";
+  totalPages = Math.max(1, Math.ceil(questions.length / PER_PAGE));
+  for (let p = 1; p <= totalPages; p++) formEl.appendChild(buildPage(p));
+  currentPage = 1;
+  doneScreen.hidden = true;
+  formEl.hidden = false;
+  bottomBar.hidden = false;
+  submitBtn.disabled = false;
+  submitBtn.textContent = "Submit";
+  submitBtn.classList.remove("incomplete");
+  updateUI();
+}
+function updateUI() {
+  const total    = questions.length || 1;
+  const answered = answeredCount();
+  const pct      = Math.round((answered / total) * 100);
+
+  barEl.style.width = pct + "%";
+  pctLabel.textContent = pct + "%";
+  pageLabel.textContent = "Page " + currentPage + " of " + totalPages;
+
+  prevBtn.hidden = currentPage === 1;
+  nextBtn.hidden = currentPage === totalPages;
+
+  const onLastPage = currentPage === totalPages;
+  submitBtn.hidden = !onLastPage;
+  if (onLastPage) {
+    if (allAnswered()) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove("incomplete");
+      submitBtn.textContent = "Submit";
+    } else {
+      submitBtn.disabled = true;
+      submitBtn.classList.add("incomplete");
+      submitBtn.textContent = "Submit (" + (total - answered) + " left)";
+    }
+  } else {
+    submitBtn.disabled = false;
+    submitBtn.classList.remove("incomplete");
+    submitBtn.textContent = "Submit";
+  }
+}
+function showPage(target) {
+  formEl.querySelector('.page[data-page="' + currentPage + '"]').hidden = true;
+  currentPage = target;
+  formEl.querySelector('.page[data-page="' + currentPage + '"]').hidden = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  updateUI();
+}
+
+/* ---------- validation ---------- */
+function validatePage(p) {
+  const problems = [];
+  pageQuestions(p).forEach(q => {
+    if (!formEl.querySelector('input[name="' + q.id + '"]:checked')) {
+      problems.push(formEl.querySelector('.q[data-qid="' + q.id + '"]'));
+    }
+  });
+  return problems;
+}
+function flagProblems(problems) {
+  problems.forEach(el => el && el.classList.add("missing"));
+  if (problems.length) {
+    problems[0].scrollIntoView({ behavior: "smooth", block: "center" });
+    alertBox.textContent = "Please answer all items on this page.";
+  }
+}
+
+/* ---------- payload / submit ---------- */
+function buildPayload() {
+  const data = new URLSearchParams();
+  data.append(NAME_ENTRY,   NAME);
+  data.append(ENROLL_ENTRY, ENROLL);
+  questions.forEach(q => {
+    const checked = formEl.querySelector('input[name="' + q.id + '"]:checked');
+    data.append(q.entry, checked ? checked.value : "");
+  });
+  return data;
+}
+async function sendToGoogleForms() {
+  await fetch(FORM_ACTION, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: buildPayload().toString()
+  });
+}
+async function markAssessmentComplete() {
+  if (!TOKEN) return;
+  try {
+    await fetch(`${API_BASE}/complete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + TOKEN },
+      body: JSON.stringify({ assessment: THIS_ID })
+    });
+  } catch (e) { console.warn("complete failed:", e); }
+}
+
+/* ---------- events ---------- */
+formEl.addEventListener("change", e => {
+  const card = e.target.closest(".q");
+  if (card) card.classList.remove("missing");
+  clearAlert();
+  updateUI();
+});
+
+nextBtn.addEventListener("click", () => {
+  const problems = validatePage(currentPage);
+  if (problems.length) { flagProblems(problems); return; }
+  clearAlert();
+  showPage(currentPage + 1);
+});
+
+prevBtn.addEventListener("click", () => {
+  clearAlert();
+  showPage(currentPage - 1);
+});
+
+submitBtn.addEventListener("click", async () => {
+  if (!allAnswered()) return;
+  clearAlert();
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Submitting…";
+  try {
+    await sendToGoogleForms();
+    await markAssessmentComplete();
+    formEl.hidden = true;
+    bottomBar.hidden = true;
+    doneScreen.hidden = false;
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } catch (err) {
+    console.error(err);
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit";
+    alertBox.textContent = "Submission failed. Please check your connection and try again.";
+  }
+});
+
+/* ---------- back ---------- */
+function goHome() { location.href = MAIN_URL; }
+document.getElementById("exitAssessBtn").addEventListener("click", () => {
+  if (answeredCount() > 0 && !allAnswered()) {
+    if (!confirm("You haven't finished this assessment. Leave anyway? Your answers won't be saved.")) return;
+  }
+  goHome();
+});
+document.getElementById("backToDash").addEventListener("click", goHome);
+
+/* ---------- boot ---------- */
+assessTitle.textContent = "Assessment " + THIS_ID;
+idNameEl.textContent   = NAME || "—";
+idEnrollEl.textContent = ENROLL || "—";
+
+questions = QUESTIONS.map((q, i) => ({ ...q, id: THIS_ID + "_q" + (i + 1) }));
+renderSurvey();
+</script>
+</body>
+</html>
