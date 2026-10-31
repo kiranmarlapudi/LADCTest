@@ -6,10 +6,9 @@
 <title>Campaign</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1rem 140px; }
+body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1rem; }
 [hidden] { display: none !important; }
 
-/* ---------- Brand / home ---------- */
 .brand { text-align: center; margin-top: 2rem; }
 .brand .logo { width: 90px; height: 90px; object-fit: contain; margin-bottom: 1rem; }
 .brand h1 { font-size: 2rem; letter-spacing: .5px; }
@@ -31,7 +30,6 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
 .role-card h2 { font-size: 1.6rem; margin-bottom: .5rem; }
 .role-card p  { color: #556; font-size: .9rem; }
 
-/* ---------- Login ---------- */
 .login-box {
   max-width: 420px; margin: 6rem auto; background: #fff;
   padding: 2.5rem; border-radius: 20px;
@@ -56,14 +54,13 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
 .back a { color: #556; text-decoration: none; }
 .back a:hover { color: #3b5bdb; }
 
-/* ---------- Dashboard ---------- */
 .dash { max-width: 780px; margin: 3rem auto; }
 .dash h1 { text-align: center; margin-bottom: 2rem; }
 .assessment-row {
   background: #fff; border-radius: 16px; padding: 1.2rem 1.5rem;
   margin-bottom: 1rem; display: flex; justify-content: space-between;
   align-items: center; box-shadow: 0 6px 18px rgba(50,80,180,.08);
-  text-decoration: none; color: inherit;
+  text-decoration: none; color: inherit; cursor: pointer;
   transition: transform .15s, box-shadow .15s;
 }
 .assessment-row:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(50,80,180,.14); }
@@ -72,107 +69,6 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
 .assessment-row .status { color: #3b5bdb; font-weight: 600; font-size: .9rem; }
 .assessment-row.done .status { color: #2a9d54; }
 .assessment-row .meta { color: #889; font-size: .78rem; margin-top: 2px; }
-
-/* ---------- Assessment (survey) ---------- */
-.assess-wrap { max-width: 860px; margin: 0 auto; }
-.assess-wrap .top {
-  margin-bottom: 20px;
-  position: sticky;
-  top: 0;
-  z-index: 15;
-  background: #f4f6fb;                 /* matches page bg so text underneath doesn't bleed */
-  padding: 10px 0 12px;
-  border-bottom: 1px solid #e3e7ef;
-}
-.assess-wrap .top h1 { font-size: 24px; margin: 0 0 4px; }
-.assess-wrap .top .sub { margin: 0 0 14px; color: #6b7280; font-size: 14px; }
-.assess-wrap .progress { height: 8px; background: #e6e9f2; border-radius: 99px; overflow: hidden; }
-.assess-wrap .progress .bar { height: 100%; width: 20%; background: #3b5bfd; border-radius: 99px; transition: width .25s ease; }
-.assess-wrap .pagemeta { display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; margin-top: 6px; font-weight: 600; }
-.assess-back-row { margin-bottom: 12px; }
-.identity-card {
-  background: #fff; border: 1px solid #e3e7ef; border-radius: 14px;
-  padding: 16px; margin-bottom: 14px;
-  display: flex; gap: 16px; flex-wrap: wrap;
-}
-.identity-card .id-field { flex: 1 1 200px; }
-.identity-card .id-field span {
-  display: block; font-size: 11px; letter-spacing: .5px; text-transform: uppercase;
-  color: #6b7280; font-weight: 700; margin-bottom: 4px;
-}
-.identity-card .id-field strong { font-size: 15px; color: #1f2430; }
-
-.q {
-  background: #fff; border: 1px solid #e3e7ef; border-radius: 14px;
-  padding: 16px; margin: 0 0 12px;
-}
-.q.missing { border-color: #d64545; box-shadow: 0 0 0 3px #fdecec; }
-.qtext { margin: 0 0 12px; font-weight: 600; font-size: 15.5px; }
-.qnum { color: #3b5bfd; font-weight: 700; margin-right: 6px; }
-
-.scale { display: flex; gap: 6px; }
-.opt {
-  position: relative; flex: 1 1 0; min-width: 0;
-  display: flex; align-items: center; justify-content: center; text-align: center;
-  padding: 11px 6px; border: 1px solid #e3e7ef; border-radius: 10px;
-  background: #fbfcff; cursor: pointer; user-select: none;
-  transition: background .15s, border-color .15s, color .15s;
-}
-.opt input { position: absolute; opacity: 0; width: 0; height: 0; margin: 0; }
-.opt .lbl { font-weight: 600; font-size: 12.5px; color: #6b7280; line-height: 1.2; }
-.opt:hover { border-color: #3b5bfd; background: #eef1ff; }
-.opt:has(input:checked) { background: #3b5bfd; border-color: #3b5bfd; }
-.opt:has(input:checked) .lbl { color: #fff; }
-.opt input:focus-visible + .lbl { outline: 2px solid #3b5bfd; outline-offset: 4px; border-radius: 4px; }
-
-/* ---------- Bottom bar ---------- */
-.bottom {
-  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
-  background: rgba(255,255,255,.95); backdrop-filter: blur(8px);
-  border-top: 1px solid #e3e7ef;
-}
-.bottom .inner {
-  max-width: 860px; margin: 0 auto; padding: 10px 16px;
-  display: flex; align-items: center; gap: 12px;
-}
-.alert { color: #d64545; font-size: 13.5px; font-weight: 700; }
-.btns { display: flex; gap: 10px; margin-left: auto; }
-.btn {
-  font: inherit; font-weight: 600; font-size: 15px;
-  padding: 11px 22px; border-radius: 10px; border: 1px solid #3b5bfd;
-  background: #3b5bfd; color: #fff; cursor: pointer; transition: opacity .15s, background .15s;
-}
-.btn:hover { opacity: .9; }
-.btn.ghost { background: #fff; color: #3b5bfd; }
-.btn.ghost:hover { background: #eef1ff; opacity: 1; }
-.btn[disabled] { opacity: .55; cursor: not-allowed; }
-.btn[hidden] { display: none; }
-
-/* greyed Submit when incomplete */
-#submitBtn.incomplete {
-  background: #c9cfdc;
-  border-color: #c9cfdc;
-  color: #fff;
-  opacity: 1;
-  cursor: not-allowed;
-}
-#submitBtn.incomplete:hover { opacity: 1; }
-
-.done {
-  background: #fff; border: 1px solid #e3e7ef; border-radius: 14px;
-  padding: 48px 24px; text-align: center; margin-top: 24px;
-}
-.done h2 { margin: 0 0 8px; font-size: 22px; }
-.done p { margin: 0; color: #6b7280; }
-
-@media (max-width: 520px) {
-  .q { padding: 14px; }
-  .scale { gap: 4px; }
-  .opt { padding: 9px 3px; border-radius: 8px; }
-  .opt .lbl { font-size: 10.5px; }
-  .btn { padding: 10px 14px; font-size: 14px; }
-  .identity-card { flex-direction: column; gap: 8px; }
-}
 </style>
 </head>
 <body>
@@ -216,308 +112,31 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
   </div>
 </section>
 
-<!-- ================= ASSESSMENT (survey) ================= -->
-<section id="view-assessment" class="view" hidden>
-<div class="assess-wrap">
-    <div class="assess-back-row">
-      <button type="button" class="btn ghost" id="exitAssessBtn">← Back to assessments</button>
-    </div>
-    <header class="top">
-      <h1 id="assessTitle">Survey</h1>
-      <p class="sub">Please answer every statement on each page.</p>
-      <div class="progress"><div class="bar" id="bar"></div></div>
-      <div class="pagemeta">
-        <span id="pageLabel">Page 1 of 1</span>
-        <span id="pct">0%</span>
-      </div>
-    </header>
-
-    <!-- Identity auto-filled from login session -->
-    <div class="identity-card">
-      <div class="id-field"><span>Name</span><strong id="idName">—</strong></div>
-      <div class="id-field"><span>Enrollment No.</span><strong id="idEnroll">—</strong></div>
-    </div>
-
-    <form id="survey" novalidate></form>
-
-    <div id="done" class="done" hidden>
-      <h2>Thank you!</h2>
-      <p>Your responses have been submitted.</p>
-      <p style="margin-top:16px"><a href="javascript:void(0)" id="backToDash" style="color:#3b5bdb;font-weight:600;text-decoration:none">← Back to assessments</a></p>
-      </div>
-  </div>
-</section>
-
-<!-- ================= BOTTOM BAR ================= -->
-<div class="bottom" id="bottomBar" hidden>
-  <div class="inner">
-    <span class="alert" id="alert" role="alert" aria-live="polite"></span>
-    <div class="btns">
-      <button type="button" class="btn ghost" id="prevBtn" hidden>Back</button>
-      <button type="button" class="btn" id="nextBtn">Next</button>
-      <button type="button" class="btn" id="submitBtn" hidden>Submit</button>
-    </div>
-  </div>
-</div>
-
 <script>
-/* ============================================================
-   BACKEND
-   ============================================================ */
 const API_BASE = "https://broken-term-9f64.kmarlapudi.workers.dev";
 
-// Ordered list of assessment IDs — MUST match the keys used in
-// SURVEY_CONFIG and ASSESSMENTS below.
+/* Ordered list — must match keys in ASSESSMENT_URLS. */
 const ASSESSMENT_IDS = ["B5", "A2", "A3", "MLQ", "A5", "A6", "A7"];
-  
-/* ============================================================
-   GOOGLE FORM CONFIG
-   ------------------------------------------------------------
-   Each assessment posts to its own Google Form. Replace:
-     - formAction : the form's /formResponse endpoint
-     - nameEntry  : entry ID for the Name field on that form
-     - enrollEntry: entry ID for the Enrollment field on that form
-     - each question's entry : the entry ID for that item
-   ============================================================ */
-const SURVEY_CONFIG = {
-  B5: { formAction: "https://docs.google.com/forms/d/e/1FAIpQLSf6nZwl7bNvCjoETy4XF-ne2l0CqY67tT9gUhVWmvAo4o0Bxw/formResponse",
-        nameEntry: "entry.1724494963", enrollEntry: "entry.320304801" },
-  A2: { formAction: "https://docs.google.com/forms/d/e/PASTE_A2_FORM_ID/formResponse",
-        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" },
-  A3: { formAction: "https://docs.google.com/forms/d/e/PASTE_A3_FORM_ID/formResponse",
-        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" },
-  MLQ: { formAction: "https://docs.google.com/forms/d/e/1FAIpQLScL8lBlQstkmr-0_0QSR81_4sHXxUpkjgZrxbLNEuLUFHU80A/formResponse",
-        nameEntry: "entry.1686164657", enrollEntry: "entry.1008893045" },
-  A5: { formAction: "https://docs.google.com/forms/d/e/PASTE_A5_FORM_ID/formResponse",
-        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" },
-  A6: { formAction: "https://docs.google.com/forms/d/e/PASTE_A6_FORM_ID/formResponse",
-        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" },
-  A7: { formAction: "https://docs.google.com/forms/d/e/PASTE_A7_FORM_ID/formResponse",
-        nameEntry: "entry.1000000", enrollEntry: "entry.1000001" }
+
+/* Each assessment lives in its own page. Same-origin, so sessionStorage carries over. */
+const ASSESSMENT_URLS = {
+  B5:  "assessments/B5.html",
+  A2:  "assessments/A2.html",
+  A3:  "assessments/A3.html",
+  MLQ: "assessments/MLQ.html",
+  A5:  "assessments/A5.html",
+  A6:  "assessments/A6.html",
+  A7:  "assessments/A7.html"
 };
 
-/* ============================================================
-   Likert options — TEXT ONLY
-   ============================================================ */
-const LIKERT = [
-  "Strongly disagree",
-  "Disagree",
-  "Somewhat disagree",
-  "Neutral",
-  "Somewhat agree",
-  "Agree",
-  "Strongly agree"
-];
+/* Item counts (for dashboard label only). Keep in sync with each sub-page's QUESTIONS.length. */
+const ASSESSMENT_COUNTS = { B5: 3, A2: 55, A3: 45, MLQ: 3, A5: 40, A6: 60, A7: 50 };
 
-/* ============================================================
-   Per-assessment question banks
-   ------------------------------------------------------------
-   Each entry: { text: "Actual question", entry: "entry.XXXX" }
-   Replace the generic text + dummy entry IDs with the real ones.
-   Counts are already correct:
-     A1 = 100, A2 = 55, A3 = 45, A4 = 80, A5 = 40, A6 = 60, A7 = 50
-   ============================================================ */
-function makeGenericQuestions(prefix, count) {
-  const out = [];
-  for (let i = 1; i <= count; i++) {
-    out.push({
-      text:  prefix + " — Item " + i,
-      entry: "entry." + prefix.replace(/\D/g, "") + String(i).padStart(3, "0")
-    });
-  }
-  return out;
-}
-
-const ASSESSMENTS = {
-  B5: [
-     { id: "q1",  text: "I always put other people before me.",  entry: "entry.320304801" },
-  { id: "q2",  text: "I prefer to use tools and techniques to express myself rather than be extempore.",  entry: "entry.208352163" },
-  { id: "q3",  text: "I make detailed plans about my classes.",  entry: "entry.44281645" },
-  { id: "q4",  text: "I feel stressed often.",  entry: "entry.1693266205" },
-  { id: "q5",  text: "I love socializing, parties, going out with friends and restaurants.",  entry: "entry.1282781067" },
-  { id: "q6",  text: "Though I like to help others, I rarely find time.",  entry: "entry.1532890308" },
-  { id: "q7",  text: "I can imagine and visualize many things I have never seen.",  entry: "entry.118127876" },
-  { id: "q8",  text: "I am always calm and composed.",  entry: "entry.1783167424" },
-  { id: "q9",  text: "My studies or preparation for work often get delayed because of various distractions.",  entry: "entry.501929734" },
-  { id: "q10", text: "I take long time to make friends.", entry: "entry.40357179" },
-  { id: "q11", text: "I feel great sympathy for others.", entry: "entry.495995274" },
-  { id: "q12", text: "I take quite some time to understand things.", entry: "entry.1693330125" },
-  { id: "q13", text: "When I do a problem or write important notes, I always do rough work and check again.", entry: "entry.489112697" },
-  { id: "q14", text: "I tend to keep worrying about things going right and wrong.", entry: "entry.67302311" },
-  { id: "q15", text: "I have lot of friends in other sections and in hostels", entry: "entry.1454567788" },
-  { id: "q16", text: "I do not like playing around with children too much.", entry: "entry.2133312763" },
-  { id: "q17", text: "I get plenty of ideas on various issues.", entry: "entry.828271895" },
-  { id: "q18", text: "I do not get angry easily.", entry: "entry.274849181" },
-  { id: "q19", text: "Though I make plans, I often find it difficult to stick to it.", entry: "entry.2044618180" },
-  { id: "q20", text: "I don’t think that I mix with many friends naturally and with ease.", entry: "entry.1850079564" },/* ---------- PAGE 2 : Q21 – Q40 ---------- */
-  { id: "q21", text: "I am gentle and my heart often bleeds for others.", entry: "entry.1301381979" },
-  { id: "q22", text: "I do not prefer to do multitasking.", entry: "entry.396977804" },
-  { id: "q23", text: "Whenever I use a thing, I am particular to ensure that it is placed back in the right place.", entry: "entry.1600065878" },
-  { id: "q24", text: "I get quite upset even if a small thing goes wrong.", entry: "entry.1994638409" },
-  { id: "q25", text: "In a party or social event like a marriage, I am a hit as I go round and talk to everyone.", entry: "entry.1994934439" },
-  { id: "q26", text: "I have very good friends; but they are just a handful.", entry: "entry.1245981911" },
-  { id: "q27", text: "I like to use difficult words and sentences when I speak and write.", entry: "entry.1232977456" },
-  { id: "q28", text: "I do not remember to have panicked often.", entry: "entry.1181065271" },
-  { id: "q29", text: "I often have to spend time searching for my belongings when I need them.", entry: "entry.151208126" },
-  { id: "q30", text: "I like to work back stage rather than front stage.", entry: "entry.232027115" },
-  { id: "q31", text: "I feel the emotions of other people very strongly.", entry: "entry.907540777" },
-  { id: "q32", text: "I find it very difficult to understand modern art.", entry: "entry.869228450" },
-  { id: "q33", text: "I like to review my computer desktop frequently and keep them ordered well.", entry: "entry.1191504344" },
-  { id: "q34", text: "My mood changes often.", entry: "entry.1321303028" },
-  { id: "q35", text: "I love family get together and take every opportunity to join them", entry: "entry.1414964280" },
-  { id: "q36", text: "I seldom appreciate people openly.", entry: "entry.1304304259" },
-  { id: "q37", text: "I don’t miss a day to spend time reflecting on things, ideas, and decisions.", entry: "entry.2044529569" },
-  { id: "q38", text: "I don’t get offended easily when criticized.", entry: "entry.182921743" },
-  { id: "q39", text: "When I work, there is always a mess that others have to clean up.", entry: "entry.256511492" },
-  { id: "q40", text: "I don’t give opinion unless coaxed.", entry: "entry.86801602" },
-  { id: "q41", text: "I make people feel very much at ease.", entry: "entry.1056604768" },
-  { id: "q42", text: "I am never interested in abstract things like universe, beauty etc.", entry: "entry.1559653462" },
-  { id: "q43", text: "I follow a strict time table for my class/other works.", entry: "entry.1791331584" },
-  { id: "q44", text: "I frequently feel lonely and left alone.", entry: "entry.1372559310" },
-  { id: "q45", text: "I like to dress to be the centre of attraction.", entry: "entry.382667755" },
-  { id: "q46", text: "If I don’t like a person, I don’t hesitate to take a dig at him/her.", entry: "entry.452337042" },
-  { id: "q47", text: "I like to discuss concepts and principles.", entry: "entry.1992983143" },
-  { id: "q48", text: "I seldom complain or grumble.", entry: "entry.1516749740" },
-  { id: "q49", text: "I tend to put off things till the last moment.", entry: "entry.1564792377" },
-  { id: "q50", text: "I don’t like to draw attention to myself.", entry: "entry.449922772" },
-  { id: "q51", text: "Whenever I meet someone, I wish, waive and ask their well-being.", entry: "entry.197392682" },
-  { id: "q52", text: "My imagination capacity is not too good.", entry: "entry.21902431" },
-  { id: "q53", text: "I like to work very hard always and expect others to do so.", entry: "entry.1102215440" },
-  { id: "q54", text: "I get irritated very quickly.", entry: "entry.1395372699" },
-  { id: "q55", text: "I like to take charge of people and give them directions.", entry: "entry.1691420987" },
-  { id: "q56", text: "I don’t spend too much time to understand other people’s thoughts and feelings.", entry: "entry.1237463220" },
-  { id: "q57", text: "I grasp complex things quickly.", entry: "entry.1738550538" },
-  { id: "q58", text: "I don’t mind harsh criticism by others.", entry: "entry.1452255080" },
-  { id: "q59", text: "I often neglect my work, self-development and duties.", entry: "entry.764890989" },
-  { id: "q60", text: "When guests come home, I don’t show great enthusiasm to entertain them.", entry: "entry.1592956743" },
-  { id: "q61", text: "Whenever I feel someone is in trouble, I quickly comfort them.", entry: "entry.221685810" },
-  { id: "q62", text: "I avoid people who do difficult and complex things.", entry: "entry.2082409257" },
-  { id: "q63", text: "I always plan things systematically, write them and follow through.", entry: "entry.1173065786" },
-  { id: "q64", text: "I feel upset often.", entry: "entry.1427967490" },
-  { id: "q65", text: "I know how to keep others interested in my talk and actions.", entry: "entry.2119432402" },
-  { id: "q66", text: "I don’t feel much concern for other people.", entry: "entry.1652079217" },
-  { id: "q67", text: "I can handle a lot of information.", entry: "entry.740024284" },
-  { id: "q68", text: "I rarely feel upset.", entry: "entry.1265124099" },
-  { id: "q69", text: "I often spend time without considering its purposefulness.", entry: "entry.15917086" },
-  { id: "q70", text: "If I have to sell some tickets, for an event, I have difficulty approaching people for it.", entry: "entry.1424222204" },
-  { id: "q71", text: "I always find ways to thank others even for little things.", entry: "entry.557334925" },
-  { id: "q72", text: "When someone describes a new thing, I have difficulty imagining how it is.", entry: "entry.2121414837" },
-  { id: "q73", text: "I do my work neatly, ensure that it is always perfect and expect others to do so.", entry: "entry.1066289774" },
-  { id: "q74", text: "I tend to feel scared and threatened easily.", entry: "entry.741252437" },
-  { id: "q75", text: "I like to be around with a lot of friends even if they are not close ones.", entry: "entry.795344038" },
-  { id: "q76", text: "I don’t like to connect with other people just for the sake of it.", entry: "entry.583053188" },
-  { id: "q77", text: "I love to read difficult things like Shakespeare or some complex economic concepts.", entry: "entry.118462585" },
-  { id: "q78", text: "I seldom care for small irritants.", entry: "entry.919311988" },
-  { id: "q79", text: "Whenever I do a work, I usually have something left over to make it perfect.", entry: "entry.978679697" },
-  { id: "q80", text: "I don’t chat a lot with others.", entry: "entry.655726392" },
-  { id: "q81",  text: "For me others are more important than I.",  entry: "entry.551922020" },
-  { id: "q82",  text: "I don’t enjoy reading an article which is difficult to understand.",  entry: "entry.26051769" },
-  { id: "q83",  text: "I love order and regularity in class and in life.",  entry: "entry.1480118578" },
-  { id: "q84",  text: "I get overwhelmed with emotions such as anger, sadness, fear etc.",  entry: "entry.1554560889" },
-  { id: "q85",  text: "If there is a new committee to be formed, I prefer to let others take the lead.",  entry: "entry.2083085765" },
-  { id: "q86",  text: "I am very secretive about my life and people cannot come to know me easily.",  entry: "entry.1416261568" },
-  { id: "q87",  text: "I don’t like to dig deeper and deeper into a subject.",  entry: "entry.995887886" },
-  { id: "q88",  text: "I show coolness always.",  entry: "entry.1443288515" },
-  { id: "q89",  text: "I get distracted easily.",  entry: "entry.552316277" },
-  { id: "q90",  text: "If someone insults me, I prefer to bottle up my feelings rather than talk it out with him/her.",  entry: "entry.1072067307" },
-  { id: "q91",  text: "I take every opportunity to help others even if the job is small.",  entry: "entry.485479235" },
-  { id: "q92",  text: "I prefer to do routine things than ones with a lot of uncertainties.",  entry: "entry.73040778" },
-  { id: "q93",  text: "If I see something messy, I will always clean it up.",  entry: "entry.1247888621" },
-  { id: "q94",  text: "I get caught up in personal problems and tend to take a long time to resolve them.",  entry: "entry.362479496" },
-  { id: "q95",  text: "I can handle challenging situations like organizing an event for an institution.",  entry: "entry.1640685985" },
-  { id: "q96",  text: "Before I take a decision, I don’t particularly examine its impact on feelings on all others.",  entry: "entry.1012002548" },
-  { id: "q97",  text: "I like to try out new things even if it is risky.",  entry: "entry.393874733" },
-  { id: "q98",  text: "I rarely lose my temper.",  entry: "entry.220324117" },
-  { id: "q99",  text: "My colleagues envy my room/office and work station for its systematic arrangements.",  entry: "entry.1650708546" },
-  { id: "q100", text: "I am a very private person.", entry: "entry.1914377303" }
-  ],
-  A2: makeGenericQuestions("A2", 55),
-  A3: makeGenericQuestions("A3", 45),
-  MLQ: [
- { id: "1", text: "I provide others with assistance in exchange for their efforts", entry: "entry.1008893045" },
-{ id: "2", text: "I re-examine critical assumptions and question whether they are appropriate", entry: "entry.1238885255" },
-{ id: "3", text: "I don’t interfere until problems become serious", entry: "entry.2116387498" },
-{ id: "4", text: "I focus attention on irregularities, mistakes, exceptions, and deviations from standard", entry: "entry.74751801" },
-{ id: "5", text: "I avoid getting involved when important issues arise", entry: "entry.696057925" },
-{ id: "6", text: "I talk about my most important values and beliefs", entry: "entry.1877855571" },
-{ id: "7", text: "I am absent when needed", entry: "entry.1015252114" },
-{ id: "8", text: "I seek differing perspectives when solving problems", entry: "entry.400434799" },
-{ id: "9", text: "I talk optimistically about the future to those who are working for me", entry: "entry.1932346655" },
-{ id: "10", text: "I instill pride in others for being associated with me", entry: "entry.890821869" },
-{ id: "11", text: "I discuss in specific terms who is responsible for achieving performance targets", entry: "entry.838419170" },
-{ id: "12", text: "I wait for things to go wrong before taking action", entry: "entry.115980309" },
-{ id: "13", text: "I talk enthusiastically about what needs to be accomplished", entry: "entry.1484326875" },
-{ id: "14", text: "I specify the importance of having a strong sense of purpose.", entry: "entry.26862428" },
-{ id: "15", text: "I spend time teaching and coaching", entry: "entry.1819779438" },
-{ id: "16", text: "I make clear what one can expect to receive when performance goals are achieved", entry: "entry.1757035088" },
-{ id: "17", text: "I show and tell others that I am a firm believer in “If it is not broke, don’t fix it.”", entry: "entry.495435826" },
-{ id: "18", text: "I go beyond self-interest for the good of the group", entry: "entry.2085161989" },
-{ id: "19", text: "I treat others as “individuals” rather than just as a member of a group", entry: "entry.1177680423" },
-{ id: "20", text: "I demonstrate to others that problems must become chronic before I take action", entry: "entry.428257929" },
-{ id: "21", text: "I act in ways that build others’ respect for me", entry: "entry.152236361" },
-{ id: "22", text: "I concentrate my full attention on dealing with mistakes, complaints, and failures", entry: "entry.547263674" },
-{ id: "23", text: "I consider the moral and ethical consequences of decisions", entry: "entry.652633051" },
-{ id: "24", text: "I keep track of all mistakes", entry: "entry.942838212" },
-{ id: "25", text: "I display a sense of power and confidence", entry: "entry.272923451" },
-{ id: "26", text: "I articulate a compelling vision of the future", entry: "entry.448418756" },
-{ id: "27", text: "I direct my attention toward failures to meet standard", entry: "entry.1237707358" },
-{ id: "28", text: "I avoid making decisions", entry: "entry.559586092" },
-{ id: "29", text: "I consider an individual as having different needs, abilities, and aspirations from others", entry: "entry.822897144" },
-{ id: "30", text: "I get others to look at problems from many different angles", entry: "entry.263039403" },
-{ id: "31", text: "I help others to develop their strengths", entry: "entry.1393239099" },
-{ id: "32", text: "I suggest new ways of looking at how to complete assignments", entry: "entry.1057389993" },
-{ id: "33", text: "I delay responding to urgent questions", entry: "entry.1704335524" },
-{ id: "34", text: "I emphasize the importance of having a collective sense of mission", entry: "entry.1704246359" },
-{ id: "35", text: "I express satisfaction when others meet expectations", entry: "entry.1562313718" },
-{ id: "36", text: "I express confidence that goals will be achieved", entry: "entry.1240350353" },
-{ id: "37", text: "I am effective in meeting others’ job-related needs", entry: "entry.1868928018" },
-{ id: "38", text: "I use methods of leadership that are satisfying", entry: "entry.84556955" },
-{ id: "39", text: "I get others to do more than they expected to do", entry: "entry.1931121497" },
-{ id: "40", text: "I am effective in representing others to higher authority", entry: "entry.755905984" },
-{ id: "41", text: "I work with others in a satisfactory way", entry: "entry.1340151429" },
-{ id: "42", text: "I heighten others’ desire to succeed", entry: "entry.1236789664" },
-{ id: "43", text: "I am effective in meeting organizational requirement", entry: "entry.1185413905" },
-{ id: "44", text: "I increase others’ willingness to try harder", entry: "entry.209874568" },
-{ id: "45", text: "I lead a group that is effective", entry: "entry.53388127" }]
-  A5: makeGenericQuestions("A5", 40),
-  A6: makeGenericQuestions("A6", 60),
-  A7: makeGenericQuestions("A7", 50)
-};
-
-/* ============================================================
-   SURVEY ENGINE STATE
-   ============================================================ */
-const PER_PAGE = 20;
-
-let currentAssessmentId = null;
-let currentQuestions = [];       // active bank (with stable ids)
-let totalPages = 1;
-let currentPage = 1;
-
-const formEl     = document.getElementById("survey");
-const barEl      = document.getElementById("bar");
-const pageLabel  = document.getElementById("pageLabel");
-const pctLabel   = document.getElementById("pct");
-const prevBtn    = document.getElementById("prevBtn");
-const nextBtn    = document.getElementById("nextBtn");
-const submitBtn  = document.getElementById("submitBtn");
-const alertBox   = document.getElementById("alert");
-const bottomBar  = document.getElementById("bottomBar");
-const doneScreen = document.getElementById("done");
-const idNameEl   = document.getElementById("idName");
-const idEnrollEl = document.getElementById("idEnroll");
-const assessTitle= document.getElementById("assessTitle");
-
-/* ============================================================
-   Helpers
-   ============================================================ */
 const $ = (s) => document.querySelector(s);
+
 function show(id) {
   const target = document.getElementById(id);
-  if (!target) {
-    console.error("show(): missing view id →", id);
-    return;
-  }
+  if (!target) { console.error("show(): missing view id →", id); return; }
   document.querySelectorAll(".view").forEach(v => { v.hidden = true; });
   target.hidden = false;
   window.scrollTo(0, 0);
@@ -535,313 +154,7 @@ function setError(msg, detail) {
 }
 function clearError() { $("#errMsg").hidden = true; }
 
-function pageQuestions(p) {
-  return currentQuestions.slice((p - 1) * PER_PAGE, p * PER_PAGE);
-}
-function globalIndexOfQid(qid) {
-  return currentQuestions.findIndex(q => q.id === qid);
-}
-function pageOfQid(qid) {
-  const idx = globalIndexOfQid(qid);
-  return idx < 0 ? 1 : Math.floor(idx / PER_PAGE) + 1;
-}
-
-/* how many of the current assessment's questions are answered */
-function answeredCount() {
-  let n = 0;
-  currentQuestions.forEach(q => {
-    if (formEl.querySelector('input[name="' + q.id + '"]:checked')) n++;
-  });
-  return n;
-}
-function allAnswered() {
-  return currentQuestions.length > 0 && answeredCount() === currentQuestions.length;
-}
-
-/* ============================================================
-   Build survey DOM
-   ============================================================ */
-function buildQuestion(q, index) {
-  const card = document.createElement("div");
-  card.className = "q";
-  card.dataset.qid = q.id;
-  card.setAttribute("role", "radiogroup");
-  card.setAttribute("aria-labelledby", "lbl-" + q.id);
-
-  const text = document.createElement("p");
-  text.className = "qtext";
-  text.id = "lbl-" + q.id;
-
-  const num = document.createElement("span");
-  num.className = "qnum";
-  num.textContent = (index + 1) + ".";
-  text.appendChild(num);
-  text.appendChild(document.createTextNode(q.text));
-  card.appendChild(text);
-
-  const scale = document.createElement("div");
-  scale.className = "scale";
-
-  LIKERT.forEach((label) => {
-    const opt = document.createElement("label");
-    opt.className = "opt";
-    opt.title = label;
-
-    const input = document.createElement("input");
-    input.type = "radio";
-    input.name = q.id;
-    input.value = label;                       // send TEXT, not a number
-    input.setAttribute("aria-label", q.text + " — " + label);
-
-    const lbl = document.createElement("span");
-    lbl.className = "lbl";
-    lbl.textContent = label;
-
-    opt.appendChild(input);
-    opt.appendChild(lbl);
-    scale.appendChild(opt);
-  });
-
-  card.appendChild(scale);
-  return card;
-}
-
-function buildPage(p) {
-  const sec = document.createElement("section");
-  sec.className = "page";
-  sec.dataset.page = p;
-  if (p !== 1) sec.hidden = true;
-
-  const startIndex = (p - 1) * PER_PAGE;
-  pageQuestions(p).forEach((q, i) => sec.appendChild(buildQuestion(q, startIndex + i)));
-  return sec;
-}
-
-function renderSurvey() {
-  formEl.innerHTML = "";
-  totalPages = Math.max(1, Math.ceil(currentQuestions.length / PER_PAGE));
-  for (let p = 1; p <= totalPages; p++) formEl.appendChild(buildPage(p));
-
-  currentPage = 1;
-  doneScreen.hidden = true;
-  formEl.hidden = false;
-  bottomBar.hidden = false;
-  submitBtn.disabled = false;
-  submitBtn.textContent = "Submit";
-  submitBtn.classList.remove("incomplete");
-  updateUI();
-}
-
-function updateUI() {
-  // --- progress = answered items / total items in this assessment ---
-  const total    = currentQuestions.length || 1;
-  const answered = answeredCount();
-  const pct      = Math.round((answered / total) * 100);
-
-  barEl.style.width = pct + "%";
-  pctLabel.textContent = pct + "%";
-
-  // --- page label stays about pages ---
-  pageLabel.textContent = "Page " + currentPage + " of " + totalPages;
-
-  prevBtn.hidden   = currentPage === 1;
-  nextBtn.hidden   = currentPage === totalPages;
-
-  // Submit is shown ONLY on the final page of the current assessment
-  const onLastPage = currentPage === totalPages;
-  submitBtn.hidden = !onLastPage;
-
-  // On the final page, grey out Submit until every question is answered
-  if (onLastPage) {
-    if (allAnswered()) {
-      submitBtn.disabled = false;
-      submitBtn.classList.remove("incomplete");
-      submitBtn.textContent = "Submit";
-    } else {
-      submitBtn.disabled = true;
-      submitBtn.classList.add("incomplete");
-      const left = total - answered;
-      submitBtn.textContent = "Submit (" + left + " left)";
-    }
-  } else {
-    submitBtn.disabled = false;
-    submitBtn.classList.remove("incomplete");
-    submitBtn.textContent = "Submit";
-  }
-}
-
-function showPage(target) {
-  formEl.querySelector('.page[data-page="' + currentPage + '"]').hidden = true;
-  currentPage = target;
-  formEl.querySelector('.page[data-page="' + currentPage + '"]').hidden = false;
-  window.scrollTo({ top: 0, behavior: "smooth" });
-  updateUI();
-}
-
-/* ============================================================
-   Validation
-   ============================================================ */
-function validatePage(p) {
-  const problems = [];
-  pageQuestions(p).forEach(q => {
-    if (!formEl.querySelector('input[name="' + q.id + '"]:checked')) {
-      problems.push(formEl.querySelector('.q[data-qid="' + q.id + '"]'));
-    }
-  });
-  return problems;
-}
-function validateAll() {
-  const problems = [];
-  currentQuestions.forEach(q => {
-    if (!formEl.querySelector('input[name="' + q.id + '"]:checked')) {
-      problems.push(formEl.querySelector('.q[data-qid="' + q.id + '"]'));
-    }
-  });
-  return problems;
-}
-function flagProblems(problems) {
-  problems.forEach(el => el && el.classList.add("missing"));
-  if (problems.length) {
-    problems[0].scrollIntoView({ behavior: "smooth", block: "center" });
-    alertBox.textContent = "Please answer all items on this page.";
-  }
-}
-function setAlert(msg) { alertBox.textContent = msg || ""; }
-function clearAlert()  { alertBox.textContent = ""; }
-
-/* ============================================================
-   Payload — name & enrollment auto-injected from session
-   ============================================================ */
-function buildPayload() {
-  const cfg    = SURVEY_CONFIG[currentAssessmentId];
-  const data   = new URLSearchParams();
-  const name   = sessionStorage.getItem("name")   || "";
-  const enroll = sessionStorage.getItem("enroll") || "";
-
-  data.append(cfg.nameEntry,   name);
-  data.append(cfg.enrollEntry, enroll);
-
-  currentQuestions.forEach(q => {
-    const checked = formEl.querySelector('input[name="' + q.id + '"]:checked');
-    data.append(q.entry, checked ? checked.value : "");
-  });
-
-  return data;
-}
-
-async function sendToGoogleForms() {
-  const cfg  = SURVEY_CONFIG[currentAssessmentId];
-  const body = buildPayload();
-  await fetch(cfg.formAction, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: body.toString()
-  });
-}
-
-async function markAssessmentComplete(assessmentId) {
-  const token = sessionStorage.getItem("token");
-  if (!token) return;
-  try {
-    await fetch(`${API_BASE}/complete`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-      },
-      body: JSON.stringify({ assessment: assessmentId })
-    });
-  } catch (e) {
-    console.warn("Could not mark assessment complete:", e);
-  }
-}
-
-/* ============================================================
-   Survey events
-   ============================================================ */
-formEl.addEventListener("change", e => {
-  const card = e.target.closest(".q");
-  if (card) card.classList.remove("missing");
-  clearAlert();
-  updateUI();   // live-update the Submit button state
-});
-
-nextBtn.addEventListener("click", () => {
-  const problems = validatePage(currentPage);
-  if (problems.length) { flagProblems(problems); return; }
-  clearAlert();
-  showPage(currentPage + 1);
-});
-
-prevBtn.addEventListener("click", () => {
-  clearAlert();
-  showPage(currentPage - 1);
-});
-
-submitBtn.addEventListener("click", async () => {
-  if (!allAnswered()) {
-    // safety net — should not normally fire because the button is disabled
-    const problems = validateAll();
-    if (problems.length) {
-      const first = problems[0];
-      const targetPage = pageOfQid(first.dataset.qid);
-      flagProblems(problems);
-      if (targetPage !== currentPage) showPage(targetPage);
-    }
-    return;
-  }
-
-  document.getElementById("backToDash").addEventListener("click", () => {
-  formEl.hidden = false;
-  doneScreen.hidden = true;
-  bottomBar.hidden = true;
-  renderDashboard();
-  // keep URL in sync without needing a hashchange
-  if (location.hash !== "#dashboard") location.hash = "#dashboard";
-});
-
-  clearAlert();
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Submitting…";
-
-  try {
-    await sendToGoogleForms();
-    if (currentAssessmentId) await markAssessmentComplete(currentAssessmentId);
-    formEl.hidden = true;
-    bottomBar.hidden = true;
-    doneScreen.hidden = false;
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  } catch (err) {
-    console.error(err);
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit";
-    setAlert("Submission failed. Please check your connection and try again.");
-  }
-});
-
-/* ============================================================
-   Login
-   ============================================================ */
-  /* ============================================================
-   Exit assessment (go back to the list without finishing)
-   ============================================================ */
-document.getElementById("exitAssessBtn").addEventListener("click", () => {
-  const answered = answeredCount();
-  if (answered > 0 && !allAnswered()) {
-    const ok = confirm("You haven't finished this assessment. Leave anyway? Your answers won't be saved.");
-    if (!ok) return;
-  }
-  // Reset any leftover survey UI state
-  clearAlert();
-  formEl.hidden = false;
-  doneScreen.hidden = true;
-  bottomBar.hidden = true;
-
-  // Go back to the dashboard
-  renderDashboard();
-  if (location.hash !== "#dashboard") location.hash = "#dashboard";
-});
+/* ---------------- login ---------------- */
 $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const btn = $("#submitBtnLogin");
@@ -885,9 +198,7 @@ $("#loginForm").addEventListener("submit", async (e) => {
   }
 });
 
-/* ============================================================
-   Dashboard
-   ============================================================ */
+/* ---------------- dashboard ---------------- */
 async function renderDashboard() {
   const enroll = sessionStorage.getItem("enroll");
   const role   = sessionStorage.getItem("role");
@@ -911,58 +222,34 @@ async function renderDashboard() {
   }
 
   list.innerHTML = "";
-ASSESSMENT_IDS.forEach((id, idx) => {
-  const done  = completed.includes(id);
-  const count = ASSESSMENTS[id] ? ASSESSMENTS[id].length : 0;
-  const label = "Assessment " + (idx + 1);   // display number
+  ASSESSMENT_IDS.forEach((id, idx) => {
+    const done  = completed.includes(id);
+    const count = ASSESSMENT_COUNTS[id] || 0;
+    const label = "Assessment " + (idx + 1);
 
-  const row = document.createElement("a");
-  row.className = "assessment-row" + (done ? " done" : "");
-  row.href = "javascript:void(0)";
-  row.innerHTML = `
-    <div>
-      <div>${label}</div>
-      <div class="meta">${count} items</div>
-    </div>
-    <span class="status">${done ? "Completed ✓" : "Pending"}</span>`;
+    const row = document.createElement("a");
+    row.className = "assessment-row" + (done ? " done" : "");
+    row.href = "javascript:void(0)";
+    row.innerHTML = `
+      <div>
+        <div>${label}</div>
+        <div class="meta">${count} items</div>
+      </div>
+      <span class="status">${done ? "Completed ✓" : "Pending"}</span>`;
 
-  if (!done) row.addEventListener("click", () => openAssessment(id, idx + 1));
-  list.appendChild(row);
-});
+    if (!done) {
+      row.addEventListener("click", () => {
+        const url = ASSESSMENT_URLS[id];
+        if (!url) { alert("No page configured for " + id); return; }
+        location.href = url;
+      });
+    }
+    list.appendChild(row);
+  });
   show("view-dashboard");
 }
 
-/* ============================================================
-   Open an assessment
-   ============================================================ */
-function openAssessment(id, num) {
-  const name   = sessionStorage.getItem("name")   || "—";
-  const enroll = sessionStorage.getItem("enroll") || "—";
-  const bank   = ASSESSMENTS[id];
-  if (!bank || !bank.length) {
-    alert("No questions configured for " + id);
-    return;
-  }
-
-  currentAssessmentId = id;
-
-  // Tag every question with a stable per-assessment id
-  currentQuestions = bank.map((q, i) => ({
-    ...q,
-    id: id + "_q" + (i + 1)
-  }));
-
-  assessTitle.textContent = "Assessment " + num;
-  idNameEl.textContent    = name;
-  idEnrollEl.textContent  = enroll;
-
-  renderSurvey();
-  show("view-assessment");
-}
-
-/* ============================================================
-   Router
-   ============================================================ */
+/* ---------------- router ---------------- */
 function route() {
   try {
     const hash = location.hash || "#home";
@@ -976,31 +263,22 @@ function route() {
       clearError();
 
       const loginBtn = document.getElementById("submitBtnLogin");
-      if (loginBtn) {
-        loginBtn.disabled = false;
-        loginBtn.textContent = "Login";
-      }
+      if (loginBtn) { loginBtn.disabled = false; loginBtn.textContent = "Login"; }
 
       const loginForm = document.getElementById("loginForm");
       if (loginForm) loginForm.reset();
 
       show("view-login");
     } else if (view === "#dashboard") {
-      // reset any leftover survey UI state
-      if (formEl) formEl.hidden = false;
-      if (doneScreen) doneScreen.hidden = true;
-      if (bottomBar) bottomBar.hidden = true;
       renderDashboard();
     } else if (view === "#logout") {
       sessionStorage.clear();
       location.hash = "#home";
     } else {
-      if (bottomBar) bottomBar.hidden = true;
       show("view-home");
     }
   } catch (err) {
     console.error("route() failed:", err);
-    // Always fall back to home so the page isn't stuck showing every view
     try { show("view-home"); } catch (_) {}
   }
 }
