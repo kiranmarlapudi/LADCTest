@@ -964,29 +964,44 @@ function openAssessment(id, num) {
    Router
    ============================================================ */
 function route() {
-  const hash = location.hash || "#home";
-  const view = hash.split("?")[0];
-  const role = new URLSearchParams(hash.split("?")[1] || "").get("role");
+  try {
+    const hash = location.hash || "#home";
+    const view = hash.split("?")[0];
+    const role = new URLSearchParams(hash.split("?")[1] || "").get("role");
 
-  if (view === "#login") {
-    $("#roleTitle").textContent = (role || "Taker") + " Login";
-    clearError();
-    $("#submitBtnLogin").disabled = false;
-    $("#submitBtnLogin").textContent = "Login";
-    $("#loginForm").reset();
-    show("view-login");
+    if (view === "#login") {
+      const titleEl = document.getElementById("roleTitle");
+      if (titleEl) titleEl.textContent = (role || "Taker") + " Login";
+
+      clearError();
+
+      const loginBtn = document.getElementById("submitBtnLogin");
+      if (loginBtn) {
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Login";
+      }
+
+      const loginForm = document.getElementById("loginForm");
+      if (loginForm) loginForm.reset();
+
+      show("view-login");
     } else if (view === "#dashboard") {
-    // Reset any leftover survey state so the dashboard renders cleanly
-    formEl.hidden = false;
-    doneScreen.hidden = true;
-    bottomBar.hidden = true;
-    renderDashboard();
-  } else if (view === "#logout") {
-    sessionStorage.clear();
-    location.hash = "#home";
-  } else {
-    bottomBar.hidden = true;
-    show("view-home");
+      // reset any leftover survey UI state
+      if (formEl) formEl.hidden = false;
+      if (doneScreen) doneScreen.hidden = true;
+      if (bottomBar) bottomBar.hidden = true;
+      renderDashboard();
+    } else if (view === "#logout") {
+      sessionStorage.clear();
+      location.hash = "#home";
+    } else {
+      if (bottomBar) bottomBar.hidden = true;
+      show("view-home");
+    }
+  } catch (err) {
+    console.error("route() failed:", err);
+    // Always fall back to home so the page isn't stuck showing every view
+    try { show("view-home"); } catch (_) {}
   }
 }
 window.addEventListener("hashchange", route);
