@@ -513,8 +513,13 @@ const assessTitle= document.getElementById("assessTitle");
    ============================================================ */
 const $ = (s) => document.querySelector(s);
 function show(id) {
-  document.querySelectorAll(".view").forEach(v => v.hidden = true);
-  document.getElementById(id).hidden = false;
+  const target = document.getElementById(id);
+  if (!target) {
+    console.error("show(): missing view id →", id);
+    return;
+  }
+  document.querySelectorAll(".view").forEach(v => { v.hidden = true; });
+  target.hidden = false;
   window.scrollTo(0, 0);
 }
 function setError(msg, detail) {
