@@ -265,8 +265,11 @@ body { min-height: 100vh; background: #f4f6fb; color: #1a1a2e; padding: 2rem 1re
    BACKEND
    ============================================================ */
 const API_BASE = "https://broken-term-9f64.kmarlapudi.workers.dev";
-const ASSESSMENT_COUNT = 7;
 
+// Ordered list of assessment IDs — MUST match the keys used in
+// SURVEY_CONFIG and ASSESSMENTS below.
+const ASSESSMENT_IDS = ["B5", "A2", "A3", "MLQ", "A5", "A6", "A7"];
+  
 /* ============================================================
    GOOGLE FORM CONFIG
    ------------------------------------------------------------
