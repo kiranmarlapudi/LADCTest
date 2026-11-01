@@ -223,7 +223,7 @@ async function renderDashboard() {
 
   list.innerHTML = "";
   ASSESSMENT_IDS.forEach((id, idx) => {
-    const done  = completed.includes(id);
+    const done  = !!assessStatus[id];
     const count = ASSESSMENT_COUNTS[id] || 0;
     const label = "Assessment " + (idx + 1);
 
