@@ -210,15 +210,15 @@ async function renderDashboard() {
   const list = $("#list");
   list.innerHTML = "<p style='text-align:center;color:#888'>Loading…</p>";
 
-  let completed = [];
+  let assessStatus = {};
   try {
-    const res = await fetch(`${API_BASE}/progress`, {
+    const res = await fetch(`${API_BASE}/assessment-status`, {
       headers: { "Authorization": "Bearer " + token }
     });
     const data = await res.json();
-    if (data.ok) completed = data.completed || [];
+    if (data.ok && data.status) assessStatus = data.status;
   } catch (e) {
-    console.warn("progress fetch failed", e);
+    console.warn("assessment-status fetch failed", e);
   }
 
   list.innerHTML = "";
